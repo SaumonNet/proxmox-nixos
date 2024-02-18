@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: John Snow <jsnow@redhat.com>
+Date: Mon, 6 Apr 2020 12:17:04 +0200
+Subject: [PATCH] drive-mirror: add support for conditional and always bitmap
+ sync modes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Teach mirror two new tricks for using bitmaps:
+
+Always: no matter what, we synchronize the copy_bitmap back to the
+sync_bitmap. In effect, this allows us resume a failed mirror at a later
+date.
+
+Conditional: On success only, we sync the bitmap. This is akin to
+incremental backup modes; we can use this bitmap to later refresh a
+successfully created mirror.
+
+Signed-off-by: Fabian Grünbichler <f.gruenbichler@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ block/mirror.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
+
+diff --git a/block/mirror.c b/block/mirror.c
+index 1ff42c8af1..11b8a8e959 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -682,8 +682,6 @@ static int mirror_exit_common(Job *job)
+         bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
+     }
+ 
+-    bdrv_release_dirty_bitmap(s->dirty_bitmap);
+-
+     /* Make sure that the source BDS doesn't go away during bdrv_replace_node,
+      * before we can call bdrv_drained_end */
+     bdrv_ref(src);
+@@ -788,6 +786,18 @@ static int mirror_exit_common(Job *job)
+     block_job_remove_all_bdrv(bjob);
+     bdrv_replace_node(mirror_top_bs, mirror_top_bs->backing->bs, &error_abort);
+ 
++    if (s->sync_bitmap) {
++        if (s->bitmap_mode == BITMAP_SYNC_MODE_ALWAYS ||
++            (s->bitmap_mode == BITMAP_SYNC_MODE_ON_SUCCESS &&
++             job->ret == 0 && ret == 0)) {
++            /* Success; synchronize copy back to sync. */
++            bdrv_clear_dirty_bitmap(s->sync_bitmap, NULL);
++            bdrv_merge_dirty_bitmap(s->sync_bitmap, s->dirty_bitmap,
++                                    NULL, &error_abort);
++        }
++    }
++    bdrv_release_dirty_bitmap(s->dirty_bitmap);
++
+     bs_opaque->job = NULL;
+ 
+     bdrv_drained_end(src);
+@@ -1699,10 +1709,6 @@ static BlockJob *mirror_start_job(
+                        " sync mode",
+                        MirrorSyncMode_str(sync_mode));
+             return NULL;
+-        } else if (bitmap_mode != BITMAP_SYNC_MODE_NEVER) {
+-            error_setg(errp,
+-                       "Bitmap Sync Mode '%s' is not supported by Mirror",
+-                       BitmapSyncMode_str(bitmap_mode));
+         }
+     } else if (bitmap) {
+         error_setg(errp,
+@@ -1719,6 +1725,12 @@ static BlockJob *mirror_start_job(
+             return NULL;
+         }
+         granularity = bdrv_dirty_bitmap_granularity(bitmap);
++
++        if (bitmap_mode != BITMAP_SYNC_MODE_NEVER) {
++            if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_DEFAULT, errp)) {
++                return NULL;
++            }
++        }
+     } else if (granularity == 0) {
+         granularity = bdrv_get_default_bitmap_granularity(target);
+     }

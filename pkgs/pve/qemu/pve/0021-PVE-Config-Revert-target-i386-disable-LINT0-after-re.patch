@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:49 +0200
+Subject: [PATCH] PVE: [Config] Revert "target-i386: disable LINT0 after reset"
+
+This reverts commit b8eb5512fd8a115f164edbbe897cdf8884920ccb.
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ hw/intc/apic_common.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index 4a34f03047..59b917e50c 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -252,6 +252,15 @@ static void apic_reset_common(DeviceState *dev)
+     info->vapic_base_update(s);
+ 
+     apic_init_reset(dev);
++
++    if (bsp) {
++        /*
++         * LINT0 delivery mode on CPU #0 is set to ExtInt at initialization
++         * time typically by BIOS, so PIC interrupt can be delivered to the
++         * processor when local APIC is enabled.
++         */
++        s->lvt[APIC_LVT_LINT0] = 0x700;
++    }
+ }
+ 
+ static const VMStateDescription vmstate_apic_common;

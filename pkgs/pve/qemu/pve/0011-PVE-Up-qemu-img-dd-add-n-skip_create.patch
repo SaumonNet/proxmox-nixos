@@ -1,0 +1,121 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alexandre Derumier <aderumier@odiso.com>
+Date: Mon, 6 Apr 2020 12:16:42 +0200
+Subject: [PATCH] PVE: [Up] qemu-img dd: add -n skip_create
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+[FE: fix getopt-string + add documentation]
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ docs/tools/qemu-img.rst | 11 ++++++++++-
+ qemu-img-cmds.hx        |  4 ++--
+ qemu-img.c              | 23 ++++++++++++++---------
+ 3 files changed, 26 insertions(+), 12 deletions(-)
+
+diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+index 15aeddc6d8..5e713e231d 100644
+--- a/docs/tools/qemu-img.rst
++++ b/docs/tools/qemu-img.rst
+@@ -208,6 +208,10 @@ Parameters to convert subcommand:
+ 
+ Parameters to dd subcommand:
+ 
++.. option:: -n
++
++  Skip the creation of the target volume
++
+ .. program:: qemu-img-dd
+ 
+ .. option:: bs=BLOCK_SIZE
+@@ -488,7 +492,7 @@ Command description:
+   it doesn't need to be specified separately in this case.
+ 
+ 
+-.. option:: dd [--image-opts] [-U] [-f FMT] [-O OUTPUT_FMT] [bs=BLOCK_SIZE] [count=BLOCKS] [skip=BLOCKS] if=INPUT of=OUTPUT
++.. option:: dd [--image-opts] [-U] [-f FMT] [-O OUTPUT_FMT] [-n] [bs=BLOCK_SIZE] [count=BLOCKS] [skip=BLOCKS] if=INPUT of=OUTPUT
+ 
+   dd copies from *INPUT* file to *OUTPUT* file converting it from
+   *FMT* format to *OUTPUT_FMT* format.
+@@ -499,6 +503,11 @@ Command description:
+ 
+   The size syntax is similar to :manpage:`dd(1)`'s size syntax.
+ 
++  If the ``-n`` option is specified, the target volume creation will be
++  skipped. This is useful for formats such as ``rbd`` if the target
++  volume has already been created with site specific options that cannot
++  be supplied through ``qemu-img``.
++
+ .. option:: info [--object OBJECTDEF] [--image-opts] [-f FMT] [--output=OFMT] [--backing-chain] [-U] FILENAME
+ 
+   Give information about the disk image *FILENAME*. Use it in
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index d1616c045a..b5b0bb4467 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -58,9 +58,9 @@ SRST
+ ERST
+ 
+ DEF("dd", img_dd,
+-    "dd [--image-opts] [-U] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] [osize=output_size] if=input of=output")
++    "dd [--image-opts] [-U] [-f fmt] [-O output_fmt] [-n] [bs=block_size] [count=blocks] [skip=blocks] [osize=output_size] if=input of=output")
+ SRST
+-.. option:: dd [--image-opts] [-U] [-f FMT] [-O OUTPUT_FMT] [bs=BLOCK_SIZE] [count=BLOCKS] [skip=BLOCKS] [osize=OUTPUT_SIZE] if=INPUT of=OUTPUT
++.. option:: dd [--image-opts] [-U] [-f FMT] [-O OUTPUT_FMT] [-n] [bs=BLOCK_SIZE] [count=BLOCKS] [skip=BLOCKS] [osize=OUTPUT_SIZE] if=INPUT of=OUTPUT
+ ERST
+ 
+ DEF("info", img_info,
+diff --git a/qemu-img.c b/qemu-img.c
+index 556535d9d5..289c78febb 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -5013,7 +5013,7 @@ static int img_dd(int argc, char **argv)
+     const char *fmt = NULL;
+     int64_t size = 0, readsize = 0;
+     int64_t out_pos, in_pos;
+-    bool force_share = false;
++    bool force_share = false, skip_create = false;
+     struct DdInfo dd = {
+         .flags = 0,
+         .count = 0,
+@@ -5051,7 +5051,7 @@ static int img_dd(int argc, char **argv)
+         { 0, 0, 0, 0 }
+     };
+ 
+-    while ((c = getopt_long(argc, argv, ":hf:O:U", long_options, NULL))) {
++    while ((c = getopt_long(argc, argv, ":hf:O:Un", long_options, NULL))) {
+         if (c == EOF) {
+             break;
+         }
+@@ -5071,6 +5071,9 @@ static int img_dd(int argc, char **argv)
+         case 'h':
+             help();
+             break;
++        case 'n':
++            skip_create = true;
++            break;
+         case 'U':
+             force_share = true;
+             break;
+@@ -5201,13 +5204,15 @@ static int img_dd(int argc, char **argv)
+                                 size - in.bsz * in.offset, &error_abort);
+         }
+ 
+-        ret = bdrv_create(drv, out.filename, opts, &local_err);
+-        if (ret < 0) {
+-            error_reportf_err(local_err,
+-                              "%s: error while creating output image: ",
+-                              out.filename);
+-            ret = -1;
+-            goto out;
++        if (!skip_create) {
++            ret = bdrv_create(drv, out.filename, opts, &local_err);
++            if (ret < 0) {
++                error_reportf_err(local_err,
++                                  "%s: error while creating output image: ",
++                                  out.filename);
++                ret = -1;
++                goto out;
++            }
+         }
+ 
+         /* TODO, we can't honour --image-opts for the target,

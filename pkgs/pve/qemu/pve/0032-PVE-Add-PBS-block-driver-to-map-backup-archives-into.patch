@@ -1,0 +1,454 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Stefan Reiter <s.reiter@proxmox.com>
+Date: Wed, 8 Jul 2020 09:50:54 +0200
+Subject: [PATCH] PVE: Add PBS block driver to map backup archives into VMs
+
+Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+[error cleanups, file_open implementation]
+Signed-off-by: Dietmar Maurer <dietmar@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+[WB: add namespace support]
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+[FE: adapt to changed function signatures
+     make pbs_co_preadv return values consistent with QEMU
+     getlength is now a coroutine function]
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ block/meson.build    |   3 +
+ block/pbs.c          | 305 +++++++++++++++++++++++++++++++++++++++++++
+ configure            |   9 ++
+ meson.build          |   2 +-
+ qapi/block-core.json |  13 ++
+ qapi/pragma.json     |   1 +
+ 6 files changed, 332 insertions(+), 1 deletion(-)
+ create mode 100644 block/pbs.c
+
+diff --git a/block/meson.build b/block/meson.build
+index 6d468f89e5..becc99ac4e 100644
+--- a/block/meson.build
++++ b/block/meson.build
+@@ -50,6 +50,9 @@ block_ss.add(files(
+   '../pve-backup.c',
+ ), libproxmox_backup_qemu)
+ 
++block_ss.add(when: 'CONFIG_PBS_BDRV', if_true: files('pbs.c'))
++block_ss.add(when: 'CONFIG_PBS_BDRV', if_true: libproxmox_backup_qemu)
++
+ 
+ system_ss.add(when: 'CONFIG_TCG', if_true: files('blkreplay.c'))
+ system_ss.add(files('block-ram-registrar.c'))
+diff --git a/block/pbs.c b/block/pbs.c
+new file mode 100644
+index 0000000000..a2211e0f3b
+--- /dev/null
++++ b/block/pbs.c
+@@ -0,0 +1,305 @@
++/*
++ * Proxmox Backup Server read-only block driver
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
++#include "qemu/module.h"
++#include "qemu/option.h"
++#include "qemu/cutils.h"
++#include "block/block_int.h"
++#include "block/block-io.h"
++
++#include <proxmox-backup-qemu.h>
++
++#define PBS_OPT_REPOSITORY "repository"
++#define PBS_OPT_NAMESPACE "namespace"
++#define PBS_OPT_SNAPSHOT "snapshot"
++#define PBS_OPT_ARCHIVE "archive"
++#define PBS_OPT_KEYFILE "keyfile"
++#define PBS_OPT_PASSWORD "password"
++#define PBS_OPT_FINGERPRINT "fingerprint"
++#define PBS_OPT_ENCRYPTION_PASSWORD "key_password"
++
++typedef struct {
++    ProxmoxRestoreHandle *conn;
++    char aid;
++    int64_t length;
++
++    char *repository;
++    char *namespace;
++    char *snapshot;
++    char *archive;
++} BDRVPBSState;
++
++static QemuOptsList runtime_opts = {
++    .name = "pbs",
++    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
++    .desc = {
++        {
++            .name = PBS_OPT_REPOSITORY,
++            .type = QEMU_OPT_STRING,
++            .help = "The server address and repository to connect to.",
++        },
++        {
++            .name = PBS_OPT_NAMESPACE,
++            .type = QEMU_OPT_STRING,
++            .help = "Optional: The snapshot's namespace.",
++        },
++        {
++            .name = PBS_OPT_SNAPSHOT,
++            .type = QEMU_OPT_STRING,
++            .help = "The snapshot to read.",
++        },
++        {
++            .name = PBS_OPT_ARCHIVE,
++            .type = QEMU_OPT_STRING,
++            .help = "Which archive within the snapshot should be accessed.",
++        },
++        {
++            .name = PBS_OPT_PASSWORD,
++            .type = QEMU_OPT_STRING,
++            .help = "Server password. Can be passed as env var 'PBS_PASSWORD'.",
++        },
++        {
++            .name = PBS_OPT_FINGERPRINT,
++            .type = QEMU_OPT_STRING,
++            .help = "Server fingerprint. Can be passed as env var 'PBS_FINGERPRINT'.",
++        },
++        {
++            .name = PBS_OPT_ENCRYPTION_PASSWORD,
++            .type = QEMU_OPT_STRING,
++            .help = "Optional: Key password. Can be passed as env var 'PBS_ENCRYPTION_PASSWORD'.",
++        },
++        {
++            .name = PBS_OPT_KEYFILE,
++            .type = QEMU_OPT_STRING,
++            .help = "Optional: The path to the keyfile to use.",
++        },
++        { /* end of list */ }
++    },
++};
++
++
++// filename format:
++// pbs:repository=<repo>,namespace=<ns>,snapshot=<snap>,password=<pw>,key_password=<kpw>,fingerprint=<fp>,archive=<archive>
++static void pbs_parse_filename(const char *filename, QDict *options,
++                                     Error **errp)
++{
++
++    if (!strstart(filename, "pbs:", &filename)) {
++        if (errp) error_setg(errp, "pbs_parse_filename failed - missing 'pbs:' prefix");
++    }
++
++
++    QemuOpts *opts = qemu_opts_parse_noisily(&runtime_opts, filename, false);
++    if (!opts) {
++        if (errp) error_setg(errp, "pbs_parse_filename failed");
++        return;
++    }
++
++    qemu_opts_to_qdict(opts, options);
++
++    qemu_opts_del(opts);
++}
++
++static int pbs_open(BlockDriverState *bs, QDict *options, int flags,
++                    Error **errp)
++{
++    QemuOpts *opts;
++    BDRVPBSState *s = bs->opaque;
++    char *pbs_error = NULL;
++
++    opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
++    qemu_opts_absorb_qdict(opts, options, &error_abort);
++
++    s->repository = g_strdup(qemu_opt_get(opts, PBS_OPT_REPOSITORY));
++    s->snapshot = g_strdup(qemu_opt_get(opts, PBS_OPT_SNAPSHOT));
++    s->archive = g_strdup(qemu_opt_get(opts, PBS_OPT_ARCHIVE));
++    const char *keyfile = qemu_opt_get(opts, PBS_OPT_KEYFILE);
++    const char *password = qemu_opt_get(opts, PBS_OPT_PASSWORD);
++    const char *namespace = qemu_opt_get(opts, PBS_OPT_NAMESPACE);
++    const char *fingerprint = qemu_opt_get(opts, PBS_OPT_FINGERPRINT);
++    const char *key_password = qemu_opt_get(opts, PBS_OPT_ENCRYPTION_PASSWORD);
++
++    if (!password) {
++        password = getenv("PBS_PASSWORD");
++    }
++    if (!fingerprint) {
++        fingerprint = getenv("PBS_FINGERPRINT");
++    }
++    if (!key_password) {
++        key_password = getenv("PBS_ENCRYPTION_PASSWORD");
++    }
++    if (namespace) {
++        s->namespace = g_strdup(namespace);
++    }
++
++    /* connect to PBS server in read mode */
++    s->conn = proxmox_restore_new_ns(s->repository, s->snapshot, s->namespace, password,
++        keyfile, key_password, fingerprint, &pbs_error);
++
++    /* invalidates qemu_opt_get char pointers from above */
++    qemu_opts_del(opts);
++
++    if (!s->conn) {
++        if (pbs_error && errp) error_setg(errp, "PBS restore_new failed: %s", pbs_error);
++        if (pbs_error) proxmox_backup_free_error(pbs_error);
++        return -ENOMEM;
++    }
++
++    int ret = proxmox_restore_connect(s->conn, &pbs_error);
++    if (ret < 0) {
++        if (pbs_error && errp) error_setg(errp, "PBS connect failed: %s", pbs_error);
++        if (pbs_error) proxmox_backup_free_error(pbs_error);
++        return -ECONNREFUSED;
++    }
++
++    /* acquire handle and length */
++    s->aid = proxmox_restore_open_image(s->conn, s->archive, &pbs_error);
++    if (s->aid < 0) {
++        if (pbs_error && errp) error_setg(errp, "PBS open_image failed: %s", pbs_error);
++        if (pbs_error) proxmox_backup_free_error(pbs_error);
++        return -ENODEV;
++    }
++    s->length = proxmox_restore_get_image_length(s->conn, s->aid, &pbs_error);
++    if (s->length < 0) {
++        if (pbs_error && errp) error_setg(errp, "PBS get_image_length failed: %s", pbs_error);
++        if (pbs_error) proxmox_backup_free_error(pbs_error);
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
++static int pbs_file_open(BlockDriverState *bs, QDict *options, int flags,
++                         Error **errp)
++{
++    return pbs_open(bs, options, flags, errp);
++}
++
++static void pbs_close(BlockDriverState *bs) {
++    BDRVPBSState *s = bs->opaque;
++    g_free(s->repository);
++    g_free(s->namespace);
++    g_free(s->snapshot);
++    g_free(s->archive);
++    proxmox_restore_disconnect(s->conn);
++}
++
++static coroutine_fn int64_t pbs_co_getlength(BlockDriverState *bs)
++{
++    BDRVPBSState *s = bs->opaque;
++    return s->length;
++}
++
++typedef struct ReadCallbackData {
++    Coroutine *co;
++    AioContext *ctx;
++} ReadCallbackData;
++
++static void read_callback(void *callback_data)
++{
++    ReadCallbackData *rcb = callback_data;
++    aio_co_schedule(rcb->ctx, rcb->co);
++}
++
++static coroutine_fn int pbs_co_preadv(BlockDriverState *bs,
++                                      int64_t offset, int64_t bytes,
++                                      QEMUIOVector *qiov, BdrvRequestFlags flags)
++{
++    BDRVPBSState *s = bs->opaque;
++    int ret;
++    char *pbs_error = NULL;
++    uint8_t *buf;
++    bool inline_buf = true;
++
++    /* for single-buffer IO vectors we can fast-path the write directly to it */
++    if (qiov->niov == 1 && qiov->iov->iov_len >= bytes) {
++        buf = qiov->iov->iov_base;
++    } else {
++        inline_buf = false;
++        buf = g_malloc(bytes);
++    }
++
++    if (offset < 0 || bytes < 0) {
++        fprintf(stderr, "unexpected negative 'offset' or 'bytes' value!\n");
++        return -EIO;
++    }
++
++    ReadCallbackData rcb = {
++        .co = qemu_coroutine_self(),
++        .ctx = bdrv_get_aio_context(bs),
++    };
++
++    proxmox_restore_read_image_at_async(s->conn, s->aid, buf, (uint64_t)offset, (uint64_t)bytes,
++                                        read_callback, (void *) &rcb, &ret, &pbs_error);
++
++    qemu_coroutine_yield();
++
++    if (ret < 0) {
++        fprintf(stderr, "error during PBS read: %s\n", pbs_error ? pbs_error : "unknown error");
++        if (pbs_error) proxmox_backup_free_error(pbs_error);
++        return -EIO;
++    }
++
++    if (!inline_buf) {
++        qemu_iovec_from_buf(qiov, 0, buf, bytes);
++        g_free(buf);
++    }
++
++    return 0;
++}
++
++static coroutine_fn int pbs_co_pwritev(BlockDriverState *bs,
++                                       int64_t offset, int64_t bytes,
++                                       QEMUIOVector *qiov, BdrvRequestFlags flags)
++{
++    fprintf(stderr, "pbs-bdrv: cannot write to backup file, make sure "
++           "any attached disk devices are set to read-only!\n");
++    return -EPERM;
++}
++
++static void pbs_refresh_filename(BlockDriverState *bs)
++{
++    BDRVPBSState *s = bs->opaque;
++    if (s->namespace) {
++        snprintf(bs->exact_filename, sizeof(bs->exact_filename), "%s/%s:%s(%s)",
++                 s->repository, s->namespace, s->snapshot, s->archive);
++    } else {
++        snprintf(bs->exact_filename, sizeof(bs->exact_filename), "%s/%s(%s)",
++                 s->repository, s->snapshot, s->archive);
++    }
++}
++
++static const char *const pbs_strong_runtime_opts[] = {
++    NULL
++};
++
++static BlockDriver bdrv_pbs_co = {
++    .format_name            = "pbs",
++    .protocol_name          = "pbs",
++    .instance_size          = sizeof(BDRVPBSState),
++
++    .bdrv_parse_filename    = pbs_parse_filename,
++
++    .bdrv_file_open         = pbs_file_open,
++    .bdrv_open              = pbs_open,
++    .bdrv_close             = pbs_close,
++    .bdrv_co_getlength      = pbs_co_getlength,
++
++    .bdrv_co_preadv         = pbs_co_preadv,
++    .bdrv_co_pwritev        = pbs_co_pwritev,
++
++    .bdrv_refresh_filename  = pbs_refresh_filename,
++    .strong_runtime_opts    = pbs_strong_runtime_opts,
++};
++
++static void bdrv_pbs_init(void)
++{
++    bdrv_register(&bdrv_pbs_co);
++}
++
++block_init(bdrv_pbs_init);
+diff --git a/configure b/configure
+index 133f4e3235..f5a830c1f3 100755
+--- a/configure
++++ b/configure
+@@ -256,6 +256,7 @@ qemu_suffix="qemu"
+ softmmu="yes"
+ linux_user=""
+ bsd_user=""
++pbs_bdrv="yes"
+ plugins="$default_feature"
+ ninja=""
+ python=
+@@ -809,6 +810,10 @@ for opt do
+   ;;
+   --enable-download) download="enabled"; git_submodules_action=update;
+   ;;
++  --disable-pbs-bdrv) pbs_bdrv="no"
++  ;;
++  --enable-pbs-bdrv) pbs_bdrv="yes"
++  ;;
+   --enable-plugins) if test "$mingw32" = "yes"; then
+                         error_exit "TCG plugins not currently supported on Windows platforms"
+                     else
+@@ -959,6 +964,7 @@ cat << EOF
+   bsd-user        all BSD usermode emulation targets
+   pie             Position Independent Executables
+   debug-tcg       TCG debugging (default is disabled)
++  pbs-bdrv        Proxmox backup server read-only block driver support
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -1744,6 +1750,9 @@ if test "$solaris" = "yes" ; then
+ fi
+ echo "SRC_PATH=$source_path" >> $config_host_mak
+ echo "TARGET_DIRS=$target_list" >> $config_host_mak
++if test "$pbs_bdrv" = "yes" ; then
++  echo "CONFIG_PBS_BDRV=y" >> $config_host_mak
++fi
+ 
+ # XXX: suppress that
+ if [ "$bsd" = "yes" ] ; then
+diff --git a/meson.build b/meson.build
+index c3330310d9..cbfc9a43fb 100644
+--- a/meson.build
++++ b/meson.build
+@@ -4319,7 +4319,7 @@ summary_info += {'bzip2 support':     libbzip2}
+ summary_info += {'lzfse support':     liblzfse}
+ summary_info += {'zstd support':      zstd}
+ summary_info += {'NUMA host support': numa}
+-summary_info += {'capstone':          capstone}
++summary_info += {'PBS bdrv support':  config_host.has_key('CONFIG_PBS_BDRV')}
+ summary_info += {'libpmem support':   libpmem}
+ summary_info += {'libdaxctl support': libdaxctl}
+ summary_info += {'libudev':           libudev}
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 331c8336d1..a818d5f90f 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3396,6 +3396,7 @@
+             'parallels', 'preallocate', 'qcow', 'qcow2', 'qed', 'quorum',
+             'raw', 'rbd',
+             { 'name': 'replication', 'if': 'CONFIG_REPLICATION' },
++            'pbs',
+             'ssh', 'throttle', 'vdi', 'vhdx',
+             { 'name': 'virtio-blk-vfio-pci', 'if': 'CONFIG_BLKIO' },
+             { 'name': 'virtio-blk-vhost-user', 'if': 'CONFIG_BLKIO' },
+@@ -3482,6 +3483,17 @@
+ { 'struct': 'BlockdevOptionsNull',
+   'data': { '*size': 'int', '*latency-ns': 'uint64', '*read-zeroes': 'bool' } }
+ 
++##
++# @BlockdevOptionsPbs:
++#
++# Driver specific block device options for the PBS backend.
++#
++##
++{ 'struct': 'BlockdevOptionsPbs',
++  'data': { 'repository': 'str', 'snapshot': 'str', 'archive': 'str',
++            '*keyfile': 'str', '*password': 'str', '*fingerprint': 'str',
++            '*key_password': 'str', '*namespace': 'str' } }
++
+ ##
+ # @BlockdevOptionsNVMe:
+ #
+@@ -4886,6 +4898,7 @@
+       'nfs':        'BlockdevOptionsNfs',
+       'null-aio':   'BlockdevOptionsNull',
+       'null-co':    'BlockdevOptionsNull',
++      'pbs':        'BlockdevOptionsPbs',
+       'nvme':       'BlockdevOptionsNVMe',
+       'nvme-io_uring': { 'type': 'BlockdevOptionsNvmeIoUring',
+                          'if': 'CONFIG_BLKIO' },
+diff --git a/qapi/pragma.json b/qapi/pragma.json
+index 325e684411..b6079f6a0e 100644
+--- a/qapi/pragma.json
++++ b/qapi/pragma.json
+@@ -45,6 +45,7 @@
+         'BlockInfo',                # query-block
+         'BlockdevAioOptions',       # blockdev-add, -blockdev
+         'BlockdevDriver',           # blockdev-add, query-blockstats, ...
++        'BlockdevOptionsPbs',       # for PBS backwards compat
+         'BlockdevVmdkAdapterType',  # blockdev-create (to match VMDK spec)
+         'BlockdevVmdkSubformat',    # blockdev-create (to match VMDK spec)
+         'ColoCompareProperties',    # object_add, -object

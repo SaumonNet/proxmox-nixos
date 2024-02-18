@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fabian Ebner <f.ebner@proxmox.com>
+Date: Thu, 23 Jun 2022 14:00:05 +0200
+Subject: [PATCH] Revert "block/rbd: workaround for ceph issue #53784"
+
+This reverts commit fc176116cdea816ceb8dd969080b2b95f58edbc0 in
+preparation to revert 0347a8fd4c3faaedf119be04c197804be40a384b.
+
+Signed-off-by: Fabian Ebner <f.ebner@proxmox.com>
+---
+ block/rbd.c | 42 ++----------------------------------------
+ 1 file changed, 2 insertions(+), 40 deletions(-)
+
+diff --git a/block/rbd.c b/block/rbd.c
+index a4749f3b1b..53e0396b51 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -1511,7 +1511,6 @@ static int coroutine_fn qemu_rbd_co_block_status(BlockDriverState *bs,
+     int status, r;
+     RBDDiffIterateReq req = { .offs = offset };
+     uint64_t features, flags;
+-    uint64_t head = 0;
+ 
+     assert(offset + bytes <= s->image_size);
+ 
+@@ -1539,43 +1538,7 @@ static int coroutine_fn qemu_rbd_co_block_status(BlockDriverState *bs,
+         return status;
+     }
+ 
+-#if LIBRBD_VERSION_CODE < LIBRBD_VERSION(1, 17, 0)
+-    /*
+-     * librbd had a bug until early 2022 that affected all versions of ceph that
+-     * supported fast-diff. This bug results in reporting of incorrect offsets
+-     * if the offset parameter to rbd_diff_iterate2 is not object aligned.
+-     * Work around this bug by rounding down the offset to object boundaries.
+-     * This is OK because we call rbd_diff_iterate2 with whole_object = true.
+-     * However, this workaround only works for non cloned images with default
+-     * striping.
+-     *
+-     * See: https://tracker.ceph.com/issues/53784
+-     */
+-
+-    /* check if RBD image has non-default striping enabled */
+-    if (features & RBD_FEATURE_STRIPINGV2) {
+-        return status;
+-    }
+-
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+-    /*
+-     * check if RBD image is a clone (= has a parent).
+-     *
+-     * rbd_get_parent_info is deprecated from Nautilus onwards, but the
+-     * replacement rbd_get_parent is not present in Luminous and Mimic.
+-     */
+-    if (rbd_get_parent_info(s->image, NULL, 0, NULL, 0, NULL, 0) != -ENOENT) {
+-        return status;
+-    }
+-#pragma GCC diagnostic pop
+-
+-    head = req.offs & (s->object_size - 1);
+-    req.offs -= head;
+-    bytes += head;
+-#endif
+-
+-    r = rbd_diff_iterate2(s->image, NULL, req.offs, bytes, true, true,
++    r = rbd_diff_iterate2(s->image, NULL, offset, bytes, true, true,
+                           qemu_rbd_diff_iterate_cb, &req);
+     if (r < 0 && r != QEMU_RBD_EXIT_DIFF_ITERATE2) {
+         return status;
+@@ -1594,8 +1557,7 @@ static int coroutine_fn qemu_rbd_co_block_status(BlockDriverState *bs,
+         status = BDRV_BLOCK_ZERO | BDRV_BLOCK_OFFSET_VALID;
+     }
+ 
+-    assert(req.bytes > head);
+-    *pnum = req.bytes - head;
++    *pnum = req.bytes;
+     return status;
+ }
+ 

@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fiona Ebner <f.ebner@proxmox.com>
+Date: Thu, 28 Sep 2023 11:19:14 +0200
+Subject: [PATCH] migration states: workaround snapshot performance regression
+
+Commit 813cd616 ("migration: Use migration_transferred_bytes() to
+calculate rate_limit") introduced a prohibitive performance regression
+when taking a snapshot [0]. The reason turns out to be the flushing
+done by migration_transferred_bytes()
+
+Just use a _noflush version of the relevant function as a workaround
+until upstream fixes the issue. This is inspired by a not-applied
+upstream series [1], but doing the very minimum to avoid the
+regression.
+
+[0]: https://gitlab.com/qemu-project/qemu/-/issues/1821
+[1]: https://lists.nongnu.org/archive/html/qemu-devel/2023-05/msg07708.html
+
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ migration/migration-stats.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/migration/migration-stats.c b/migration/migration-stats.c
+index 095d6d75bb..8073c8ebaa 100644
+--- a/migration/migration-stats.c
++++ b/migration/migration-stats.c
+@@ -18,6 +18,20 @@
+ 
+ MigrationAtomicStats mig_stats;
+ 
++/*
++ * Same as migration_transferred_bytes below, but using the _noflush
++ * variant of qemu_file_transferred() to avoid a performance
++ * regression in migration_rate_exceeded().
++ */
++static uint64_t migration_transferred_bytes_noflush(QEMUFile *f)
++{
++    uint64_t multifd = stat64_get(&mig_stats.multifd_bytes);
++    uint64_t qemu_file = qemu_file_transferred_noflush(f);
++
++    trace_migration_transferred_bytes(qemu_file, multifd);
++    return qemu_file + multifd;
++}
++
+ bool migration_rate_exceeded(QEMUFile *f)
+ {
+     if (qemu_file_get_error(f)) {
+@@ -25,7 +39,7 @@ bool migration_rate_exceeded(QEMUFile *f)
+     }
+ 
+     uint64_t rate_limit_start = stat64_get(&mig_stats.rate_limit_start);
+-    uint64_t rate_limit_current = migration_transferred_bytes(f);
++    uint64_t rate_limit_current = migration_transferred_bytes_noflush(f);
+     uint64_t rate_limit_used = rate_limit_current - rate_limit_start;
+     uint64_t rate_limit_max = stat64_get(&mig_stats.rate_limit_max);
+ 

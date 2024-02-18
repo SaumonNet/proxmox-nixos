@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Lamprecht <t.lamprecht@proxmox.com>
+Date: Mon, 17 May 2021 09:43:35 +0200
+Subject: [PATCH] Revert "Remove the default value of wsProtocols"
+
+This reverts commit c912230309806aacbae4295faf7ad6406da97617.
+
+We very-much depend on the WS protocol default of 'binary', for now
+lets just revert it here, albeit it could be externally set..
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ core/rfb.js | 3 ++-
+ docs/API.md | 3 +--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/core/rfb.js b/core/rfb.js
+index 2dc0638..39fd869 100644
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -117,7 +117,8 @@ export default class RFB extends EventTargetMixin {
+         this._rfbCredentials = options.credentials || {};
+         this._shared = 'shared' in options ? !!options.shared : true;
+         this._repeaterID = options.repeaterID || '';
+-        this._wsProtocols = options.wsProtocols || [];
++        this._wsProtocols = options.wsProtocols || ['binary'];
++        this._showDotCursor = options.showDotCursor || false;
+ 
+         // Internal state
+         this._rfbConnectionState = '';
+diff --git a/docs/API.md b/docs/API.md
+index eb3ec33..6616048 100644
+--- a/docs/API.md
++++ b/docs/API.md
+@@ -229,8 +229,7 @@ new RFB(target, urlOrChannel, options);
+         encountered.
+ 
+     `wsProtocols`
+-      - An `Array` of `DOMString`s specifying the sub-protocols to use
+-        in the WebSocket connection. Empty by default.
++      - Protocols to use in the WebSocket connection, the default is: ['binary']
+ 
+ #### bell
+ 

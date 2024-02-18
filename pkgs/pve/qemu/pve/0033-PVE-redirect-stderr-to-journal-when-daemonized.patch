@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Stefan Reiter <s.reiter@proxmox.com>
+Date: Tue, 12 Jan 2021 14:12:20 +0100
+Subject: [PATCH] PVE: redirect stderr to journal when daemonized
+
+QEMU uses the logging for error messages usually, so LOG_ERR is most
+fitting.
+
+Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ meson.build | 2 ++
+ os-posix.c  | 7 +++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index cbfc9a43fb..8206270272 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1779,6 +1779,7 @@ endif
+ has_gettid = cc.has_function('gettid')
+ 
+ libuuid = cc.find_library('uuid', required: true)
++libsystemd = cc.find_library('systemd', required: true)
+ libproxmox_backup_qemu = cc.find_library('proxmox_backup_qemu', required: true)
+ 
+ # libselinux
+@@ -3406,6 +3407,7 @@ if have_block
+   # os-posix.c contains POSIX-specific functions used by qemu-storage-daemon,
+   # os-win32.c does not
+   blockdev_ss.add(when: 'CONFIG_POSIX', if_true: files('os-posix.c'))
++  blockdev_ss.add(when: 'CONFIG_POSIX', if_true: libsystemd)
+   system_ss.add(when: 'CONFIG_WIN32', if_true: [files('os-win32.c')])
+ endif
+ 
+diff --git a/os-posix.c b/os-posix.c
+index cfcb96533c..fb2ad87009 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -28,6 +28,8 @@
+ #include <pwd.h>
+ #include <grp.h>
+ #include <libgen.h>
++#include <systemd/sd-journal.h>
++#include <syslog.h>
+ 
+ /* Needed early for CONFIG_BSD etc. */
+ #include "net/slirp.h"
+@@ -310,9 +312,10 @@ void os_setup_post(void)
+ 
+         dup2(fd, 0);
+         dup2(fd, 1);
+-        /* In case -D is given do not redirect stderr to /dev/null */
++        /* In case -D is given do not redirect stderr to journal */
+         if (!qemu_log_enabled()) {
+-            dup2(fd, 2);
++            int journal_fd = sd_journal_stream_fd("QEMU", LOG_ERR, 0);
++            dup2(journal_fd, 2);
+         }
+ 
+         close(fd);

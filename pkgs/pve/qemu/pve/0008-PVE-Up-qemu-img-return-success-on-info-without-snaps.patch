@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:39 +0200
+Subject: [PATCH] PVE: [Up] qemu-img: return success on info without snapshots
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ qemu-img.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index 27f48051b0..bb287d8538 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3062,7 +3062,8 @@ static int img_info(int argc, char **argv)
+     list = collect_image_info_list(image_opts, filename, fmt, chain,
+                                    force_share);
+     if (!list) {
+-        return 1;
++ 	// return success if snapshot does not exist
++        return 0;
+     }
+ 
+     switch (output_format) {

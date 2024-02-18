@@ -1,0 +1,646 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dominik Csapak <d.csapak@proxmox.com>
+Date: Tue, 13 Dec 2016 16:11:35 +0100
+Subject: [PATCH] add PVE specific JS code
+
+Add a ES6 module named `PVEUI` which defines the Proxmox VE
+related helper methods, like for example, API2Request.
+
+Hook the `PVEUI` module into the upstream `ui.js`, so that handlers
+for `autoresizing`, `commandstoggle`, etc., get setup.
+
+Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ app/pve.js | 427 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ app/ui.js  |  66 +++++++--
+ vnc.html   |  10 +-
+ 3 files changed, 489 insertions(+), 14 deletions(-)
+ create mode 100644 app/pve.js
+
+diff --git a/app/pve.js b/app/pve.js
+new file mode 100644
+index 0000000..e3c7758
+--- /dev/null
++++ b/app/pve.js
+@@ -0,0 +1,427 @@
++/*
++ * PVE Utility functions for noVNC
++ * Copyright (C) 2017 Proxmox GmbH
++ */
++
++import * as WebUtil from "./webutil.js";
++
++export default function PVEUI(UI){
++    this.consoletype = WebUtil.getQueryVar('console');
++    this.vmid = WebUtil.getQueryVar('vmid');
++    this.vmname = WebUtil.getQueryVar('vmname');
++    this.nodename = WebUtil.getQueryVar('node');
++    this.resize = WebUtil.getQueryVar('resize');
++    this.lastFBWidth = undefined;
++    this.lastFBHeight = undefined;
++    this.sizeUpdateTimer = undefined;
++    this.UI = UI;
++
++    var baseUrl = '/nodes/' + this.nodename;
++    var url;
++    var params = { websocket: 1 };
++    var title;
++
++    switch (this.consoletype) {
++	case 'kvm':
++	    baseUrl += '/qemu/' + this.vmid;
++	    url =  baseUrl + '/vncproxy';
++	    title = "VM " + this.vmid;
++	    if (this.vmname) {
++		title += " ('" + this.vmname + "')";
++	    }
++	    break;
++	case 'lxc':
++	    baseUrl += '/lxc/' + this.vmid;
++	    url =  baseUrl + '/vncproxy';
++	    title = "CT " + this.vmid;
++	    if (this.vmname) {
++		title += " ('" + this.vmname + "')";
++	    }
++	    break;
++	case 'shell':
++	    url =  baseUrl + '/vncshell';
++	    title = "node '" + this.nodename + "'";
++	    break;
++	case 'upgrade':
++	    url =  baseUrl + '/vncshell';
++	    params.upgrade = 1;
++	    title = 'System upgrade on node ' + this.nodename;
++	    break;
++	default:
++	    throw 'implement me';
++	    break;
++    }
++
++    if (this.resize == 'scale' &&
++	(this.consoletype === 'lxc' || this.consoletype === 'shell')) {
++	var size = this.getFBSize();
++	params.width = size.width;
++	params.height = size.height;
++    }
++
++    this.baseUrl = baseUrl;
++    this.url = url;
++    this.params = params;
++    document.title = title;
++};
++
++PVEUI.prototype = {
++    urlEncode: function(object) {
++	var i,value, params = [];
++
++	for (i in object) {
++	    if (object.hasOwnProperty(i)) {
++		value = object[i];
++		if (value === undefined) value = '';
++		params.push(encodeURIComponent(i) + '=' + encodeURIComponent(String(value)));
++	    }
++	}
++
++	return params.join('&');
++    },
++
++    API2Request: function(reqOpts) {
++	var me = this;
++
++	reqOpts.method = reqOpts.method || 'GET';
++
++	var xhr = new XMLHttpRequest();
++
++	xhr.onload = function() {
++	    var scope = reqOpts.scope || this;
++	    var result;
++	    var errmsg;
++
++	    if (xhr.readyState === 4) {
++		var ctype = xhr.getResponseHeader('Content-Type');
++		if (xhr.status === 200) {
++		    if (ctype.match(/application\/json;/)) {
++			result = JSON.parse(xhr.responseText);
++		    } else {
++			errmsg = 'got unexpected content type ' + ctype;
++		    }
++		} else {
++		    errmsg = 'Error ' + xhr.status + ': ' + xhr.statusText;
++		}
++	    } else {
++		errmsg = 'Connection error - server offline?';
++	    }
++
++	    if (errmsg !== undefined) {
++		if (reqOpts.failure) {
++		    reqOpts.failure.call(scope, errmsg);
++		}
++	    } else {
++		if (reqOpts.success) {
++		    reqOpts.success.call(scope, result);
++		}
++	    }
++	    if (reqOpts.callback) {
++		reqOpts.callback.call(scope, errmsg === undefined);
++	    }
++	}
++
++	var data = me.urlEncode(reqOpts.params || {});
++
++	if (reqOpts.method === 'GET') {
++	    xhr.open(reqOpts.method, "/api2/json" + reqOpts.url + '?' + data);
++	} else {
++	    xhr.open(reqOpts.method, "/api2/json" + reqOpts.url);
++	}
++	xhr.setRequestHeader('Cache-Control', 'no-cache');
++	if (reqOpts.method === 'POST' || reqOpts.method === 'PUT') {
++	    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
++	    xhr.setRequestHeader('CSRFPreventionToken', PVE.CSRFPreventionToken);
++	    xhr.send(data);
++	} else if (reqOpts.method === 'GET') {
++	    xhr.send();
++	} else {
++	    throw "unknown method";
++	}
++    },
++
++    pve_detect_migrated_vm: function() {
++	var me = this;
++	if (me.consoletype === 'kvm') {
++	    // try to detect migrated VM
++	    me.API2Request({
++		url: '/cluster/resources',
++		method: 'GET',
++		success: function(result) {
++		    var list = result.data;
++		    list.every(function(item) {
++			if (item.type === 'qemu' && item.vmid == me.vmid) {
++			    var url = "?" + me.urlEncode({
++				console: me.consoletype,
++				novnc: 1,
++				vmid: me.vmid,
++				vmname: me.vmname,
++				node: item.node,
++				resize: me.resize
++			    });
++			    location.href = url;
++			    return false; // break
++			}
++			return true;
++		    });
++		}
++	    });
++	} else if(me.consoletype === 'lxc') {
++	    // lxc restart migration can take a while,
++	    // so we need to find out if we are really migrating
++	    var migrating;
++	    var check = setInterval(function() {
++		if (migrating === undefined ||
++		    migrating === true) {
++		    // check (again) if migrating
++		    me.UI.showStatus('Waiting for connection...', 'warning', 5000);
++		    me.API2Request({
++			url: me.baseUrl + '/config',
++			method: 'GET',
++			success: function(result) {
++			    var lock = result.data.lock;
++			    if (lock == 'migrate') {
++				migrating = true;
++				me.UI.showStatus('Migration detected, waiting...', 'warning', 5000);
++			    } else {
++				migrating = false;
++			    }
++			},
++			failure: function() {
++			    migrating = false;
++			}
++		    });
++		} else {
++		    // not migrating any more
++		    me.UI.showStatus('Connection resumed', 'warning');
++		    clearInterval(check);
++		    me.API2Request({
++			url: '/cluster/resources',
++			method: 'GET',
++			success: function(result) {
++			    var list = result.data;
++			    list.every(function(item) {
++				if (item.type === 'lxc' && item.vmid == me.vmid) {
++				    var url = "?" + me.urlEncode({
++					console: me.consoletype,
++					novnc: 1,
++					vmid: me.vmid,
++					vmname: me.vmname,
++					node: item.node,
++					resize: me.resize
++				    });
++				    location.href = url;
++				    return false; // break
++				}
++				return true;
++			    });
++			}
++		    });
++		}
++	    }, 5000);
++	}
++
++    },
++
++    pve_vm_command: function(cmd, params, reload) {
++	var me = this;
++	var baseUrl;
++	var confirmMsg = "";
++
++	switch(cmd) {
++	    case "start":
++		reload = 1;
++	    case "shutdown":
++	    case "stop":
++	    case "reset":
++	    case "suspend":
++	    case "resume":
++		confirmMsg = "Do you really want to " + cmd + " VM/CT {0}?";
++		break;
++	    case "reload":
++		location.reload();
++		break;
++	    default:
++		throw "implement me " + cmd;
++	}
++
++	confirmMsg = confirmMsg.replace('{0}', me.vmid);
++
++	if (confirmMsg !== "" && confirm(confirmMsg) !== true) {
++	    return;
++	}
++
++	me.UI.closePVECommandPanel();
++
++	if (me.consoletype === 'kvm') {
++	    baseUrl = '/nodes/' + me.nodename + '/qemu/' + me.vmid;
++	} else if (me.consoletype === 'lxc') {
++	    baseUrl = '/nodes/' + me.nodename + '/lxc/' + me.vmid;
++	} else {
++	    throw "unknown VM type";
++	}
++
++	me.API2Request({
++	    params: params,
++	    url: baseUrl + "/status/" + cmd,
++	    method: 'POST',
++	    failure: function(msg) {
++		if (cmd === 'start' && msg.match(/already running/) !== null) {
++		    // we wanted to start, but it was already running, so
++		    // reload anyway
++		    me.UI.showStatus("VM command '" + cmd +"' successful", 'normal');
++		    setTimeout(function() {
++			location.reload();
++		    }, 1000);
++		} else {
++		    me.UI.showStatus(msg, 'warning');
++		}
++	    },
++	    success: function() {
++		me.UI.showStatus("VM command '" + cmd +"' successful", 'normal');
++		if (reload) {
++		    setTimeout(function() {
++			location.reload();
++		    }, 1000);
++		};
++	    }
++	});
++    },
++
++    addPVEHandlers: function() {
++	var me = this;
++	document.getElementById('pve_commands_button')
++	    .addEventListener('click', me.UI.togglePVECommandPanel);
++
++	// show/hide the buttons
++	document.getElementById('noVNC_disconnect_button')
++	    .classList.add('noVNC_hidden');
++	if (me.consoletype === 'kvm') {
++	    document.getElementById('noVNC_clipboard_button')
++		.classList.add('noVNC_hidden');
++	}
++
++	if (me.consoletype === 'shell' || me.consoletype === 'upgrade') {
++	    document.getElementById('pve_commands_button')
++		.classList.add('noVNC_hidden');
++	}
++
++	// add command logic
++	var commandArray = [
++	    { cmd: 'start', kvm: 1, lxc: 1},
++	    { cmd: 'stop', kvm: 1, lxc: 1},
++	    { cmd: 'shutdown', kvm: 1, lxc: 1},
++	    { cmd: 'suspend', kvm: 1},
++	    { cmd: 'resume', kvm: 1},
++	    { cmd: 'reset', kvm: 1},
++	    { cmd: 'reload', kvm: 1, lxc: 1, shell: 1},
++	];
++
++	commandArray.forEach(function(item) {
++	    var el = document.getElementById('pve_command_'+item.cmd);
++	    if (!el) {
++		return;
++	    }
++
++	    if (item[me.consoletype] === 1) {
++		el.onclick = function() {
++		    me.pve_vm_command(item.cmd);
++		};
++	    } else {
++		el.classList.add('noVNC_hidden');
++	    }
++	});
++    },
++
++    getFBSize: function() {
++	var oh;
++	var ow;
++
++	if (window.innerHeight) {
++	    oh = window.innerHeight;
++	    ow = window.innerWidth;
++	} else if (document.documentElement &&
++		   document.documentElement.clientHeight) {
++	    oh = document.documentElement.clientHeight;
++	    ow = document.documentElement.clientWidth;
++	} else if (document.body) {
++	    oh = document.body.clientHeight;
++	    ow = document.body.clientWidth;
++	}  else {
++	    throw "can't get window size";
++	}
++
++	return { width: ow, height: oh };
++    },
++
++    pveStart: function(callback) {
++	var me = this;
++	me.API2Request({
++	    url: me.url,
++	    method: 'POST',
++	    params: me.params,
++	    success: function(result) {
++		var wsparams = me.urlEncode({
++		    port: result.data.port,
++		    vncticket: result.data.ticket
++		});
++
++		document.getElementById('noVNC_password_input').value = result.data.ticket;
++		me.UI.forceSetting('path', 'api2/json' + me.baseUrl + '/vncwebsocket' + "?" + wsparams);
++
++		callback();
++	    },
++	    failure: function(msg) {
++		me.UI.showStatus(msg, 'error');
++	    }
++	});
++    },
++
++    updateFBSize: function(rfb, width, height) {
++	var me = this;
++	try {
++	    // Note: window size must be even number for firefox
++	    me.lastFBWidth = Math.floor((width + 1)/2)*2;
++	    me.lastFBHeight = Math.floor((height + 1)/2)*2;
++
++	    if (me.sizeUpdateTimer !== undefined) {
++		clearInterval(me.sizeUpdateTimer);
++	    }
++
++	    var update_size = function() {
++		var clip = me.UI.getSetting('view_clip');
++		var resize = me.UI.getSetting('resize');
++		var autoresize = me.UI.getSetting('autoresize');
++		if (clip || resize === 'scale' || !autoresize) {
++		    return;
++		}
++
++		// we do not want to resize if we are in fullscreen
++		if (document.fullscreenElement || // alternative standard method
++		    document.mozFullScreenElement || // currently working methods
++		    document.webkitFullscreenElement ||
++		    document.msFullscreenElement) {
++		    return;
++		}
++
++		var oldsize = me.getFBSize();
++		var offsetw = me.lastFBWidth - oldsize.width;
++		var offseth = me.lastFBHeight - oldsize.height;
++		if (offsetw !== 0 || offseth !== 0) {
++		    //console.log("try resize by " + offsetw + " " + offseth);
++		    try {
++			window.resizeBy(offsetw, offseth);
++		    } catch (e) {
++			console.log('resizing did not work', e);
++		    }
++		}
++	    };
++
++	    update_size();
++	    me.sizeUpdateTimer = setInterval(update_size, 1000);
++
++	} catch(e) {
++	    console.log(e);
++	}
++    },
++};
+diff --git a/app/ui.js b/app/ui.js
+index c1f6776..5ebb134 100644
+--- a/app/ui.js
++++ b/app/ui.js
+@@ -17,6 +17,7 @@ import keysyms from "../core/input/keysymdef.js";
+ import Keyboard from "../core/input/keyboard.js";
+ import RFB from "../core/rfb.js";
+ import * as WebUtil from "./webutil.js";
++import PVEUI from "./pve.js";
+ 
+ const PAGE_TITLE = "noVNC";
+ 
+@@ -57,6 +58,8 @@ const UI = {
+     // Render default UI and initialize settings menu
+     start() {
+ 
++        UI.PVE = new PVEUI(UI);
++
+         UI.initSettings();
+ 
+         // Translate the DOM
+@@ -108,6 +111,9 @@ const UI = {
+         UI.addConnectionControlHandlers();
+         UI.addClipboardHandlers();
+         UI.addSettingsHandlers();
++
++        // add pve specific event handlers
++        UI.PVE.addPVEHandlers();
+         document.getElementById("noVNC_status")
+             .addEventListener('click', UI.hideStatus);
+ 
+@@ -116,19 +122,15 @@ const UI = {
+ 
+         UI.openControlbar();
+ 
++        UI.updateViewClip();
++
+         UI.updateVisualState('init');
+ 
+         document.documentElement.classList.remove("noVNC_loading");
+ 
+-        let autoconnect = WebUtil.getConfigVar('autoconnect', false);
+-        if (autoconnect === 'true' || autoconnect == '1') {
+-            autoconnect = true;
++        UI.PVE.pveStart(function() {
+             UI.connect();
+-        } else {
+-            autoconnect = false;
+-            // Show the connect panel on first load unless autoconnecting
+-            UI.openConnectPanel();
+-        }
++        });
+ 
+         return Promise.resolve(UI.rfb);
+     },
+@@ -172,11 +174,12 @@ const UI = {
+         /* Populate the controls if defaults are provided in the URL */
+         UI.initSetting('host', window.location.hostname);
+         UI.initSetting('port', port);
+-        UI.initSetting('encrypt', (window.location.protocol === "https:"));
++        UI.initSetting('encrypt', true);
+         UI.initSetting('view_clip', false);
+         UI.initSetting('resize', 'off');
+         UI.initSetting('quality', 6);
+         UI.initSetting('compression', 2);
++        UI.initSetting('autoresize', true);
+         UI.initSetting('shared', true);
+         UI.initSetting('view_only', false);
+         UI.initSetting('show_dot', false);
+@@ -357,6 +360,7 @@ const UI = {
+         UI.addSettingChangeHandler('resize');
+         UI.addSettingChangeHandler('resize', UI.applyResizeMode);
+         UI.addSettingChangeHandler('resize', UI.updateViewClip);
++        UI.addSettingChangeHandler('autoresize');
+         UI.addSettingChangeHandler('quality');
+         UI.addSettingChangeHandler('quality', UI.updateQuality);
+         UI.addSettingChangeHandler('compression');
+@@ -411,6 +415,9 @@ const UI = {
+                 document.documentElement.classList.add("noVNC_connecting");
+                 break;
+             case 'connected':
++                UI.connected = true;
++                UI.inhibit_reconnect = false;
++                UI.pveAllowMigratedTest = true;
+                 document.documentElement.classList.add("noVNC_connected");
+                 break;
+             case 'disconnecting':
+@@ -418,6 +425,11 @@ const UI = {
+                 document.documentElement.classList.add("noVNC_disconnecting");
+                 break;
+             case 'disconnected':
++                UI.showStatus(_("Disconnected"));
++                if (UI.pveAllowMigratedTest === true) {
++                    UI.pveAllowMigratedTest = false;
++                    UI.PVE.pve_detect_migrated_vm();
++                }
+                 break;
+             case 'reconnecting':
+                 transitionElem.textContent = _("Reconnecting...");
+@@ -843,6 +855,7 @@ const UI = {
+         UI.closePowerPanel();
+         UI.closeClipboardPanel();
+         UI.closeExtraKeys();
++        UI.closePVECommandPanel();
+     },
+ 
+ /* ------^-------
+@@ -1015,6 +1028,12 @@ const UI = {
+             UI.reconnectPassword = password;
+         }
+ 
++        var password = document.getElementById('noVNC_password_input').value;
++
++        if (!password) {
++            password = WebUtil.getConfigVar('password');
++        }
++
+         if (password === null) {
+             password = undefined;
+         }
+@@ -1689,9 +1708,36 @@ const UI = {
+ /* ------^-------
+  *   /EXTRA KEYS
+  * ==============
+- *     MISC
++ *     PVE
+  * ------v------*/
+ 
++    togglePVECommandPanel: function() {
++        if (document.getElementById('pve_commands').classList.contains("noVNC_open")) {
++            UI.closePVECommandPanel();
++        } else {
++            UI.openPVECommandPanel();
++        }
++    },
++
++    openPVECommandPanel: function() {
++        var me = this;
++        UI.closeAllPanels();
++        UI.openControlbar();
++
++        document.getElementById('pve_commands').classList.add("noVNC_open");
++        document.getElementById('pve_commands_button').classList.add("noVNC_selected");
++    },
++
++    closePVECommandPanel: function() {
++        document.getElementById('pve_commands').classList.remove("noVNC_open");
++        document.getElementById('pve_commands_button').classList.remove("noVNC_selected");
++    },
++
++/* ------^-------
++ *    /PVE
++ * ==============
++ *     MISC
++ * ------v------*/
+     updateViewOnly() {
+         if (!UI.rfb) return;
+         UI.rfb.viewOnly = UI.getSetting('view_only');
+diff --git a/vnc.html b/vnc.html
+index 24a118d..e8a982f 100644
+--- a/vnc.html
++++ b/vnc.html
+@@ -154,7 +154,7 @@
+                     <img alt="" src="app/images/settings.svg"> Settings
+                 </div>
+                 <ul>
+-                    <li>
++                    <li style="display:none;">
+                         <label><input id="noVNC_setting_shared" type="checkbox"> Shared Mode</label>
+                     </li>
+                     <li>
+@@ -164,16 +164,18 @@
+                     <li>
+                         <label><input id="noVNC_setting_view_clip" type="checkbox"> Clip to Window</label>
+                     </li>
++                    <li>
++                        <label><input id="noVNC_setting_autoresize" type="checkbox" /> Autoresize Window</label>
++                    </li>
+                     <li>
+                         <label for="noVNC_setting_resize">Scaling Mode:</label>
+                         <select id="noVNC_setting_resize" name="vncResize">
+-                            <option value="off">None</option>
++                            <option value="off">Off</option>
+                             <option value="scale">Local Scaling</option>
+-                            <option value="remote">Remote Resizing</option>
+                         </select>
+                     </li>
+                     <li><hr></li>
+-                    <li>
++                    <li style="display:none;">
+                         <div class="noVNC_expander">Advanced</div>
+                         <div><ul>
+                             <li>

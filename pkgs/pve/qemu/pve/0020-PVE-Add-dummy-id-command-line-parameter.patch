@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:48 +0200
+Subject: [PATCH] PVE: Add dummy -id command line parameter
+
+This used to be part of the qemu-side PVE authentication for
+VNC. Now this does nothing.
+
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ qemu-options.hx | 3 +++
+ softmmu/vl.c    | 8 ++++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c8c78c92d4..20ca2cdba7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1197,6 +1197,9 @@ legacy PC, they are not recommended for modern configurations.
+ 
+ ERST
+ 
++DEF("id", HAS_ARG, QEMU_OPTION_id,
++    "-id n           set the VMID", QEMU_ARCH_ALL)
++
+ DEF("fda", HAS_ARG, QEMU_OPTION_fda,
+     "-fda/-fdb file  use 'file' as floppy disk 0/1 image\n", QEMU_ARCH_ALL)
+ DEF("fdb", HAS_ARG, QEMU_OPTION_fdb, "", QEMU_ARCH_ALL)
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index f3251de3e7..1b63ffd33d 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -2679,6 +2679,7 @@ void qemu_init(int argc, char **argv)
+     MachineClass *machine_class;
+     bool userconfig = true;
+     FILE *vmstate_dump_file = NULL;
++    long vm_id;
+ 
+     qemu_add_opts(&qemu_drive_opts);
+     qemu_add_drive_opts(&qemu_legacy_drive_opts);
+@@ -3302,6 +3303,13 @@ void qemu_init(int argc, char **argv)
+                 machine_parse_property_opt(qemu_find_opts("smp-opts"),
+                                            "smp", optarg);
+                 break;
++            case QEMU_OPTION_id:
++                vm_id = strtol(optarg, (char **)&optarg, 10);
++                if (*optarg != 0 || vm_id < 100 || vm_id > INT_MAX) {
++                    error_report("invalid -id argument %s", optarg);
++                    exit(1);
++                }
++                break;
+             case QEMU_OPTION_vnc:
+                 vnc_parse(optarg);
+                 break;

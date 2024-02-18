@@ -1,0 +1,153 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fiona Ebner <f.ebner@proxmox.com>
+Date: Thu, 6 Apr 2023 14:59:31 +0200
+Subject: [PATCH] alloc-track: fix deadlock during drop
+
+by replacing the block node directly after changing the backing file
+instead of rescheduling it.
+
+With changes in QEMU 8.0, calling bdrv_get_info (and bdrv_unref)
+during drop can lead to a deadlock when using iothread (only triggered
+with multiple disks, except during debugging where it also triggered
+with one disk sometimes):
+1. job_unref_locked acquires the AioContext and calls job->driver->free
+2. track_drop gets scheduled
+3. bdrv_graph_wrlock is called and polls which leads to track_drop being
+   called
+4. track_drop acquires the AioContext recursively
+5. bdrv_get_info is a wrapped coroutine (since 8.0) and thus polls for
+   bdrv_co_get_info. This releases the AioContext, but only once! The
+   documentation for the AIO_WAIT_WHILE macro states that the
+   AioContext lock needs to be acquired exactly once, but there does
+   not seem to be a way for track_drop to know if it acquired the lock
+   recursively or not (without adding further hacks).
+6. Because the AioContext is still held by the main thread once, it can't
+   be acquired before entering bdrv_co_get_info in co_schedule_bh_cb
+   which happens in the iothread
+
+When doing the operation in change_backing_file, the AioContext has
+already been acquired by the caller, so the issue with the recursive
+lock goes away.
+
+The comment explaining why delaying the replace is necessary is
+> we need to schedule this for later however, since when this function
+> is called, the blockjob modifying us is probably not done yet and
+> has a blocker on 'bs'
+
+However, there is no check for blockers in bdrv_replace_node. It would
+need to be done by us, the caller, with check_to_replace_node.
+Furthermore, the mirror job also does its call to bdrv_replace_node
+while there is an active blocker (inserted by mirror itself) and they
+use a specialized version to check for blockers instead of
+check_to_replace_node there. Alloc-track could also do something
+similar to check for other blockers, but it should be fine to rely on
+Proxmox VE that no other operation with the blockdev is going on.
+
+Mirror also drains the target before replacing the node, but the
+target can have other users. In case of alloc-track the file child
+should not be accessible by anybody else and so there can't be an
+in-flight operation for the file child when alloc-track is drained.
+
+The rescheduling based on refcounting is a hack and it doesn't seem to
+be necessary anymore. It's not clear what the original issue from the
+comment was. Testing with older builds with track_drop done directly
+without rescheduling also didn't lead to any noticable issue for me.
+
+One issue it might have been is the one fixed by b1e1af394d
+("block/stream: Drain subtree around graph change"), where
+block-stream had a use-after-free if the base node changed at an
+inconvenient time (which alloc-track's auto-drop does).
+
+It's also not possible to just not auto-replace the alloc-track. Not
+replacing it at all leads to other operations like block resize
+hanging, and there is no good way to replace it manually via QMP
+(there is x-blockdev-change, but it is experimental and doesn't
+implement the required operation yet). Also, it's just cleaner in
+general to not leave unnecessary block nodes lying around.
+
+Suggested-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ block/alloc-track.c | 54 ++++++++++++++-------------------------------
+ 1 file changed, 16 insertions(+), 38 deletions(-)
+
+diff --git a/block/alloc-track.c b/block/alloc-track.c
+index b75d7c6460..76da140a68 100644
+--- a/block/alloc-track.c
++++ b/block/alloc-track.c
+@@ -25,7 +25,6 @@
+ 
+ typedef enum DropState {
+     DropNone,
+-    DropRequested,
+     DropInProgress,
+ } DropState;
+ 
+@@ -268,37 +267,6 @@ static void track_child_perm(BlockDriverState *bs, BdrvChild *c,
+     }
+ }
+ 
+-static void track_drop(void *opaque)
+-{
+-    BlockDriverState *bs = (BlockDriverState*)opaque;
+-    BlockDriverState *file = bs->file->bs;
+-    BDRVAllocTrackState *s = bs->opaque;
+-
+-    assert(file);
+-
+-    /* we rely on the fact that we're not used anywhere else, so let's wait
+-     * until we're only used once - in the drive connected to the guest (and one
+-     * ref is held by bdrv_ref in track_change_backing_file) */
+-    if (bs->refcnt > 2) {
+-        aio_bh_schedule_oneshot(qemu_get_aio_context(), track_drop, opaque);
+-        return;
+-    }
+-    AioContext *aio_context = bdrv_get_aio_context(bs);
+-    aio_context_acquire(aio_context);
+-
+-    bdrv_drained_begin(bs);
+-
+-    /* now that we're drained, we can safely set 'DropInProgress' */
+-    s->drop_state = DropInProgress;
+-    bdrv_child_refresh_perms(bs, bs->file, &error_abort);
+-
+-    bdrv_replace_node(bs, file, &error_abort);
+-    bdrv_set_backing_hd(bs, NULL, &error_abort);
+-    bdrv_drained_end(bs);
+-    bdrv_unref(bs);
+-    aio_context_release(aio_context);
+-}
+-
+ static int track_change_backing_file(BlockDriverState *bs,
+                                      const char *backing_file,
+                                      const char *backing_fmt)
+@@ -308,13 +276,23 @@ static int track_change_backing_file(BlockDriverState *bs,
+         backing_file == NULL && backing_fmt == NULL)
+     {
+         /* backing file has been disconnected, there's no longer any use for
+-         * this node, so let's remove ourselves from the block graph - we need
+-         * to schedule this for later however, since when this function is
+-         * called, the blockjob modifying us is probably not done yet and has a
+-         * blocker on 'bs' */
+-        s->drop_state = DropRequested;
++         * this node, so let's remove ourselves from the block graph */
++        BlockDriverState *file = bs->file->bs;
++
++        /* Just to be sure, because bdrv_replace_node unrefs it */
+         bdrv_ref(bs);
+-        aio_bh_schedule_oneshot(qemu_get_aio_context(), track_drop, (void*)bs);
++        bdrv_drained_begin(bs);
++
++        /* now that we're drained, we can safely set 'DropInProgress' */
++        s->drop_state = DropInProgress;
++
++        bdrv_child_refresh_perms(bs, bs->file, &error_abort);
++
++        bdrv_replace_node(bs, file, &error_abort);
++        bdrv_set_backing_hd(bs, NULL, &error_abort);
++
++        bdrv_drained_end(bs);
++        bdrv_unref(bs);
+     }
+ 
+     return 0;

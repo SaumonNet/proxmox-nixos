@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:45 +0200
+Subject: [PATCH] PVE: qapi: modify spice query
+
+Provide the last ticket in the SpiceInfo struct optionally.
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+[FE: adapt to QAPI change]
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ qapi/ui.json    | 3 +++
+ ui/spice-core.c | 4 ++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 006616aa77..dfd1d3e36b 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -317,11 +317,14 @@
+ #
+ # @channels: a list of @SpiceChannel for each active spice channel
+ #
++# @ticket: The last ticket set with set_password
++#
+ # Since: 0.14
+ ##
+ { 'struct': 'SpiceInfo',
+   'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str', '*port': 'int',
+            '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str',
++           '*ticket': 'str',
+            'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel']},
+   'if': 'CONFIG_SPICE' }
+ 
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index b20c25aee0..26baeb7846 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -548,6 +548,10 @@ static SpiceInfo *qmp_query_spice_real(Error **errp)
+     micro = SPICE_SERVER_VERSION & 0xff;
+     info->compiled_version = g_strdup_printf("%d.%d.%d", major, minor, micro);
+ 
++    if (auth_passwd) {
++        info->ticket =  g_strdup(auth_passwd);
++    }
++
+     if (port) {
+         info->has_port = true;
+         info->port = port;

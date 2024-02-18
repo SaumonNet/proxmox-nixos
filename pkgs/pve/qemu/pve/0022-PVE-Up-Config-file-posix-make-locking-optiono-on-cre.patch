@@ -1,0 +1,134 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:50 +0200
+Subject: [PATCH] PVE: [Up+Config] file-posix: make locking optiono on create
+
+Otherwise creating images on nfs/cifs can be problematic.
+
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ block/file-posix.c   | 59 ++++++++++++++++++++++++++++++--------------
+ qapi/block-core.json |  3 ++-
+ 2 files changed, 42 insertions(+), 20 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 0db366a851..46f1ee38ae 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2870,6 +2870,7 @@ raw_co_create(BlockdevCreateOptions *options, Error **errp)
+     int fd;
+     uint64_t perm, shared;
+     int result = 0;
++    bool locked = false;
+ 
+     /* Validate options and set default values */
+     assert(options->driver == BLOCKDEV_DRIVER_FILE);
+@@ -2910,19 +2911,22 @@ raw_co_create(BlockdevCreateOptions *options, Error **errp)
+     perm = BLK_PERM_WRITE | BLK_PERM_RESIZE;
+     shared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
+ 
+-    /* Step one: Take locks */
+-    result = raw_apply_lock_bytes(NULL, fd, perm, ~shared, false, errp);
+-    if (result < 0) {
+-        goto out_close;
+-    }
++    if (file_opts->locking != ON_OFF_AUTO_OFF) {
++        /* Step one: Take locks */
++        result = raw_apply_lock_bytes(NULL, fd, perm, ~shared, false, errp);
++        if (result < 0) {
++            goto out_close;
++        }
++        locked = true;
+ 
+-    /* Step two: Check that nobody else has taken conflicting locks */
+-    result = raw_check_lock_bytes(fd, perm, shared, errp);
+-    if (result < 0) {
+-        error_append_hint(errp,
+-                          "Is another process using the image [%s]?\n",
+-                          file_opts->filename);
+-        goto out_unlock;
++        /* Step two: Check that nobody else has taken conflicting locks */
++        result = raw_check_lock_bytes(fd, perm, shared, errp);
++        if (result < 0) {
++            error_append_hint(errp,
++                              "Is another process using the image [%s]?\n",
++                              file_opts->filename);
++            goto out_unlock;
++        }
+     }
+ 
+     /* Clear the file by truncating it to 0 */
+@@ -2976,13 +2980,15 @@ raw_co_create(BlockdevCreateOptions *options, Error **errp)
+     }
+ 
+ out_unlock:
+-    raw_apply_lock_bytes(NULL, fd, 0, 0, true, &local_err);
+-    if (local_err) {
+-        /* The above call should not fail, and if it does, that does
+-         * not mean the whole creation operation has failed.  So
+-         * report it the user for their convenience, but do not report
+-         * it to the caller. */
+-        warn_report_err(local_err);
++    if (locked) {
++        raw_apply_lock_bytes(NULL, fd, 0, 0, true, &local_err);
++        if (local_err) {
++            /* The above call should not fail, and if it does, that does
++             * not mean the whole creation operation has failed.  So
++             * report it the user for their convenience, but do not report
++             * it to the caller. */
++            warn_report_err(local_err);
++        }
+     }
+ 
+ out_close:
+@@ -3006,6 +3012,7 @@ raw_co_create_opts(BlockDriver *drv, const char *filename,
+     PreallocMode prealloc;
+     char *buf = NULL;
+     Error *local_err = NULL;
++    OnOffAuto locking;
+ 
+     /* Skip file: protocol prefix */
+     strstart(filename, "file:", &filename);
+@@ -3028,6 +3035,18 @@ raw_co_create_opts(BlockDriver *drv, const char *filename,
+         return -EINVAL;
+     }
+ 
++    locking = qapi_enum_parse(&OnOffAuto_lookup,
++                              qemu_opt_get(opts, "locking"),
++                              ON_OFF_AUTO_AUTO, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return -EINVAL;
++    }
++
++    if (locking == ON_OFF_AUTO_AUTO) {
++        locking = ON_OFF_AUTO_OFF;
++    }
++
+     options = (BlockdevCreateOptions) {
+         .driver     = BLOCKDEV_DRIVER_FILE,
+         .u.file     = {
+@@ -3039,6 +3058,8 @@ raw_co_create_opts(BlockDriver *drv, const char *filename,
+             .nocow              = nocow,
+             .has_extent_size_hint = has_extent_size_hint,
+             .extent_size_hint   = extent_size_hint,
++            .has_locking        = true,
++            .locking            = locking,
+         },
+     };
+     return raw_co_create(&options, errp);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 903392cb8f..125aa89858 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4876,7 +4876,8 @@
+             'size':                 'size',
+             '*preallocation':       'PreallocMode',
+             '*nocow':               'bool',
+-            '*extent-size-hint':    'size'} }
++            '*extent-size-hint':    'size',
++            '*locking':         'OnOffAuto' } }
+ 
+ ##
+ # @BlockdevCreateOptionsGluster:

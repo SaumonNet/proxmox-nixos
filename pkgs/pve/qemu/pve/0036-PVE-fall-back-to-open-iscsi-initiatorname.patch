@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fabian Ebner <f.ebner@proxmox.com>
+Date: Tue, 17 Nov 2020 10:51:05 +0100
+Subject: [PATCH] PVE: fall back to open-iscsi initiatorname
+
+When no explicit option is given, try reading the initiator name from
+/etc/iscsi/initiatorname.iscsi and only use the generic fallback, i.e.
+iqn.2008-11.org.linux-kvmXXX, as a third alternative.
+
+This avoids the need to add an explicit option for vma and to explicitly set it
+for each call to qemu that deals with iSCSI disks, while still allowing to set
+the option if a different name is needed.
+
+According to RFC 3720, an initiator name is at most 223 bytes long, so the
+4 KiB buffer is big enough, even if many whitespaces are used.
+
+Signed-off-by: Fabian Ebner <f.ebner@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ block/iscsi.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 34f97ab646..398782963d 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1391,12 +1391,42 @@ static char *get_initiator_name(QemuOpts *opts)
+     const char *name;
+     char *iscsi_name;
+     UuidInfo *uuid_info;
++    FILE *name_fh;
+ 
+     name = qemu_opt_get(opts, "initiator-name");
+     if (name) {
+         return g_strdup(name);
+     }
+ 
++    name_fh = fopen("/etc/iscsi/initiatorname.iscsi", "r");
++    if (name_fh) {
++        const char *key = "InitiatorName";
++        char buffer[4096];
++        char *line;
++
++        while ((line = fgets(buffer, sizeof(buffer), name_fh))) {
++            line = g_strstrip(line);
++            if (!strncmp(line, key, strlen(key))) {
++                line = strchr(line, '=');
++                if (!line || strlen(line) == 1) {
++                    continue;
++                }
++                line++;
++                g_strstrip(line);
++                if (!strlen(line)) {
++                    continue;
++                }
++                name = line;
++                break;
++            }
++        }
++        fclose(name_fh);
++
++        if (name) {
++            return g_strdup(name);
++        }
++    }
++
+     uuid_info = qmp_query_uuid(NULL);
+     if (strcmp(uuid_info->UUID, UUID_NONE) == 0) {
+         name = qemu_get_vm_name();

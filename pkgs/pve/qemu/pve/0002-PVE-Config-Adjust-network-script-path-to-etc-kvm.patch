@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:31 +0200
+Subject: [PATCH] PVE: [Config] Adjust network script path to /etc/kvm/
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ include/net/net.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/net.h b/include/net/net.h
+index 1448d00afb..d1601d32c1 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -258,8 +258,8 @@ void netdev_add(QemuOpts *opts, Error **errp);
+ int net_hub_id_for_client(NetClientState *nc, int *id);
+ NetClientState *net_hub_port_find(int hub_id);
+ 
+-#define DEFAULT_NETWORK_SCRIPT CONFIG_SYSCONFDIR "/qemu-ifup"
+-#define DEFAULT_NETWORK_DOWN_SCRIPT CONFIG_SYSCONFDIR "/qemu-ifdown"
++#define DEFAULT_NETWORK_SCRIPT CONFIG_SYSCONFDIR "/kvm/kvm-ifup"
++#define DEFAULT_NETWORK_DOWN_SCRIPT CONFIG_SYSCONFDIR "/kvm/kvm-ifdown"
+ #define DEFAULT_BRIDGE_HELPER CONFIG_QEMU_HELPERDIR "/qemu-bridge-helper"
+ #define DEFAULT_BRIDGE_INTERFACE "br0"
+ 

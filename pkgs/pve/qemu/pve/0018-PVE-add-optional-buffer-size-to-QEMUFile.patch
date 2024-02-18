@@ -1,0 +1,216 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Mon, 4 May 2020 11:05:08 +0200
+Subject: [PATCH] PVE: add optional buffer size to QEMUFile
+
+So we can use a 4M buffer for savevm-async which should
+increase performance storing the state onto ceph.
+
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+[increase max IOV count in QEMUFile to actually write more data]
+Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+[FE: adapt to removal of QEMUFileOps]
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ migration/qemu-file.c    | 49 +++++++++++++++++++++++++++-------------
+ migration/qemu-file.h    |  2 ++
+ migration/savevm-async.c |  5 ++--
+ 3 files changed, 38 insertions(+), 18 deletions(-)
+
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 19c33c9985..e9ffff0f0a 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -33,8 +33,8 @@
+ #include "options.h"
+ #include "qapi/error.h"
+ 
+-#define IO_BUF_SIZE 32768
+-#define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 64)
++#define DEFAULT_IO_BUF_SIZE 32768
++#define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 256)
+ 
+ struct QEMUFile {
+     const QEMUFileHooks *hooks;
+@@ -46,7 +46,8 @@ struct QEMUFile {
+ 
+     int buf_index;
+     int buf_size; /* 0 when writing */
+-    uint8_t buf[IO_BUF_SIZE];
++    size_t buf_allocated_size;
++    uint8_t *buf;
+ 
+     DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
+     struct iovec iov[MAX_IOV_SIZE];
+@@ -100,7 +101,9 @@ int qemu_file_shutdown(QEMUFile *f)
+     return 0;
+ }
+ 
+-static QEMUFile *qemu_file_new_impl(QIOChannel *ioc, bool is_writable)
++static QEMUFile *qemu_file_new_impl(QIOChannel *ioc,
++                                    bool is_writable,
++                                    size_t buffer_size)
+ {
+     QEMUFile *f;
+ 
+@@ -109,6 +112,8 @@ static QEMUFile *qemu_file_new_impl(QIOChannel *ioc, bool is_writable)
+     object_ref(ioc);
+     f->ioc = ioc;
+     f->is_writable = is_writable;
++    f->buf_allocated_size = buffer_size;
++    f->buf = malloc(buffer_size);
+ 
+     return f;
+ }
+@@ -119,17 +124,27 @@ static QEMUFile *qemu_file_new_impl(QIOChannel *ioc, bool is_writable)
+  */
+ QEMUFile *qemu_file_get_return_path(QEMUFile *f)
+ {
+-    return qemu_file_new_impl(f->ioc, !f->is_writable);
++    return qemu_file_new_impl(f->ioc, !f->is_writable, DEFAULT_IO_BUF_SIZE);
+ }
+ 
+ QEMUFile *qemu_file_new_output(QIOChannel *ioc)
+ {
+-    return qemu_file_new_impl(ioc, true);
++    return qemu_file_new_impl(ioc, true, DEFAULT_IO_BUF_SIZE);
++}
++
++QEMUFile *qemu_file_new_output_sized(QIOChannel *ioc, size_t buffer_size)
++{
++    return qemu_file_new_impl(ioc, true, buffer_size);
+ }
+ 
+ QEMUFile *qemu_file_new_input(QIOChannel *ioc)
+ {
+-    return qemu_file_new_impl(ioc, false);
++    return qemu_file_new_impl(ioc, false, DEFAULT_IO_BUF_SIZE);
++}
++
++QEMUFile *qemu_file_new_input_sized(QIOChannel *ioc, size_t buffer_size)
++{
++    return qemu_file_new_impl(ioc, false, buffer_size);
+ }
+ 
+ void qemu_file_set_hooks(QEMUFile *f, const QEMUFileHooks *hooks)
+@@ -375,7 +390,7 @@ static ssize_t coroutine_mixed_fn qemu_fill_buffer(QEMUFile *f)
+     do {
+         len = qio_channel_read(f->ioc,
+                                (char *)f->buf + pending,
+-                               IO_BUF_SIZE - pending,
++                               f->buf_allocated_size - pending,
+                                &local_error);
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+             if (qemu_in_coroutine()) {
+@@ -425,6 +440,8 @@ int qemu_fclose(QEMUFile *f)
+     }
+     g_clear_pointer(&f->ioc, object_unref);
+ 
++    free(f->buf);
++
+     /* If any error was spotted before closing, we should report it
+      * instead of the close() return value.
+      */
+@@ -479,7 +496,7 @@ static void add_buf_to_iovec(QEMUFile *f, size_t len)
+ {
+     if (!add_to_iovec(f, f->buf + f->buf_index, len, false)) {
+         f->buf_index += len;
+-        if (f->buf_index == IO_BUF_SIZE) {
++        if (f->buf_index == f->buf_allocated_size) {
+             qemu_fflush(f);
+         }
+     }
+@@ -504,7 +521,7 @@ void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size)
+     }
+ 
+     while (size > 0) {
+-        l = IO_BUF_SIZE - f->buf_index;
++        l = f->buf_allocated_size - f->buf_index;
+         if (l > size) {
+             l = size;
+         }
+@@ -549,8 +566,8 @@ size_t coroutine_mixed_fn qemu_peek_buffer(QEMUFile *f, uint8_t **buf, size_t si
+     size_t index;
+ 
+     assert(!qemu_file_is_writable(f));
+-    assert(offset < IO_BUF_SIZE);
+-    assert(size <= IO_BUF_SIZE - offset);
++    assert(offset < f->buf_allocated_size);
++    assert(size <= f->buf_allocated_size - offset);
+ 
+     /* The 1st byte to read from */
+     index = f->buf_index + offset;
+@@ -600,7 +617,7 @@ size_t coroutine_mixed_fn qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size
+         size_t res;
+         uint8_t *src;
+ 
+-        res = qemu_peek_buffer(f, &src, MIN(pending, IO_BUF_SIZE), 0);
++        res = qemu_peek_buffer(f, &src, MIN(pending, f->buf_allocated_size), 0);
+         if (res == 0) {
+             return done;
+         }
+@@ -634,7 +651,7 @@ size_t coroutine_mixed_fn qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size
+  */
+ size_t coroutine_mixed_fn qemu_get_buffer_in_place(QEMUFile *f, uint8_t **buf, size_t size)
+ {
+-    if (size < IO_BUF_SIZE) {
++    if (size < f->buf_allocated_size) {
+         size_t res;
+         uint8_t *src = NULL;
+ 
+@@ -659,7 +676,7 @@ int coroutine_mixed_fn qemu_peek_byte(QEMUFile *f, int offset)
+     int index = f->buf_index + offset;
+ 
+     assert(!qemu_file_is_writable(f));
+-    assert(offset < IO_BUF_SIZE);
++    assert(offset < f->buf_allocated_size);
+ 
+     if (index >= f->buf_size) {
+         qemu_fill_buffer(f);
+@@ -777,7 +794,7 @@ static int qemu_compress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
+ ssize_t qemu_put_compression_data(QEMUFile *f, z_stream *stream,
+                                   const uint8_t *p, size_t size)
+ {
+-    ssize_t blen = IO_BUF_SIZE - f->buf_index - sizeof(int32_t);
++    ssize_t blen = f->buf_allocated_size - f->buf_index - sizeof(int32_t);
+ 
+     if (blen < compressBound(size)) {
+         return -1;
+diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+index 47015f5201..1312b7c903 100644
+--- a/migration/qemu-file.h
++++ b/migration/qemu-file.h
+@@ -63,7 +63,9 @@ typedef struct QEMUFileHooks {
+ } QEMUFileHooks;
+ 
+ QEMUFile *qemu_file_new_input(QIOChannel *ioc);
++QEMUFile *qemu_file_new_input_sized(QIOChannel *ioc, size_t buffer_size);
+ QEMUFile *qemu_file_new_output(QIOChannel *ioc);
++QEMUFile *qemu_file_new_output_sized(QIOChannel *ioc, size_t buffer_size);
+ void qemu_file_set_hooks(QEMUFile *f, const QEMUFileHooks *hooks);
+ int qemu_fclose(QEMUFile *f);
+ 
+diff --git a/migration/savevm-async.c b/migration/savevm-async.c
+index e9fc18fb10..80624fada8 100644
+--- a/migration/savevm-async.c
++++ b/migration/savevm-async.c
+@@ -378,7 +378,7 @@ void qmp_savevm_start(const char *statefile, Error **errp)
+ 
+     QIOChannel *ioc = QIO_CHANNEL(qio_channel_savevm_async_new(snap_state.target,
+                                                                &snap_state.bs_pos));
+-    snap_state.file = qemu_file_new_output(ioc);
++    snap_state.file = qemu_file_new_output_sized(ioc, 4 * 1024 * 1024);
+ 
+     if (!snap_state.file) {
+         error_set(errp, ERROR_CLASS_GENERIC_ERROR, "failed to open '%s'", statefile);
+@@ -496,7 +496,8 @@ int load_snapshot_from_blockdev(const char *filename, Error **errp)
+     blk_op_block_all(be, blocker);
+ 
+     /* restore the VM state */
+-    f = qemu_file_new_input(QIO_CHANNEL(qio_channel_savevm_async_new(be, &bs_pos)));
++    f = qemu_file_new_input_sized(QIO_CHANNEL(qio_channel_savevm_async_new(be, &bs_pos)),
++                                  4 * 1024 * 1024);
+     if (!f) {
+         error_setg(errp, "Could not open VM state file");
+         goto the_end;

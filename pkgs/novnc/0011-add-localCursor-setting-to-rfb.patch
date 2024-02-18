@@ -1,0 +1,152 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dominik Csapak <d.csapak@proxmox.com>
+Date: Thu, 19 Jul 2018 11:31:51 +0200
+Subject: [PATCH] add localCursor setting to rfb
+
+and use it in app.js (default true)
+
+Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ app/ui.js           | 10 ++++++++++
+ core/rfb.js         | 10 ++++++++++
+ core/util/cursor.js | 15 ++++++++++++++-
+ vnc.html            |  3 +++
+ 4 files changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/app/ui.js b/app/ui.js
+index 1d52a5a..02004c3 100644
+--- a/app/ui.js
++++ b/app/ui.js
+@@ -180,6 +180,7 @@ const UI = {
+         UI.initSetting('quality', 6);
+         UI.initSetting('compression', 2);
+         UI.initSetting('autoresize', true);
++        UI.initSetting('local_cursor', true);
+         UI.initSetting('shared', true);
+         UI.initSetting('view_only', false);
+         UI.initSetting('show_dot', false);
+@@ -372,6 +373,8 @@ const UI = {
+         UI.addSettingChangeHandler('view_only', UI.updateViewOnly);
+         UI.addSettingChangeHandler('show_dot');
+         UI.addSettingChangeHandler('show_dot', UI.updateShowDotCursor);
++        UI.addSettingChangeHandler('local_cursor');
++        UI.addSettingChangeHandler('local_cursor', UI.updateLocalCursor);
+         UI.addSettingChangeHandler('host');
+         UI.addSettingChangeHandler('port');
+         UI.addSettingChangeHandler('path');
+@@ -1076,6 +1079,7 @@ const UI = {
+         UI.rfb.addEventListener("desktopname", UI.updateDesktopName);
+         UI.rfb.addEventListener("fbresize", UI.updateSessionSize);
+         UI.rfb.clipViewport = UI.getSetting('view_clip');
++        UI.rfb.localCursor = UI.getSetting('local_cursor');
+         UI.rfb.scaleViewport = UI.getSetting('resize') === 'scale';
+         UI.rfb.resizeSession = UI.getSetting('resize') === 'remote';
+         UI.rfb.qualityLevel = parseInt(UI.getSetting('quality'));
+@@ -1760,6 +1764,12 @@ const UI = {
+  * ==============
+  *     MISC
+  * ------v------*/
++
++    updateLocalCursor() {
++        if (!UI.rfb) return;
++        UI.rfb.localCursor = UI.getSetting('local_cursor');
++    },
++
+     updateViewOnly() {
+         if (!UI.rfb) return;
+         UI.rfb.viewOnly = UI.getSetting('view_only');
+diff --git a/core/rfb.js b/core/rfb.js
+index 2f662ce..2dc0638 100644
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -290,6 +290,7 @@ export default class RFB extends EventTargetMixin {
+         this._clippingViewport = false;
+         this._scaleViewport = false;
+         this._resizeSession = false;
++        this._localCursor = false;
+ 
+         this._showDotCursor = false;
+         if (options.showDotCursor !== undefined) {
+@@ -360,6 +361,15 @@ export default class RFB extends EventTargetMixin {
+         }
+     }
+ 
++    get localCursor() { return this._localCursor; }
++    set localCursor(localCursor) {
++        this._localCursor = localCursor;
++
++        if (this._cursor) {
++            this._cursor.setLocalCursor(localCursor);
++        }
++    }
++
+     get showDotCursor() { return this._showDotCursor; }
+     set showDotCursor(show) {
+         this._showDotCursor = show;
+diff --git a/core/util/cursor.js b/core/util/cursor.js
+index 3000cf0..0d9651f 100644
+--- a/core/util/cursor.js
++++ b/core/util/cursor.js
+@@ -12,6 +12,8 @@ export default class Cursor {
+     constructor() {
+         this._target = null;
+ 
++        this._showLocalCursor = false;
++
+         this._canvas = document.createElement('canvas');
+ 
+         if (useFallback) {
+@@ -104,7 +106,7 @@ export default class Cursor {
+     }
+ 
+     clear() {
+-        this._target.style.cursor = 'none';
++        this._target.style.cursor = this._showLocalCursor ? 'default' : 'none';
+         this._canvas.width = 0;
+         this._canvas.height = 0;
+         this._position.x = this._position.x + this._hotSpot.x;
+@@ -134,6 +136,11 @@ export default class Cursor {
+         this._updateVisibility(target);
+     }
+ 
++    setLocalCursor(cursor) {
++        this._showLocalCursor = cursor;
++        this._updateLocalCursor();
++    }
++
+     _handleMouseOver(event) {
+         // This event could be because we're entering the target, or
+         // moving around amongst its sub elements. Let the move handler
+@@ -186,6 +193,11 @@ export default class Cursor {
+         }
+     }
+ 
++    _updateLocalCursor() {
++        if (this._target)
++            this._target.style.cursor = this._showLocalCursor ? 'default' : 'none';
++    }
++
+     _showCursor() {
+         if (this._canvas.style.visibility === 'hidden') {
+             this._canvas.style.visibility = '';
+@@ -244,4 +256,5 @@ export default class Cursor {
+         return document.captureElement &&
+             document.documentElement.contains(document.captureElement);
+     }
++
+ }
+diff --git a/vnc.html b/vnc.html
+index eed474f..b80f3c5 100644
+--- a/vnc.html
++++ b/vnc.html
+@@ -157,6 +157,9 @@
+                     <li>
+                         <label><input id="noVNC_setting_view_clip" type="checkbox"> Clip to Window</label>
+                     </li>
++                    <li>
++                        <label><input id="noVNC_setting_local_cursor" type="checkbox" /> Local Cursor</label>
++                    </li>
+                     <li>
+                         <label><input id="noVNC_setting_autoresize" type="checkbox" /> Autoresize Window</label>
+                     </li>

@@ -1,0 +1,323 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dietmar Maurer <dietmar@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:58 +0200
+Subject: [PATCH] PVE-Backup: add backup-dump block driver
+
+- add backup-dump block driver block/backup-dump.c
+- move BackupBlockJob declaration from block/backup.c to include/block/block_int.h
+- block/backup.c - backup-job-create: also consider source cluster size
+- job.c: make job_should_pause non-static
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+[FE: adapt to coroutine changes]
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ block/backup-dump.c              | 168 +++++++++++++++++++++++++++++++
+ block/backup.c                   |  30 ++----
+ block/meson.build                |   1 +
+ include/block/block_int-common.h |  35 +++++++
+ job.c                            |   3 +-
+ 5 files changed, 214 insertions(+), 23 deletions(-)
+ create mode 100644 block/backup-dump.c
+
+diff --git a/block/backup-dump.c b/block/backup-dump.c
+new file mode 100644
+index 0000000000..232a094426
+--- /dev/null
++++ b/block/backup-dump.c
+@@ -0,0 +1,168 @@
++/*
++ * BlockDriver to send backup data stream to a callback function
++ *
++ * Copyright (C) 2020 Proxmox Server Solutions GmbH
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qom/object_interfaces.h"
++#include "block/block_int.h"
++
++typedef struct {
++    int             dump_cb_block_size;
++    uint64_t        byte_size;
++    BackupDumpFunc *dump_cb;
++    void           *dump_cb_data;
++} BDRVBackupDumpState;
++
++static coroutine_fn int qemu_backup_dump_co_get_info(BlockDriverState *bs,
++                                                     BlockDriverInfo *bdi)
++{
++    BDRVBackupDumpState *s = bs->opaque;
++
++    bdi->cluster_size = s->dump_cb_block_size;
++    return 0;
++}
++
++static int qemu_backup_dump_check_perm(
++    BlockDriverState *bs,
++    uint64_t perm,
++    uint64_t shared,
++    Error **errp)
++{
++    /* Nothing to do. */
++    return 0;
++}
++
++static void qemu_backup_dump_set_perm(
++    BlockDriverState *bs,
++    uint64_t perm,
++    uint64_t shared)
++{
++    /* Nothing to do. */
++}
++
++static void qemu_backup_dump_abort_perm_update(BlockDriverState *bs)
++{
++    /* Nothing to do. */
++}
++
++static void qemu_backup_dump_refresh_limits(BlockDriverState *bs, Error **errp)
++{
++    bs->bl.request_alignment = BDRV_SECTOR_SIZE; /* No sub-sector I/O */
++}
++
++static void qemu_backup_dump_close(BlockDriverState *bs)
++{
++    /* Nothing to do. */
++}
++
++static coroutine_fn int64_t qemu_backup_dump_co_getlength(BlockDriverState *bs)
++{
++    BDRVBackupDumpState *s = bs->opaque;
++
++    return s->byte_size;
++}
++
++static coroutine_fn int qemu_backup_dump_co_writev(
++    BlockDriverState *bs,
++    int64_t sector_num,
++    int nb_sectors,
++    QEMUIOVector *qiov,
++    int flags)
++{
++    /* flags can be only values we set in supported_write_flags */
++    assert(flags == 0);
++
++    BDRVBackupDumpState *s = bs->opaque;
++    off_t offset = sector_num * BDRV_SECTOR_SIZE;
++
++    uint64_t written = 0;
++
++    for (int i = 0; i < qiov->niov; ++i) {
++        const struct iovec *v = &qiov->iov[i];
++
++        int rc = s->dump_cb(s->dump_cb_data, offset, v->iov_len, v->iov_base);
++        if (rc < 0) {
++            return rc;
++        }
++
++        if (rc != v->iov_len) {
++            return -EIO;
++        }
++
++        written += v->iov_len;
++        offset += v->iov_len;
++    }
++
++    return written;
++}
++
++static void qemu_backup_dump_child_perm(
++    BlockDriverState *bs,
++    BdrvChild *c,
++    BdrvChildRole role,
++    BlockReopenQueue *reopen_queue,
++    uint64_t perm, uint64_t shared,
++    uint64_t *nperm, uint64_t *nshared)
++{
++    *nperm = BLK_PERM_ALL;
++    *nshared = BLK_PERM_ALL;
++}
++
++static BlockDriver bdrv_backup_dump_drive = {
++    .format_name                  = "backup-dump-drive",
++    .protocol_name                = "backup-dump",
++    .instance_size                = sizeof(BDRVBackupDumpState),
++
++    .bdrv_close                   = qemu_backup_dump_close,
++    .bdrv_has_zero_init           = bdrv_has_zero_init_1,
++    .bdrv_co_getlength            = qemu_backup_dump_co_getlength,
++    .bdrv_co_get_info             = qemu_backup_dump_co_get_info,
++
++    .bdrv_co_writev               = qemu_backup_dump_co_writev,
++
++    .bdrv_refresh_limits          = qemu_backup_dump_refresh_limits,
++    .bdrv_check_perm              = qemu_backup_dump_check_perm,
++    .bdrv_set_perm                = qemu_backup_dump_set_perm,
++    .bdrv_abort_perm_update       = qemu_backup_dump_abort_perm_update,
++    .bdrv_child_perm              = qemu_backup_dump_child_perm,
++};
++
++static void bdrv_backup_dump_init(void)
++{
++    bdrv_register(&bdrv_backup_dump_drive);
++}
++
++block_init(bdrv_backup_dump_init);
++
++
++BlockDriverState *bdrv_backup_dump_create(
++    int dump_cb_block_size,
++    uint64_t byte_size,
++    BackupDumpFunc *dump_cb,
++    void *dump_cb_data,
++    Error **errp)
++{
++    BDRVBackupDumpState *state;
++    BlockDriverState *bs = bdrv_new_open_driver(
++        &bdrv_backup_dump_drive, NULL, BDRV_O_RDWR, errp);
++
++    if (!bs) {
++        return NULL;
++    }
++
++    bs->total_sectors = byte_size / BDRV_SECTOR_SIZE;
++    bs->opaque = state = g_new0(BDRVBackupDumpState, 1);
++
++    state->dump_cb_block_size = dump_cb_block_size;
++    state->byte_size = byte_size;
++    state->dump_cb = dump_cb;
++    state->dump_cb_data = dump_cb_data;
++
++    return bs;
++}
+diff --git a/block/backup.c b/block/backup.c
+index 39410dcf8d..af87fa6aa9 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -29,28 +29,6 @@
+ 
+ #include "block/copy-before-write.h"
+ 
+-typedef struct BackupBlockJob {
+-    BlockJob common;
+-    BlockDriverState *cbw;
+-    BlockDriverState *source_bs;
+-    BlockDriverState *target_bs;
+-
+-    BdrvDirtyBitmap *sync_bitmap;
+-
+-    MirrorSyncMode sync_mode;
+-    BitmapSyncMode bitmap_mode;
+-    BlockdevOnError on_source_error;
+-    BlockdevOnError on_target_error;
+-    uint64_t len;
+-    int64_t cluster_size;
+-    BackupPerf perf;
+-
+-    BlockCopyState *bcs;
+-
+-    bool wait;
+-    BlockCopyCallState *bg_bcs_call;
+-} BackupBlockJob;
+-
+ static const BlockJobDriver backup_job_driver;
+ 
+ static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+@@ -457,6 +435,14 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+     }
+ 
+     cluster_size = block_copy_cluster_size(bcs);
++    if (cluster_size < 0) {
++        goto error;
++    }
++
++    BlockDriverInfo bdi;
++    if (bdrv_get_info(bs, &bdi) == 0) {
++        cluster_size = MAX(cluster_size, bdi.cluster_size);
++    }
+ 
+     if (perf->max_chunk && perf->max_chunk < cluster_size) {
+         error_setg(errp, "Required max-chunk (%" PRIi64 ") is less than backup "
+diff --git a/block/meson.build b/block/meson.build
+index 59b71ba9f3..6fde9f7dcd 100644
+--- a/block/meson.build
++++ b/block/meson.build
+@@ -4,6 +4,7 @@ block_ss.add(files(
+   'aio_task.c',
+   'amend.c',
+   'backup.c',
++  'backup-dump.c',
+   'copy-before-write.c',
+   'blkdebug.c',
+   'blklogwrites.c',
+diff --git a/include/block/block_int-common.h b/include/block/block_int-common.h
+index 74195c3004..0f2e1817ad 100644
+--- a/include/block/block_int-common.h
++++ b/include/block/block_int-common.h
+@@ -26,6 +26,7 @@
+ 
+ #include "block/aio.h"
+ #include "block/block-common.h"
++#include "block/block-copy.h"
+ #include "block/block-global-state.h"
+ #include "block/snapshot.h"
+ #include "qemu/iov.h"
+@@ -60,6 +61,40 @@
+ 
+ #define BLOCK_PROBE_BUF_SIZE        512
+ 
++typedef int BackupDumpFunc(void *opaque, uint64_t offset, uint64_t bytes, const void *buf);
++
++BlockDriverState *bdrv_backup_dump_create(
++    int dump_cb_block_size,
++    uint64_t byte_size,
++    BackupDumpFunc *dump_cb,
++    void *dump_cb_data,
++    Error **errp);
++
++// Needs to be defined here, since it's used in blockdev.c to detect PVE backup
++// jobs with source_bs
++typedef struct BlockCopyState BlockCopyState;
++typedef struct BackupBlockJob {
++    BlockJob common;
++    BlockDriverState *cbw;
++    BlockDriverState *source_bs;
++    BlockDriverState *target_bs;
++
++    BdrvDirtyBitmap *sync_bitmap;
++
++    MirrorSyncMode sync_mode;
++    BitmapSyncMode bitmap_mode;
++    BlockdevOnError on_source_error;
++    BlockdevOnError on_target_error;
++    uint64_t len;
++    int64_t cluster_size;
++    BackupPerf perf;
++
++    BlockCopyState *bcs;
++
++    bool wait;
++    BlockCopyCallState *bg_bcs_call;
++} BackupBlockJob;
++
+ enum BdrvTrackedRequestType {
+     BDRV_TRACKED_READ,
+     BDRV_TRACKED_WRITE,
+diff --git a/job.c b/job.c
+index 72d57f0934..93e22d180b 100644
+--- a/job.c
++++ b/job.c
+@@ -330,7 +330,8 @@ static bool job_started_locked(Job *job)
+ }
+ 
+ /* Called with job_mutex held. */
+-static bool job_should_pause_locked(Job *job)
++bool job_should_pause_locked(Job *job);
++bool job_should_pause_locked(Job *job)
+ {
+     return job->pause_count > 0;
+ }

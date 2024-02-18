@@ -1,0 +1,100 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fiona Ebner <f.ebner@proxmox.com>
+Date: Tue, 7 Mar 2023 15:03:02 +0100
+Subject: [PATCH] ide: avoid potential deadlock when draining during trim
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The deadlock can happen as follows:
+1. ide_issue_trim is called, and increments the in_flight counter.
+2. ide_issue_trim_cb calls blk_aio_pdiscard.
+3. Somebody else starts draining (e.g. backup to insert the cbw node).
+4. ide_issue_trim_cb is called as the completion callback for
+   blk_aio_pdiscard.
+5. ide_issue_trim_cb issues yet another blk_aio_pdiscard request.
+6. The request is added to the wait queue via blk_wait_while_drained,
+   because draining has been started.
+7. Nobody ever decrements the in_flight counter and draining can't
+   finish. This would be done by ide_trim_bh_cb, which is called after
+   ide_issue_trim_cb has issued its last request, but
+   ide_issue_trim_cb is not called anymore, because it's the
+   completion callback of blk_aio_pdiscard, which waits on draining.
+
+Quoting Hanna Czenczek:
+> The point of 7e5cdb345f was that we need any in-flight count to
+> accompany a set s->bus->dma->aiocb. While blk_aio_pdiscard() is
+> happening, we don’t necessarily need another count. But we do need
+> it while there is no blk_aio_pdiscard().
+> ide_issue_trim_cb() returns in two cases (and, recursively through
+> its callers, leaves s->bus->dma->aiocb set):
+> 1. After calling blk_aio_pdiscard(), which will keep an in-flight
+>    count,
+> 2. After calling replay_bh_schedule_event() (i.e.
+>    qemu_bh_schedule()), which does not keep an in-flight count.
+
+Thus, even after moving the blk_inc_in_flight to above the
+replay_bh_schedule_event call, the invariant "ide_issue_trim_cb
+returns with an accompanying in-flight count" is still satisfied.
+
+However, the issue 7e5cdb345f fixed for canceling resurfaces, because
+ide_cancel_dma_sync assumes that it just needs to drain once. But now
+the in_flight count is not consistently > 0 during the trim operation.
+So, change it to drain until !s->bus->dma->aiocb, which means that the
+operation finished (s->bus->dma->aiocb is cleared by ide_set_inactive
+via the ide_dma_cb when the end of the transfer is reached).
+
+Discussion here:
+https://lists.nongnu.org/archive/html/qemu-devel/2023-03/msg02506.html
+
+Fixes: 7e5cdb345f ("ide: Increment BB in-flight counter for TRIM BH")
+Suggested-by: Hanna Czenczek <hreitz@redhat.com>
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ hw/ide/core.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 07971c0218..6a74afe564 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -444,7 +444,7 @@ static void ide_trim_bh_cb(void *opaque)
+     iocb->bh = NULL;
+     qemu_aio_unref(iocb);
+ 
+-    /* Paired with an increment in ide_issue_trim() */
++    /* Paired with an increment in ide_issue_trim_cb() */
+     blk_dec_in_flight(blk);
+ }
+ 
+@@ -504,6 +504,8 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+ done:
+     iocb->aiocb = NULL;
+     if (iocb->bh) {
++        /* Paired with a decrement in ide_trim_bh_cb() */
++        blk_inc_in_flight(s->blk);
+         replay_bh_schedule_event(iocb->bh);
+     }
+ }
+@@ -516,9 +518,6 @@ BlockAIOCB *ide_issue_trim(
+     IDEDevice *dev = s->unit ? s->bus->slave : s->bus->master;
+     TrimAIOCB *iocb;
+ 
+-    /* Paired with a decrement in ide_trim_bh_cb() */
+-    blk_inc_in_flight(s->blk);
+-
+     iocb = blk_aio_get(&trim_aiocb_info, s->blk, cb, cb_opaque);
+     iocb->s = s;
+     iocb->bh = qemu_bh_new_guarded(ide_trim_bh_cb, iocb,
+@@ -742,8 +741,9 @@ void ide_cancel_dma_sync(IDEState *s)
+      */
+     if (s->bus->dma->aiocb) {
+         trace_ide_cancel_dma_sync_remaining();
+-        blk_drain(s->blk);
+-        assert(s->bus->dma->aiocb == NULL);
++        while (s->bus->dma->aiocb) {
++            blk_drain(s->blk);
++        }
+     }
+ }
+ 

@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Stefan Reiter <s.reiter@proxmox.com>
+Date: Tue, 2 Mar 2021 16:34:28 +0100
+Subject: [PATCH] PVE: block/stream: increase chunk size
+
+Ceph favors bigger chunks, so increase to 4M.
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ block/stream.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/stream.c b/block/stream.c
+index e522bbdec5..afed72db55 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -27,7 +27,7 @@ enum {
+      * large enough to process multiple clusters in a single call, so
+      * that populating contiguous regions of the image is efficient.
+      */
+-    STREAM_CHUNK = 512 * 1024, /* in bytes */
++    STREAM_CHUNK = 4 * 1024 * 1024, /* in bytes */
+ };
+ 
+ typedef struct StreamBlockJob {

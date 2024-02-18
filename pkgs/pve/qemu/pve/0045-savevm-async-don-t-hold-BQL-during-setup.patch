@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fiona Ebner <f.ebner@proxmox.com>
+Date: Fri, 5 May 2023 15:30:16 +0200
+Subject: [PATCH] savevm-async: don't hold BQL during setup
+
+See commit "migration: for snapshots, hold the BQL during setup
+callbacks" for why. This is separate, because a version of that one
+will hopefully land upstream.
+
+Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
+---
+ migration/savevm-async.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/migration/savevm-async.c b/migration/savevm-async.c
+index 80624fada8..b1d85a4b41 100644
+--- a/migration/savevm-async.c
++++ b/migration/savevm-async.c
+@@ -401,10 +401,8 @@ void qmp_savevm_start(const char *statefile, Error **errp)
+     snap_state.state = SAVE_STATE_ACTIVE;
+     snap_state.finalize_bh = qemu_bh_new(process_savevm_finalize, &snap_state);
+     snap_state.co = qemu_coroutine_create(&process_savevm_co, NULL);
+-    qemu_mutex_unlock_iothread();
+     qemu_savevm_state_header(snap_state.file);
+     qemu_savevm_state_setup(snap_state.file);
+-    qemu_mutex_lock_iothread();
+ 
+     /* Async processing from here on out happens in iohandler context, so let
+      * the target bdrv have its home there.

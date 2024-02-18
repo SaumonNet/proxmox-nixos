@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dietmar Maurer <dietmar@proxmox.com>
+Date: Mon, 6 Apr 2020 12:16:44 +0200
+Subject: [PATCH] PVE: qapi: modify query machines
+
+provide '*is-current' in MachineInfo struct
+
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+Signed-off-by: Dietmar Maurer <dietmar@proxmox.com>
+---
+ hw/core/machine-qmp-cmds.c | 6 ++++++
+ qapi/machine.json          | 4 +++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
+index 3860a50c3b..40821e2317 100644
+--- a/hw/core/machine-qmp-cmds.c
++++ b/hw/core/machine-qmp-cmds.c
+@@ -91,6 +91,12 @@ MachineInfoList *qmp_query_machines(Error **errp)
+         info->numa_mem_supported = mc->numa_mem_supported;
+         info->deprecated = !!mc->deprecation_reason;
+         info->acpi = !!object_class_property_find(OBJECT_CLASS(mc), "acpi");
++
++        if (strcmp(mc->name, MACHINE_GET_CLASS(current_machine)->name) == 0) {
++            info->has_is_current = true;
++            info->is_current = true;
++        }
++
+         if (mc->default_cpu_type) {
+             info->default_cpu_type = g_strdup(mc->default_cpu_type);
+         }
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 5c9a4d55f4..fbb61f18e4 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -139,6 +139,8 @@
+ #
+ # @is-default: whether the machine is default
+ #
++# @is-current: whether this machine is currently used
++#
+ # @cpu-max: maximum number of CPUs supported by the machine type
+ #     (since 1.5)
+ #
+@@ -163,7 +165,7 @@
+ ##
+ { 'struct': 'MachineInfo',
+   'data': { 'name': 'str', '*alias': 'str',
+-            '*is-default': 'bool', 'cpu-max': 'int',
++            '*is-default': 'bool', '*is-current': 'bool', 'cpu-max': 'int',
+             'hotpluggable-cpus': 'bool',  'numa-mem-supported': 'bool',
+             'deprecated': 'bool', '*default-cpu-type': 'str',
+             '*default-ram-id': 'str', 'acpi': 'bool' } }

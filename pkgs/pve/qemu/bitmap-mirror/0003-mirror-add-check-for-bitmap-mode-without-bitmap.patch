@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fabian=20Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>
+Date: Mon, 6 Apr 2020 12:17:05 +0200
+Subject: [PATCH] mirror: add check for bitmap-mode without bitmap
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+as one without the other does not make much sense with the current set
+of modes.
+
+Signed-off-by: Fabian Grünbichler <f.gruenbichler@proxmox.com>
+Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+---
+ blockdev.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/blockdev.c b/blockdev.c
+index a8b1fd2a73..83d5cc1e49 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2945,6 +2945,9 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+         if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_ALLOW_RO, errp)) {
+             return;
+         }
++    } else if (has_bitmap_mode) {
++        error_setg(errp, "Cannot specify bitmap sync mode without a bitmap");
++        return;
+     }
+ 
+     if (!replaces) {

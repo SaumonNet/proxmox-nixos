@@ -64,6 +64,8 @@
               users.users.root.openssh.authorizedKeys.keys = [
                 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmuMNGkWQ7ozpC2UU0+jqMsRw1zVgT2Q9ORmLcTXpK2 camille@zeppelin"
                 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINg9kUL5kFcPOWmGy/7kJZMlG2+Ls79XiWgvO8p+OQ3f camille@genesis"
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMBW7rTtfZL9wtrpCVgariKdpN60/VeAzXkh9w3MwbO julien@enigma"
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGa+7n7kNzb86pTqaMn554KiPrkHRGeTJ0asY1NjSbpr julien@tower"
               ];
 
               system.stateVersion = "23.11";

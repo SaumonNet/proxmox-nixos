@@ -3,6 +3,7 @@ let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
   ours = rec {
     markedjs = callPackage ./markedjs.nix { };
+    vncterm = callPackage ./vncterm.nix { };
     proxmox-ve = callPackage ./pve { };
     pve-novnc = callPackage ./novnc { };
     proxmox-widget-toolkit = callPackage ./widget-toolkit.nix { };

@@ -20,6 +20,7 @@
 , tzdata
 , pve-novnc
 , iproute2
+, vncterm
 }:
 
 let
@@ -96,7 +97,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
 
     for bin in $out/{bin/*,share/pve-manager/helpers/pve-startall-delay}; do
       wrapProgram $bin \
-        --prefix PATH : ${lib.makeBinPath [ ceph gzip openssh gnupg openvswitch pve-qemu iproute2 ]} \
+        --prefix PATH : ${lib.makeBinPath [ ceph gzip openssh gnupg openvswitch pve-qemu iproute2 vncterm ]} \
         --prefix PERL5LIB : $out/${perl.libPrefix}/${perl.version}
     done      
   '';

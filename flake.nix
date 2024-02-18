@@ -59,6 +59,7 @@
               };
 
               services.tailscale.enable = true;
+              services.openssh.enable = true;
 
               users.users.root.openssh.authorizedKeys.keys = [
                 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmuMNGkWQ7ozpC2UU0+jqMsRw1zVgT2Q9ORmLcTXpK2 camille@zeppelin"

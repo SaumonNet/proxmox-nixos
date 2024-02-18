@@ -94,6 +94,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
       -e "s|/usr/share/pve-manager|$out/share/pve-manager|" \
       -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
       -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
+      -e "s|/usr/bin/termproxy|${termproxy}/share/termproxy|" \
       -Ee "s|(/usr)?/s?bin/||" \
       -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
 

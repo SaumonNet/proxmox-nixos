@@ -26,7 +26,8 @@ rustPlatform.buildRustPackage rec {
   '';
 
   postInstall = ''
-    mv $out/bin/proxmox-termproxy $out/bin/termproxy
+    mkdir $out/share
+    mv $out/bin/proxmox-termproxy $out/share/termproxy
   '';
 
   meta = with lib; {

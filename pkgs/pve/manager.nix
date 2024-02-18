@@ -4,11 +4,11 @@
 , callPackage
 , makeWrapper
 , perl
-, proxmox-widget-toolkit ? callPackage ../widget-toolkit.nix { }
-, pve-acme ? callPackage ./acme.nix { }
-, pve-docs ? callPackage ./docs.nix { }
-, pve-ha-manager ? callPackage ./ha-manager.nix { }
-, pve-http-server ? callPackage ./http-server.nix { }
+, proxmox-widget-toolkit
+, pve-acme
+, pve-docs
+, pve-ha-manager
+, pve-http-server
 , ceph
 , gnupg
 , graphviz

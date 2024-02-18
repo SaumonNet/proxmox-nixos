@@ -19,6 +19,7 @@
 , pve-qemu
 , tzdata
 , pve-novnc
+, pve-xtermjs
 , iproute2
 }:
 
@@ -91,6 +92,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
       -e "s|/usr/share/fonts-font-awesome|${pve-http-server}/share/fonts-font-awesome|" \
       -e "s|/usr/share/pve-manager|$out/share/pve-manager|" \
       -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
+      -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
       -Ee "s|(/usr)?/s?bin/||" \
       -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
 

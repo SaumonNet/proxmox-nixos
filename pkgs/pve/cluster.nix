@@ -3,9 +3,9 @@
 , fetchFromGitHub
 , callPackage
 , perl
-, pve-access-control ? callPackage ./access-control.nix { }
-, pve-apiclient ? callPackage ./apiclient.nix { }
-, pve-rs ? callPackage ./rs { }
+, pve-access-control
+, pve-apiclient
+, pve-rs
 , bash
 , check
 , corosync
@@ -89,7 +89,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation {
   '';
 
   postFixup = ''
-    find $out/lib -type f | xargs sed -i -re "s|[/usr]?/s?bin/||"
+    find $out/lib -type f | xargs sed -i -re "s|(/usr)?/s?bin/||"
 
     for bin in $out/bin/*; do
       wrapProgram $bin \

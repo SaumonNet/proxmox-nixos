@@ -25,7 +25,6 @@ in
     {
       boot.supportedFilesystems = [ "fuse" "glusterfs" ];
       networking.hosts = { "${cfg.localIP}" = [ config.networking.hostName ]; };
-      services.corosync.enable = true;
       services.rpcbind.enable = true;
       services.rrdcached.enable = true;
       users.users.www-data = { isSystemUser = true; group = "www-data"; };

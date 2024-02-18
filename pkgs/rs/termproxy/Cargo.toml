@@ -1,0 +1,25 @@
+[package]
+name = "proxmox-termproxy"
+description = "Execute a terminal command and proxy I/O via network"
+version = "1.0.1"
+authors = [
+    "Proxmox Support Team <support@proxmox.com>",
+    "for xterm.js parts: The xterm.js authors <https://github.com/xtermjs/xterm.js>",
+]
+edition = "2021"
+license = "AGPL-3"
+
+exclude = [ "build", "debian" ]
+
+[profile.release]
+lto = true
+
+[dependencies]
+anyhow = "1"
+libc = "0.2.107"
+mio = { version = "0.8", features = [ "net", "os-ext" ] }
+nix = "0.26.1"
+pico-args = "0.4"
+proxmox-io = { version = "1", git = "https://git.proxmox.com/git/proxmox.git" }
+proxmox-lang = { version = "1.0", git = "https://git.proxmox.com/git/proxmox.git" }
+ureq = { version = "2.4", default-features = false, features = [ "gzip" ] }

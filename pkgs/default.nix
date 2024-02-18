@@ -23,6 +23,7 @@ let
     pve-rados2 = callPackage ./pve/rados2.nix { };
     pve-rs = callPackage ./pve/rs { };
     pve-xtermjs = callPackage ./pve/xtermjs.nix { };
+    termproxy = callPackage ./rs/termproxy { };
     pve-qemu-server = callPackage ./pve/qemu-server.nix { };
     pve-qemu = (pkgs.qemu.overrideAttrs (old: {
       patches = old.patches ++ [

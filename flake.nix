@@ -41,8 +41,8 @@
               networking = {
                 hostName = "proxmox-dev";
                 networkmanager.enable = true;
-                firewall.allowedTCPPorts = [ 80 443 5900 ];
-                firewall.allowedUDPPorts = [ 80 443 5900 ];
+                firewall.allowedTCPPorts = [ 80 443 5900 5901 5902 ];
+                firewall.allowedUDPPorts = [ 80 443 5900 5901 5902 ];
                 nftables.enable = true;
               };
 

@@ -1,28 +1,31 @@
 { pkgs, ... }:
-
-rec {
-  markedjs = pkgs.callPackage ./markedjs.nix { };
-  proxmox-ve = pkgs.callPackage ./pve { inherit pve-access-control pve-cluster pve-container pve-firewall pve-ha-manager pve-manager pve-qemu-server pve-storage; };
-  pve-novnc = pkgs.callPackage ./novnc { };
-  proxmox-widget-toolkit = pkgs.callPackage ./widget-toolkit.nix { };
-  perlmod = pkgs.callPackage ./perlmod { };
-  pve-access-control = pkgs.callPackage ./pve/access-control.nix { };
-  pve-acme = pkgs.callPackage ./pve/acme.nix { };
-  pve-apiclient = pkgs.callPackage ./pve/apiclient.nix { };
-  pve-cluster = pkgs.callPackage ./pve/cluster.nix { };
-  pve-common = pkgs.callPackage ./pve/common.nix { };
-  pve-container = pkgs.callPackage ./pve/container.nix { };
-  pve-docs = pkgs.callPackage ./pve/docs.nix { };
-  pve-firewall = pkgs.callPackage ./pve/firewall.nix { };
-  pve-ha-manager = pkgs.callPackage ./pve/ha-manager.nix { inherit pve-qemu pve-qemu-server pve-storage; };
-  pve-http-server = pkgs.callPackage ./pve/http-server.nix { };
-  pve-guest-common = pkgs.callPackage ./pve/guest-common.nix { };
-  pve-manager = pkgs.callPackage ./pve/manager.nix { inherit pve-novnc pve-qemu pve-ha-manager; };
-  pve-storage = pkgs.callPackage ./pve/storage.nix { inherit pve-qemu; };
-  pve-rados2 = pkgs.callPackage ./pve/rados2.nix { };
-  pve-rs = pkgs.callPackage ./pve/rs { };
-  pve-qemu-server = pkgs.callPackage ./pve/qemu-server.nix { inherit pve-qemu; };
-  pve-qemu = (pkgs.qemu.overrideAttrs (old: {
-    inherit (old) patches;
-  })).override { glusterfsSupport = true; };
-}
+let
+  callPackage = pkgs.lib.callPackageWith (pkgs // ours);
+  ours = rec {
+    markedjs = callPackage ./markedjs.nix { };
+    proxmox-ve = callPackage ./pve { };
+    pve-novnc = callPackage ./novnc { };
+    proxmox-widget-toolkit = callPackage ./widget-toolkit.nix { };
+    perlmod = callPackage ./perlmod { };
+    pve-access-control = callPackage ./pve/access-control.nix { };
+    pve-acme = callPackage ./pve/acme.nix { };
+    pve-apiclient = callPackage ./pve/apiclient.nix { };
+    pve-cluster = callPackage ./pve/cluster.nix { };
+    pve-common = callPackage ./pve/common.nix { };
+    pve-container = callPackage ./pve/container.nix { };
+    pve-docs = callPackage ./pve/docs.nix { };
+    pve-firewall = callPackage ./pve/firewall.nix { };
+    pve-ha-manager = callPackage ./pve/ha-manager.nix { };
+    pve-http-server = callPackage ./pve/http-server.nix { };
+    pve-guest-common = callPackage ./pve/guest-common.nix { };
+    pve-manager = callPackage ./pve/manager.nix { };
+    pve-storage = callPackage ./pve/storage.nix { };
+    pve-rados2 = callPackage ./pve/rados2.nix { };
+    pve-rs = callPackage ./pve/rs { };
+    pve-qemu-server = callPackage ./pve/qemu-server.nix { };
+    pve-qemu = (pkgs.qemu.overrideAttrs (old: {
+      inherit (old) patches;
+    })).override { glusterfsSupport = true; };
+  };
+in
+ours

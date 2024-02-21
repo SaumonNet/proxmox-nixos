@@ -36,7 +36,7 @@
         extraModules = lib.attrValues self.nixosModules;
         inherit pkgs lib;
         modules = [
-          (
+          ({ config, ... }:
             {
               networking = {
                 hostName = "proxmox-dev";
@@ -45,7 +45,7 @@
                 firewall.allowedUDPPorts = [ 80 443 5900 5901 5902 ];
                 nftables.enable = true;
               };
-
+              boot.specialFileSystems."/dev/pts" = { fsType = "devpts"; options = [ "nosuid" "noexec" "mode=620" "ptmxmode=0000" "gid=${toString config.ids.gids.tty}" ]; };
               imports = [ ./hardware-configuration.nix ];
 
               services.proxmox-ve = {

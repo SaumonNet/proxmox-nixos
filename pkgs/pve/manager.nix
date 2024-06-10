@@ -5,7 +5,7 @@
 , makeWrapper
 , perl
 , proxmox-widget-toolkit
-, pve-acme
+, proxmox-acme
 , pve-docs
 , pve-ha-manager
 , pve-http-server
@@ -30,7 +30,7 @@ let
     NetDNS
     PodParser
     TemplateToolkit
-    pve-acme
+    proxmox-acme
     pve-ha-manager
     pve-http-server
   ];
@@ -40,12 +40,12 @@ in
 
 perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-manager";
-  version = "8.0.3";
+  version = "8.2.4";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/${pname}.git";
-    rev = "50bcf799d8435b794fe2a79a74aa6df6a1419292";
-    hash = "sha256-nd1bRpfPrtqXLByhTVnqWr1l3lLPGcJZfFqLZ2hBjsk=";
+    rev = "faa83925c96413258b9a02c4de89442adeff9215";
+    hash = "sha256-onNnxvQ7YrdnrFpl+z7Z+xUyEZsMcU6Qxn/kjYLan+8=";
   };
 
   postPatch = ''

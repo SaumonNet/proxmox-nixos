@@ -9,12 +9,12 @@ let
   perlDeps = with perl.pkgs; [ HTTPDaemon HTTPMessage ];
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
-  pname = "pve-acme";
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
+  pname = "proxmox-acme";
   version = "1.4.6";
 
   src = fetchgit {
-    url = "https://git.proxmox.com/git/proxmox-acme.git";
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "c0e3e6c415cb6a6740a3718a0ab744df38bae152";
     hash = "sha256-5JZc7NarnwPmAYEQ4NznZGHWHnNxwx3av9Ehz/+Ua4M=";
   };

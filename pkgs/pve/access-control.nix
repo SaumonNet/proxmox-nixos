@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , perl
 , pve-common ? callPackage ./common.nix { }
@@ -15,13 +15,12 @@ let
   perlEnv = perl.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-access-control";
   version = "8.0.3";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-access-control";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "8a856968f778fdac953bec36d62bd57f3efc5ae6";
     hash = "sha256-FErbHoGcKQ7yQlRliD2I5KpCzPXSBDjOnL32lsqE9Ao=";
   };

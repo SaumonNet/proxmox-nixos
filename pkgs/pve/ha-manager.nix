@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , makeWrapper
 , perl
@@ -23,13 +23,12 @@ let
   perlEnv = perl.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-ha-manager";
   version = "4.0.2";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-ha-manager";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "dfe080bab1f7f5f12c6de5837c53b47b27355ea6";
     hash = "sha256-bW5++4hXuZtFvV/oP+RNnnjq9ana0VMIEwU1jcbMbTY=";
   };

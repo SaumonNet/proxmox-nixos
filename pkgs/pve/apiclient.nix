@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , perl
 }:
@@ -9,13 +9,12 @@ let
   perlDeps = with perl.pkgs; with callPackage ../perl-packages.nix { }; [ IOSocketSSL ];
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-apiclient";
   version = "3.3.1";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-apiclient";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "dfee5e09acd529f28c7565f380f2dd3415cd92e7";
     hash = "sha256-uIz0G4thjsa48QmQMMkgZ6Uh9yJTY1WPKLYReOWoKVM=";
   };

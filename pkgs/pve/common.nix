@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , bash
 , coreutils
@@ -64,13 +64,12 @@ let
   ];
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-common";
   version = "8.0.6";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-common";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "f080ddbdc845b76919ef0a4e1bcb60ade177a9f5";
     hash = "sha256-SGCEPCJOgiJENgKTbvsW+5yR7BZSMvjZgR9Nge3uMsM=";
   };

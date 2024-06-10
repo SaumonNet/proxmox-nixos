@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , makeWrapper
 , perl
@@ -42,9 +42,8 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-manager";
   version = "8.0.3";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-manager";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "50bcf799d8435b794fe2a79a74aa6df6a1419292";
     hash = "sha256-nd1bRpfPrtqXLByhTVnqWr1l3lLPGcJZfFqLZ2hBjsk=";
   };

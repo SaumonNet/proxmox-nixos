@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , makeWrapper
 , perl
@@ -19,13 +19,12 @@ let
   perlEnv = perl.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-firewall";
   version = "5.0.2";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-firewall";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "0d28aa2abcf2d453504049388b71d27a7ba3259b";
     hash = "sha256-miSdRmnFeqjBR4bHokdk4Pv4XRMivevvLCJeOgvksgA=";
   };

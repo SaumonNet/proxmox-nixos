@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , perl
 , callPackage
 , pve-cluster ? callPackage ./cluster.nix { }
@@ -37,13 +37,12 @@ let
   perlEnv = perl.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-storage";
   version = "8.0.2";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-storage";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "42c08f41cb361f350aa46646cea0b0dd5bc99bd0";
     hash = "sha256-lHXrFlxJ5jN3QBYkkwSMZz37zT8SB4hx4v7oo9O0cg8=";
   };

@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , perl
 , glib
@@ -43,13 +43,12 @@ let
   perlEnv = perl.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (stdenv.mkDerivation {
+perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-qemu-server";
   version = "8.0.6";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "qemu-server";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "f46596539f9684959b93e518010b7ecb24b34bf4";
     hash = "sha256-LUOryKOqEPHCxdjBBqrTnefIa0T3QbLURPgpYtf/bEA=";
   };

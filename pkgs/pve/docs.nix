@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchFromGitHub
+, fetchgit
 , callPackage
 , perl
 , proxmox-widget-toolkit ? callPackage ../widget-toolkit.nix { }
@@ -20,9 +20,8 @@ stdenv.mkDerivation rec {
   pname = "pve-docs";
   version = "8.0.4";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "pve-docs";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "cd44cb4c27486f0d63c332e21ed454014ae1f002";
     hash = "sha256-czVL7h1pTrSWnhkMctW2nlZk3Y3t0EWqUbneGWSZq18=";
   };

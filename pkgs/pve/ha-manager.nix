@@ -25,12 +25,12 @@ in
 
 perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-ha-manager";
-  version = "4.0.2";
+  version = "4.0.5";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/${pname}.git";
-    rev = "dfe080bab1f7f5f12c6de5837c53b47b27355ea6";
-    hash = "sha256-bW5++4hXuZtFvV/oP+RNnnjq9ana0VMIEwU1jcbMbTY=";
+    rev = "800a0c3e485f175d914fb7b59dfcd0cd375998de";
+    hash = "sha256-zY0tB4Uby3uFlPHNy75weYioSln/Bt4wzf+u7ba4nSE=";
   };
 
   sourceRoot = "source/src";

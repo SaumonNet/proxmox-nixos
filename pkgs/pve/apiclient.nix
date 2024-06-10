@@ -11,12 +11,12 @@ in
 
 perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-apiclient";
-  version = "3.3.1";
+  version = "3.3.2";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/${pname}.git";
-    rev = "dfee5e09acd529f28c7565f380f2dd3415cd92e7";
-    hash = "sha256-uIz0G4thjsa48QmQMMkgZ6Uh9yJTY1WPKLYReOWoKVM=";
+    rev = "94d38f0aba67ad04bf20159f605d5f7380cf7b58";
+    hash = "sha256-wCPCEx8SpGpcuYDV2InobN9bcBu0RUlzcpD6sgmm/Wg=";
   };
 
   sourceRoot = "source/src";

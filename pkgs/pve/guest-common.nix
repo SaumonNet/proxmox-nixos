@@ -6,12 +6,12 @@
 
 perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
   pname = "pve-guest-common";
-  version = "5.0.3";
+  version = "5.1.3";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/${pname}.git";
-    rev = "831a2fffb226de038d64a5f7ba90a826678a9a32";
-    hash = "sha256-1sVbCXxpllgjI4Moeud5XyJVfuQt4W5UATPgcJf8eiQ=";
+    rev = "a9604f72ebe6d9c5ca3c7d9eebb9b0fc31d063d0";
+    hash = "sha256-Vv2tIP8TCDUvbRcw90K4Ilg5wVxbKlV4SZgPjUJO5iI=";
   };
 
   sourceRoot = "source/src";

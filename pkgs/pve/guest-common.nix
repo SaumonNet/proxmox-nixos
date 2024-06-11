@@ -14,7 +14,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
     hash = "sha256-Vv2tIP8TCDUvbRcw90K4Ilg5wVxbKlV4SZgPjUJO5iI=";
   };
 
-  sourceRoot = "source/src";
+  sourceRoot = "${src.name}/src";
 
   makeFlags = [
     "PERL5DIR=$(out)/${perl.libPrefix}/${perl.version}"

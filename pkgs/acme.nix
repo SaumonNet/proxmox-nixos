@@ -19,7 +19,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
     hash = "sha256-5JZc7NarnwPmAYEQ4NznZGHWHnNxwx3av9Ehz/+Ua4M=";
   };
 
-  sourceRoot = "proxmox-acme-c0e3e6c/src";
+  sourceRoot = "${src.name}/src";
 
   postPatch = ''
     sed -i Makefile -e "s,acme.sh,${acme-sh}/libexec,"

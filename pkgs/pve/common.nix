@@ -74,7 +74,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
     hash = "sha256-fMgkeaOoaJDk9yf3O4uZSTs0p7H4uUYyy1Ii3J02uNw=";
   };
 
-  sourceRoot = "source/src";
+  sourceRoot = "${src.name}/src";
 
   patches = [
     (substituteAll {

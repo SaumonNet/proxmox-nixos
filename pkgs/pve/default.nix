@@ -11,7 +11,7 @@
 }:
 
 buildEnv {
-  name = "proxmox-ve-8.0.3";
+  name = "proxmox-ve-${pve-manager.version}";
 
   paths = [
     pve-access-control

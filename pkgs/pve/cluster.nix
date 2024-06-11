@@ -46,7 +46,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
     hash = "sha256-uRcZuF7p2wCVRflJy4CxwDzKF6IS3uMGiN+iL227taU=";
   };
 
-  sourceRoot = "source/src";
+  sourceRoot = "${src.name}/src";
 
   postPatch = ''
     find . -type f -name Makefile | xargs sed -i "s|/usr||g"

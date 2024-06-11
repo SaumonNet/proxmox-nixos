@@ -6,7 +6,7 @@
 , sassc
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "proxmox-widget-toolkit";
   version = "4.0.6";
 
@@ -16,7 +16,7 @@ stdenv.mkDerivation {
     hash = "sha256-EE1jc2ZXXZ9CXfhyTQ05sjDqwv4sF2WanMepTZQ/lLE=";
   };
 
-  sourceRoot = "proxmox-widget-toolkit-81562ce/src";
+  sourceRoot = "${src.name}/src";
 
   postPatch = ''
     sed -i defines.mk -e "s,/usr,,"

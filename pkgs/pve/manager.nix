@@ -52,6 +52,7 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
     sed -i {defines.mk,configs/Makefile} -e "s,/usr,,"
     sed -i Makefile \
       -e '/GITVERSION/d' \
+      -e "/default.mk/d" \
       -e '/pkg-info/d' \
       -e '/log/d' \
       -e '/architecture/d' \

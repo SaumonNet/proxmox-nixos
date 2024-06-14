@@ -101,7 +101,7 @@
 
               nix.buildMachines = [
                 {
-                  hostName = "epyc";
+                  hostName = "epyc.infra.newtype.fr";
                   system = "x86_64-linux";
                   maxJobs = 10;
                   speedFactor = 2;

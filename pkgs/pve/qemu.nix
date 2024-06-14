@@ -6,26 +6,26 @@
 
 (
   (qemu.overrideAttrs (old: {
-    #version = "8.2.2";
+    version = "8.1.5";
 
-    #src = fetchFromGitHub {
-    #  owner = "qemu";
-    #  repo = "qemu";
-    #  rev = "v8.2.2";
-    #  hash = "sha256-zihKedCHb616YEC7OuhJOQtWFThiDpo7l7E/xKaUCes=";
-    #};
+    src = fetchFromGitHub {
+      owner = "qemu";
+      repo = "qemu";
+      rev = "v8.1.5";
+      hash = "sha256-ObEFE9lKOhCtM8VU4OPSTYOAicBCNKbeMmVYSRaJpfM=";
+    };
 
     patches =
       let
-        src2 = fetchgit {
+        src_patches = fetchgit {
           url = "https://git.proxmox.com/git/pve-qemu.git";
-          rev = "c19617bf9b5b582fc2d15faba07b8648b21c8779";
-          hash = "sha256-1BNpz6Y3l/0aG8/SzOh38+FdEITstTR9qAEr7QawdTY=";
+          rev = "e62423e6156b7bf9afd8b670722c66c93fd2ba45";
+          hash = "sha256-jLFc43HHnOGRXDRyMlmcQ5Fg/Wgc3CbgwSh/TgAPDWQ=";
           fetchSubmodules = false;
         };
-        patchesDir = "${src2}/debian/patches";
+        patchesDir = "${src_patches}/debian/patches";
       in
-      old.patches ++ [
+      [ (builtins.head old.patches) ] ++ [
         "${patchesDir}/extra/0001-monitor-qmp-fix-race-with-clients-disconnecting-earl.patch"
         "${patchesDir}/extra/0002-scsi-megasas-Internal-cdbs-have-16-byte-length.patch"
         "${patchesDir}/extra/0003-ide-avoid-potential-deadlock-when-draining-during-tr.patch"

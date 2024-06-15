@@ -1,14 +1,15 @@
-{ lib
-, rustPlatform
-, fetchgit
-, pkg-config
-, openssl
-, zstd
-, clang
-, libclang
-, libuuid
-, systemdLibs
-, diffutils
+{
+  lib,
+  rustPlatform,
+  fetchgit,
+  pkg-config,
+  openssl,
+  zstd,
+  clang,
+  libclang,
+  libuuid,
+  systemdLibs,
+  diffutils,
 }:
 
 rustPlatform.buildRustPackage {
@@ -32,8 +33,20 @@ rustPlatform.buildRustPackage {
     sed -i proxmox-rrd/tests/file_format_test.rs -e "s|/usr/bin/cmp|${diffutils}/bin/cmp|"
   '';
 
-  nativeBuildInputs = [ pkg-config clang zstd zstd.dev ];
-  buildInputs = [ openssl zstd clang zstd.dev libuuid systemdLibs ];
+  nativeBuildInputs = [
+    pkg-config
+    clang
+    zstd
+    zstd.dev
+  ];
+  buildInputs = [
+    openssl
+    zstd
+    clang
+    zstd.dev
+    libuuid
+    systemdLibs
+  ];
   LIBCLANG_PATH = "${libclang.lib}/lib";
 
   installPhase = ''
@@ -44,11 +57,18 @@ rustPlatform.buildRustPackage {
 
   checkFlags = [ "--skip=test_get_current_release_codename" ];
 
+  installPhase = ''
+    mkdir -p $out
+    cp -r * $out 
+  '';
 
   meta = with lib; {
     description = "";
     homepage = "https://git.proxmox.com/git/proxmox.git";
-    maintainers = with maintainers; [ camillemndn julienmalka ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     mainProgram = "proxmox";
   };
 }

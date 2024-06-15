@@ -1,10 +1,11 @@
-{ lib
-, buildNpmPackage
-, fetchFromGitHub
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
 }:
 
 buildNpmPackage rec {
-  pname = "marked";
+  pname = "markedjs";
   version = "5.1.1";
 
   src = fetchFromGitHub {
@@ -20,7 +21,10 @@ buildNpmPackage rec {
     description = "A markdown parser and compiler. Built for speed";
     homepage = "https://github.com/markedjs/marked";
     license = with licenses; [ ];
-    maintainers = with maintainers; [ camillemndn julienmalka ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     platforms = platforms.linux;
   };
 }

@@ -127,7 +127,7 @@ async def check_changes(package: Dict, worktree: str, update_info: str):
 
         if 'newVersion' not in changes[0]:
             attr_path = changes[0]['attrPath']
-            obtain_new_version_process = await check_subprocess('nix-instantiate', '--expr', f'with import ./. {{}}; lib.getVersion {attr_path}', '--eval', '--strict', '--json', stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=worktree)
+            obtain_new_version_process = await check_subprocess('nix', 'eval', f'.#{attr_path}.version', stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=worktree)
             changes[0]['newVersion'] = json.loads((await obtain_new_version_process.stdout.read()).decode('utf-8'))
 
         if 'files' not in changes[0]:

@@ -1,16 +1,24 @@
 { lib
 , rustPlatform
 , fetchgit
+, pkg-config
+, openssl
+, zstd
+, clang
+, libclang
+, libuuid
+, systemdLibs
+, diffutils
 }:
 
-rustPlatform.buildRustPackage rec {
-  pname = "proxmox";
-  version = "unstable";
+rustPlatform.buildRustCrate {
+  pname = "proxmox-rs";
+  version = "2024-06-13";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/proxmox.git";
-    rev = "3ac6f2d9c0b3e1aa6f980a389f4e4e68f53a2524";
-    hash = "sha256-Jfsgysij+Bmu47O5gC/CzT3FRj5IIMVnSoOcCCl0wvc=";
+    rev = "b25edb67de09ab22e33ba4db8d445f1e3c8ebab7";
+    hash = "sha256-2ND/qP5hDDTov/JwbnVjBH1uAT3EpecerVm24W+1M94=";
   };
 
   cargoLock = {
@@ -18,14 +26,23 @@ rustPlatform.buildRustPackage rec {
   };
 
   postPatch = ''
-    ln -s ${./Cargo.lock} Cargo.lock
+    cp ${./Cargo.lock} Cargo.lock
+    rm .cargo/config
+
+    sed -i proxmox-rrd/tests/file_format_test.rs -e "s|/usr/bin/cmp|${diffutils}/bin/cmp|"
   '';
+
+  nativeBuildInputs = [ pkg-config clang zstd zstd.dev ];
+  buildInputs = [ openssl zstd clang zstd.dev libuuid systemdLibs ];
+  LIBCLANG_PATH = "${libclang.lib}/lib";
+
+  checkFlags = [ "--skip=test_get_current_release_codename" ];
+
 
   meta = with lib; {
     description = "";
     homepage = "https://git.proxmox.com/git/proxmox.git";
-    license = licenses.unfree; # FIXME: nix-init did not found a license
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ camillemndn julienmalka ];
     mainProgram = "proxmox";
   };
 }

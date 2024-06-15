@@ -26,6 +26,7 @@ let
     pve-xtermjs = callPackage ./pve/xtermjs.nix { };
     termproxy = callPackage ./rs/termproxy { };
     pve-qemu = callPackage ./pve/qemu.nix { };
+    proxmox-rs = callPackage ./rs { };
   };
 in
 ours

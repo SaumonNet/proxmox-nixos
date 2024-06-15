@@ -13,6 +13,8 @@
   systemd,
   tzdata,
   usbutils,
+  mimebase32,
+  mimebase64,
   substituteAll,
 }:
 
@@ -44,8 +46,8 @@ let
     #libwwwperl
     LinuxInotify2
     ScalarListUtils
-    MIMEBase32
-    MIMEBase64
+    mimebase32
+    mimebase64
     NetDBus
     NetIP
     perlldap

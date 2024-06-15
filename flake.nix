@@ -2,7 +2,10 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-24.05";
     unstable.url = "nixpkgs/nixos-unstable";
-    colmena.url = "github:zhaofengli/colmena";
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-index-database = {
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";

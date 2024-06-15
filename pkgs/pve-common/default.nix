@@ -132,7 +132,11 @@ perl.pkgs.toPerlModule (
         -Ee "s|(/usr)?/s?bin/||"
     '';
 
-    passthru.updateScript = callPackage ../update.nix { inherit src pname; };
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
 
     meta = with lib; {
       description = "Proxmox Project's Common Perl Code";

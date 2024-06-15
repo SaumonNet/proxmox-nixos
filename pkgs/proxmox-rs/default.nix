@@ -59,10 +59,7 @@ craneLib.buildPackage rec {
   meta = with lib; {
     description = "";
     homepage = "https://git.proxmox.com/git/proxmox.git";
-    maintainers = with maintainers; [
-      camillemndn
-      julienmalka
-    ];
+    maintainers = with maintainers; [ julienmalka ];
     mainProgram = "proxmox";
   };
 }

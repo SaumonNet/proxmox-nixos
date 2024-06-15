@@ -40,7 +40,7 @@ rustPlatform.buildRustPackage rec {
   ];
 
   meta = with lib; {
-    maintainers = [
+    maintainers = with maintainers; [
       camillemndn
       julienmalka
     ];

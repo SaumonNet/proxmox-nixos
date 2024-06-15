@@ -11,7 +11,7 @@
 , diffutils
 }:
 
-rustPlatform.buildRustCrate {
+rustPlatform.buildRustPackage {
   pname = "proxmox-rs";
   version = "2024-06-13";
 
@@ -35,6 +35,12 @@ rustPlatform.buildRustCrate {
   nativeBuildInputs = [ pkg-config clang zstd zstd.dev ];
   buildInputs = [ openssl zstd clang zstd.dev libuuid systemdLibs ];
   LIBCLANG_PATH = "${libclang.lib}/lib";
+
+  installPhase = ''
+    mkdir -p $out/share
+    # cp -r /build/cargo-vendor-dir $out/share
+    cp -r /build/target $out/share
+  '';
 
   checkFlags = [ "--skip=test_get_current_release_codename" ];
 

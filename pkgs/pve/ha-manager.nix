@@ -1,12 +1,11 @@
 { lib
 , stdenv
 , fetchgit
-, callPackage
 , makeWrapper
 , perl
-, pve-container ? callPackage ./container.nix { }
-, pve-firewall ? callPackage ./firewall.nix { }
-, pve-guest-common ? callPackage ./guest-common.nix { }
+, pve-container
+, pve-firewall
+, pve-guest-common
 , pve-qemu-server
 , pve-storage
 , pve-qemu

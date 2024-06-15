@@ -20,7 +20,7 @@
     , ...
     }:
     let
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
 
       pkgs = import nixpkgs {
         system = "x86_64-linux";
@@ -46,7 +46,7 @@
           };
         };
 
-      nixosConfigurations.proxmox-dev = lib.nixosSystem ({
+      nixosConfigurations.proxmox-dev = lib.nixosSystem {
         system = "x86_64-linux";
         extraModules = lib.attrValues self.nixosModules;
         inherit pkgs lib;
@@ -130,7 +130,7 @@
             }
           )
         ];
-      });
+      };
 
       colmena =
         {

@@ -7,9 +7,8 @@
 , pkg-config
 , openssl
 , fetchgit
-, callPackage
 , perl
-, perlmod ? callPackage ../../perlmod { }
+, perlmod
 }:
 
 perl.pkgs.toPerlModule (stdenv.mkDerivation rec {

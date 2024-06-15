@@ -3,7 +3,7 @@
 , fetchgit
 , callPackage
 , perl
-, proxmox-widget-toolkit ? callPackage ../widget-toolkit.nix { }
+, proxmox-widget-toolkit
 , asciidoc
 , librsvg
 }:

@@ -3,8 +3,8 @@
 , fetchgit
 , perl
 , callPackage
-, pve-cluster ? callPackage ./cluster.nix { }
-, pve-rados2 ? callPackage ./rados2.nix { }
+, pve-cluster
+, pve-rados2
 , ceph
 , coreutils
 , e2fsprogs

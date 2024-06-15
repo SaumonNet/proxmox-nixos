@@ -1,10 +1,9 @@
 { lib
 , stdenv
 , fetchgit
-, callPackage
 , makeWrapper
 , perl
-, pve-cluster ? callPackage ./cluster.nix { }
+, pve-cluster
 , glib
 , ipset
 , iptables

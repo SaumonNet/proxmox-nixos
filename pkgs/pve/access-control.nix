@@ -3,7 +3,7 @@
 , fetchgit
 , callPackage
 , perl
-, pve-common ? callPackage ./common.nix { }
+, pve-common
 }:
 
 let

@@ -1,9 +1,7 @@
 { lib
 , stdenv
 , fetchgit
-, callPackage
 , perl
-  #, pve-ha-manager ? callPackage ./ha-manager.nix { }
 , dtach
 , lxc
 , openssh
@@ -11,10 +9,7 @@
 }:
 
 let
-  perlDeps = with perl.pkgs; with callPackage ../perl-packages.nix { }; [
-    #pve-ha-manager
-  ];
-
+  perlDeps = [ ];
   perlEnv = perl.withPackages (_: perlDeps);
 in
 
@@ -58,12 +53,6 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
     "SBINDIR=$(out)/.bin"
     "PERLDIR=$(out)/${perl.libPrefix}/${perl.version}"
   ];
-
-  #postInstall = ''
-  #  sed -i $out/bin/* \
-  #    -e "s/-T//" \
-  #    -e "1s|$| -I$out/${perl.libPrefix}/${perl.version}|"
-  #'';
 
   postFixup = ''
     find $out -type f | xargs sed -i \

@@ -11,16 +11,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     utils.url = "github:numtide/flake-utils";
+    flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat";
   };
 
   description = "Proxmox on NixOS";
 
   outputs =
-    { self
-    , nixpkgs
-    , unstable
-    , utils
-    , ...
+    {
+      self,
+      nixpkgs,
+      unstable,
+      utils,
+      ...
     }:
     let
       inherit (nixpkgs) lib;
@@ -144,52 +146,50 @@
             specialArgs.lib = lib;
           };
         }
-        // builtins.mapAttrs
-          (n: v: {
-            imports = v._module.args.modules ++ v._module.args.extraModules;
-            deployment = self.machines.${n}.deployment // {
-              buildOnTarget = lib.mkDefault true;
-            };
-          })
-          self.nixosConfigurations;
+        // builtins.mapAttrs (n: v: {
+          imports = v._module.args.modules ++ v._module.args.extraModules;
+          deployment = self.machines.${n}.deployment // {
+            buildOnTarget = lib.mkDefault true;
+          };
+        }) self.nixosConfigurations;
 
       checks = lib.recursiveUpdate self.packages {
         x86_64-linux = lib.mapAttrs (_: v: v.config.system.build.toplevel) self.nixosConfigurations;
       };
     }
     //
-    utils.lib.eachSystem
-      [
-        "x86_64-linux"
-        "aarch64-linux"
-      ]
-      (
-        system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ self.overlays.${system} ];
-          };
-        in
-        {
-          overlays =
-            _: prev:
-            {
-              inherit lib;
-              unstable = unstable.legacyPackages.${system};
-            }
-            // (import ./pkgs { pkgs = prev; });
+      utils.lib.eachSystem
+        [
+          "x86_64-linux"
+          "aarch64-linux"
+        ]
+        (
+          system:
+          let
+            pkgs = import nixpkgs {
+              inherit system;
+              overlays = [ self.overlays.${system} ];
+            };
+          in
+          {
+            overlays =
+              _: prev:
+              {
+                inherit lib;
+                unstable = unstable.legacyPackages.${system};
+              }
+              // (import ./pkgs { pkgs = prev; });
 
-          packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs; });
+            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs; });
 
-          devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              age
-              sops
-              colmena
-              nixos-generators
-            ];
-          };
-        }
-      );
+            devShells.default = pkgs.mkShell {
+              buildInputs = with pkgs; [
+                age
+                sops
+                colmena
+                nixos-generators
+              ];
+            };
+          }
+        );
 }

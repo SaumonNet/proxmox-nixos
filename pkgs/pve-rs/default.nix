@@ -25,11 +25,7 @@ perl.pkgs.toPerlModule (
 
     cargoDeps = rustPlatform.importCargoLock {
       lockFile = ./Cargo.lock;
-      outputHashes = {
-        "perlmod-0.13.2" = "sha256-ByP1jubfoRfc/DmdGwjT+uxU+jz9LE4KSN/jkRxeBxc=";
-        "proxmox-api-macro-1.0.4" = "sha256-EKWOGilPdGe+yB7yXrTlhNpgTTq1lU6p6nwPL2XcD7U=";
-        "proxmox-resource-scheduling-0.3.0" = "sha256-WO5cVkurt7I0V0/7P19dllRaUbd2iFHGClfOnWbxraA=";
-      };
+      allowBuiltinFetchGit = true;
     };
 
     postPatch = ''

@@ -24,24 +24,33 @@ pushd $REPO_NAME
 
 git reset --hard HEAD && git pull
 
+# Find the latest commit with a message containing "bump version to"
+LATEST_BUMP_COMMIT=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%H")
+VERSION=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%s" | grep -oP '(?<=bump version to )[^ ]+')
+
+# Cargo update
 transform_git_deps () {
   local repo_url="https://git.proxmox.com/git/proxmox.git"
   local dependencies=$(toml get Cargo.toml dependencies | jq -r 'keys[]')
+  # Remove blank lines to make toml work
+  sed -i Cargo.toml -e '/^[[:space:]]*$/d'
   
   for dep in $dependencies; do
-    if [[ $dep == proxmox-* ]]; then
+    if [[ $dep == perlmod ]]; then
+      toml set Cargo.toml dependencies.$dep.git "https://git.proxmox.com/git/perlmod.git" > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml
+    elif [[ $dep == proxmox-resource-scheduling ]]; then
+      toml set Cargo.toml dependencies.$dep.git "https://git.proxmox.com/git/proxmox-resource-scheduling.git" > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml
+    elif [[ $dep == proxmox-* ]]; then
       toml set Cargo.toml dependencies.$dep.git "$repo_url" > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml
     fi
   done
 }
 export -f transform_git_deps
 
+cd $PKG_NAME || echo "Directory $PKG_NAME does not exist"
 find . -type f -name "config" -path "*/.cargo/*" -exec rm -f {} \;
 find . -name "Cargo.toml" -execdir sh -c 'transform_git_deps; cargo generate-lockfile; cp Cargo.{lock,toml} $BASE_DIR/pkgs/$PKG_NAME/' \;
 
-# Find the latest commit with a message containing "bump version to"
-LATEST_BUMP_COMMIT=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%H")
-VERSION=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%s" | grep -oP '(?<=bump version to )[^ ]+')
 popd
 
 popd

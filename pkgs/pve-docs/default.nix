@@ -1,17 +1,15 @@
-{ lib
-, stdenv
-, fetchgit
-, callPackage
-, perl
-, proxmox-widget-toolkit
-, asciidoc
-, librsvg
+{
+  lib,
+  stdenv,
+  fetchgit,
+  perl,
+  proxmox-widget-toolkit,
+  asciidoc,
+  librsvg,
 }:
 
 let
-  perlDeps = with perl.pkgs; with callPackage ../perl-packages.nix { }; [
-    JSON
-  ];
+  perlDeps = with perl.pkgs; [ JSON ];
 
   perlEnv = perl.withPackages (_: perlDeps);
 in
@@ -38,7 +36,11 @@ stdenv.mkDerivation rec {
     #find . -type f | xargs sed -i -e "s|/usr|$out|"
   '';
 
-  buildInputs = [ asciidoc librsvg perlEnv ];
+  buildInputs = [
+    asciidoc
+    librsvg
+    perlEnv
+  ];
   propagatedBuildInputs = perlDeps;
 
   makeFlags = [
@@ -51,7 +53,10 @@ stdenv.mkDerivation rec {
     description = "READ ONLY mirror, see https://pve.proxmox.com/wiki/Developer_Documentation";
     homepage = "https://github.com/proxmox/pve-docs";
     license = with licenses; [ ];
-    maintainers = with maintainers; [ camillemndn julienmalka ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     platforms = platforms.linux;
   };
 }

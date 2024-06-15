@@ -11,6 +11,7 @@
   util-linux,
   uuid,
   findbin,
+  termreadline,
 }:
 
 let
@@ -32,13 +33,12 @@ let
     ScalarListUtils
     Socket
     Storable
-    TermReadLine
+    termreadline
     TestHarness
     TestMockModule
     TestMore
     TimeHiRes
     uuid
-    UUID
     XMLLibXML
   ];
 

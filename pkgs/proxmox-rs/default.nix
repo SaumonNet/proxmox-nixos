@@ -57,11 +57,6 @@ rustPlatform.buildRustPackage {
 
   checkFlags = [ "--skip=test_get_current_release_codename" ];
 
-  installPhase = ''
-    mkdir -p $out
-    cp -r * $out 
-  '';
-
   meta = with lib; {
     description = "";
     homepage = "https://git.proxmox.com/git/proxmox.git";

@@ -7,7 +7,7 @@ export PKG_NAME=$1
 REPO_URL=$2
 REPO_NAME=$(echo "${REPO_URL##*/}" | sed 's#/$##; s#\.git$##')
 MESSAGE_PREFIX=${3:-bump version to}
-export PWD=$(pwd)
+export BASE_DIR=$(pwd)
 
 
 pushd /tmp || { echo "Failed to change directory to /tmp"; exit 1; }
@@ -37,7 +37,7 @@ transform_git_deps () {
 export -f transform_git_deps
 
 find . -type f -name "config" -path "*/.cargo/*" -exec rm -f {} \;
-find . -name "Cargo.toml" -execdir sh -c 'transform_git_deps; cargo generate-lockfile; cp Cargo.lock $PWD/pkgs/$PKG_NAME/' \;
+find . -name "Cargo.toml" -execdir sh -c 'transform_git_deps; cargo generate-lockfile; cp Cargo.{lock,toml} $BASE_DIR/pkgs/$PKG_NAME/' \;
 
 # Find the latest commit with a message containing "bump version to"
 LATEST_BUMP_COMMIT=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%H")

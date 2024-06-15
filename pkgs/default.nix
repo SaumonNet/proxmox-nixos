@@ -5,7 +5,7 @@ let
     markedjs = callPackage ./markedjs { };
     perlmod = callPackage ./perlmod { };
     proxmox-acme = callPackage ./proxmox-acme { };
-    proxmox-ve = callPackage ./pve { };
+    proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
     pve-access-control = callPackage ./pve-access-control { };
     pve-apiclient = callPackage ./pve-apiclient { };

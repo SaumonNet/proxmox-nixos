@@ -18,10 +18,10 @@
 let
   pkgs = import
     (
-      let lock = builtins.fromJSON (builtins.readFile ../flake.lock); in
+      let lock = builtins.fromJSON (builtins.readFile ../flake.lock); nixpkgsName = lock.nodes.root.inputs.nixpkgs; in
       fetchTarball {
-        url = "https://github.com/NixOS/nixpkgs/archive/${lock.nodes.nixpkgs.locked.rev}.tar.gz";
-        sha256 = lock.nodes.nixpkgs.locked.narHash;
+        url = "https://github.com/NixOS/nixpkgs/archive/${lock.nodes.${nixpkgsName}.locked.rev}.tar.gz";
+        sha256 = lock.nodes.${nixpkgsName}.locked.narHash;
       }
     )
     (

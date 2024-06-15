@@ -18,7 +18,7 @@ let
     perlmod = callPackage ./perlmod { };
     posixstrptime = callPackage ./posixstrptime { };
     proxmox-acme = callPackage ./proxmox-acme { };
-    proxmox-rs = callPackage ./proxmox-rs { };
+    # proxmox-rs = callPackage ./proxmox-rs { };
     proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
     pve-access-control = callPackage ./pve-access-control { };

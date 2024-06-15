@@ -7,7 +7,7 @@
 }:
 
 perl.pkgs.toPerlModule (
-  stdenv.mkDerivation {
+  stdenv.mkDerivation rec {
     pname = "pve-rados2";
     version = "1.4.0";
 
@@ -35,6 +35,12 @@ perl.pkgs.toPerlModule (
       "SBINDIR=/bin"
       "PERLDIR=/${perl.libPrefix}/${perl.version}"
       "PERLSODIR=/${perl.libPrefix}/auto"
+    ];
+
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
     ];
 
     meta = with lib; {

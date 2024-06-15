@@ -49,6 +49,12 @@ stdenv.mkDerivation rec {
     "DESTDIR=$(out)"
   ];
 
+  passthru.updateScript = [
+    ../update.sh
+    pname
+    src.url
+  ];
+
   meta = with lib; {
     description = "READ ONLY mirror, see https://pve.proxmox.com/wiki/Developer_Documentation";
     homepage = "https://github.com/proxmox/pve-docs";

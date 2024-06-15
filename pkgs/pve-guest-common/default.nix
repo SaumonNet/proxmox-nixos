@@ -23,6 +23,12 @@ perl.pkgs.toPerlModule (
       "DOCDIR=$(out)/share/doc/${pname}"
     ];
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "";
       homepage = "https://github.com/proxmox/pve-guest-common";

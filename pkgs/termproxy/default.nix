@@ -33,7 +33,16 @@ rustPlatform.buildRustPackage rec {
     mv $out/bin/proxmox-termproxy $out/share/termproxy
   '';
 
+  passthru.updateScript = [
+    ../update.sh
+    pname
+    src.url
+  ];
+
   meta = with lib; {
-    maintainers = [ ];
+    maintainers = [
+      camillemndn
+      julienmalka
+    ];
   };
 }

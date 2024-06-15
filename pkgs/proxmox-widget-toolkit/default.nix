@@ -38,6 +38,12 @@ stdenv.mkDerivation rec {
     cp api-viewer/APIViewer.js $out/share/javascript/proxmox-widget-toolkit
   '';
 
+  passthru.updateScript = [
+    ../update.sh
+    pname
+    src.url
+  ];
+
   meta = with lib; {
     description = "";
     homepage = "https://git.proxmox.com/git/proxmox-widget-toolkit.git";

@@ -122,6 +122,12 @@ perl.pkgs.toPerlModule (
       done      
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Read-Only mirror of the Proxmox VE Manager API and Web UI repository";
       homepage = "https://github.com/proxmox/pve-manager";

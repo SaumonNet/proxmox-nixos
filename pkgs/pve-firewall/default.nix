@@ -68,6 +68,12 @@ perl.pkgs.toPerlModule (
         --prefix PERL5LIB : $out/${perl.libPrefix}/${perl.version}
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Firewall test scripts";
       homepage = "https://github.com/proxmox/pve-firewall";

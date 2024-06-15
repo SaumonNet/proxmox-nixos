@@ -32,11 +32,20 @@ stdenv.mkDerivation rec {
     rustc
   ];
 
+  passthru.updateScript = [
+    ../update.sh
+    pname
+    src.url
+  ];
+
   meta = with lib; {
     description = "Library to integrate Proxmox Backup into QEMU";
     homepage = "https://github.com/proxmox/proxmox-backup-qemu";
-    license = licenses.unfree; # FIXME: nix-init did not found a license
-    maintainers = with maintainers; [ ];
+    license = [ ]; # FIXME: nix-init did not found a license
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     mainProgram = "proxmox-backup-qemu";
     platforms = platforms.all;
   };

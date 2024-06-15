@@ -67,6 +67,12 @@ perl.pkgs.toPerlModule (
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|"
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Proxmox VE container manager & runtime - read-only mirror";
       homepage = "https://github.com/proxmox/pve-container";

@@ -108,6 +108,12 @@ perl.pkgs.toPerlModule (
       done      
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Cluster FS and Tools";
       homepage = "https://github.com/proxmox/pve-cluster";

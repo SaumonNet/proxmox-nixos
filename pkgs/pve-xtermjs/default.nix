@@ -4,7 +4,7 @@
   fetchgit,
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "pve-xtermjs";
   version = "5.3.0-3";
 
@@ -23,6 +23,12 @@ stdenv.mkDerivation {
     mv index.html.hbs.in index.html.hbs
     mv index.html.tpl.in index.html.tpl
   '';
+
+  passthru.updateScript = [
+    ../update.sh
+    pname
+    src.url
+  ];
 
   meta = with lib; {
     description = "";

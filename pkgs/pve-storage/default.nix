@@ -114,6 +114,12 @@ perl.pkgs.toPerlModule (
         -e "s|/usr/share/perl5|$out/${perl.libPrefix}/${perl.version}|" \
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Read-Only Mirror of the Proxmox VE Storage Library";
       homepage = "https://github.com/proxmox/pve-storage";

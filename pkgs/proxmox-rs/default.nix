@@ -13,7 +13,7 @@
   craneLib,
 }:
 
-craneLib.buildPackage {
+craneLib.buildPackage rec {
   pname = "proxmox-rs";
   version = "2024-06-13";
 
@@ -49,6 +49,12 @@ craneLib.buildPackage {
   LIBCLANG_PATH = "${libclang.lib}/lib";
 
   cargoTestExtraArgs = "-- --skip=test_get_current_release_codename rrd::tests::load_and_save_rrd_v2 rrd::tests::upgrade_from_rrd_v1";
+
+  passthru.updateScript = [
+    ../update.sh
+    pname
+    src.url
+  ];
 
   meta = with lib; {
     description = "";

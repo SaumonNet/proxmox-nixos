@@ -29,6 +29,12 @@ perl.pkgs.toPerlModule (
 
     propagatedBuildInputs = perlDeps;
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Read-Only mirror of perl API client library";
       homepage = "https://github.com/proxmox/pve-apiclient";

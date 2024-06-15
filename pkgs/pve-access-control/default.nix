@@ -47,6 +47,12 @@ perl.pkgs.toPerlModule (
       "PERLDIR=/${perl.libPrefix}/${perl.version}"
     ];
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Access control framework";
       homepage = "https://github.com/proxmox/pve-access-control";

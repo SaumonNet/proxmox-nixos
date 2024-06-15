@@ -2,7 +2,6 @@
   qemu,
   fetchgit,
   fetchurl,
-  ...
 }:
 
 (

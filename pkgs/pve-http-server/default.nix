@@ -33,6 +33,12 @@ perl.pkgs.toPerlModule (
       unzip ${./fonts-font-awesome.zip} -d $out/share
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "";
       homepage = "https://github.com/proxmox/pve-http-server";

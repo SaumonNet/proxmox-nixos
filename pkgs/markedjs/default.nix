@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 buildNpmPackage rec {
@@ -16,6 +17,8 @@ buildNpmPackage rec {
   };
 
   npmDepsHash = "sha256-eWVLHJCRL1dP4sGtSmTwoaWXHz61wxEwNBPJu3fCo30=";
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "A markdown parser and compiler. Built for speed";

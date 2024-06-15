@@ -74,6 +74,12 @@ perl.pkgs.toPerlModule (
       done      
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Proxmox VE High Availabillity Manager - read-only source mirror";
       homepage = "https://github.com/proxmox/pve-ha-manager";

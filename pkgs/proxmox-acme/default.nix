@@ -41,6 +41,12 @@ perl.pkgs.toPerlModule (
       find $out -type f | xargs sed -i -e "s|/usr/share/proxmox-acme|$out/share/proxmox-acme|"
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "";
       homepage = "git://git.proxmox.com/git/proxmox-acme.git";

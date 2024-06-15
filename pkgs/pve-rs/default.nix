@@ -10,7 +10,6 @@
   fetchgit,
   perl,
   perlmod,
-  callPackage,
 }:
 
 perl.pkgs.toPerlModule (
@@ -77,7 +76,11 @@ perl.pkgs.toPerlModule (
       )    
     '';
 
-    passthru.updateScript = callPackage ../update.nix { inherit src pname; };
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
 
     meta = with lib; {
       description = "Proxmox rust interface for perl";

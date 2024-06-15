@@ -114,6 +114,12 @@ perl.pkgs.toPerlModule (
         #-e "s|/usr/bin/pbs-restore||" \
     '';
 
+    passthru.updateScript = [
+      ../update.sh
+      pname
+      src.url
+    ];
+
     meta = with lib; {
       description = "Proxmox VE's Virtual Machine Manager";
       homepage = "https://github.com/proxmox/qemu-server";

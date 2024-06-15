@@ -1,7 +1,7 @@
-{ lib
-, stdenv
-, fetchgit
-,
+{
+  lib,
+  stdenv,
+  fetchgit,
 }:
 
 stdenv.mkDerivation {
@@ -28,7 +28,10 @@ stdenv.mkDerivation {
     description = "";
     homepage = "git://git.proxmox.com/git/proxmox-acme.git";
     license = with licenses; [ ];
-    maintainers = with maintainers; [ camillemndn julienmalka ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     platforms = platforms.linux;
   };
 }

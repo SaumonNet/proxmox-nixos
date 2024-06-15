@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 let
@@ -6,7 +11,10 @@ let
 in
 
 {
-  meta.maintainers = with maintainers; [ julienmalka camillemndn ];
+  meta.maintainers = with maintainers; [
+    julienmalka
+    camillemndn
+  ];
 
   options.services.proxmox-ve = {
     enable = mkEnableOption (mdDoc ''Proxmox VE'');
@@ -23,15 +31,28 @@ in
     # (import ./ha-manager.nix { inherit pkgs; })
     (import ./manager.nix { inherit pkgs; })
     {
-      boot.supportedFilesystems = [ "fuse" "glusterfs" ];
-      networking.hosts = { "${cfg.localIP}" = [ config.networking.hostName ]; };
+      boot.supportedFilesystems = [
+        "fuse"
+        "glusterfs"
+      ];
+      networking.hosts = {
+        "${cfg.localIP}" = [ config.networking.hostName ];
+      };
       services.rpcbind.enable = true;
       services.rrdcached.enable = true;
-      users.users.www-data = { isSystemUser = true; group = "www-data"; };
+      users.users.www-data = {
+        isSystemUser = true;
+        group = "www-data";
+      };
       users.groups.www-data = { };
       environment.systemPackages = [ pkgs.proxmox-ve ];
       environment.etc.issue.enable = false;
-      networking.firewall.allowedTCPPorts = [ 8006 111 80 443 ];
+      networking.firewall.allowedTCPPorts = [
+        8006
+        111
+        80
+        443
+      ];
     }
   ]);
 }

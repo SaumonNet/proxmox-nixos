@@ -1,13 +1,14 @@
-{ lib
-, buildEnv
-, pve-access-control
-, pve-cluster
-, pve-container
-, pve-firewall
-, pve-ha-manager
-, pve-manager
-, pve-qemu-server
-, pve-storage
+{
+  lib,
+  buildEnv,
+  pve-access-control,
+  pve-cluster,
+  pve-container,
+  pve-firewall,
+  pve-ha-manager,
+  pve-manager,
+  pve-qemu-server,
+  pve-storage,
 }:
 
 buildEnv {
@@ -28,7 +29,10 @@ buildEnv {
     description = "Read-Only mirror of the Proxmox VE Managaer API and Web UI repository";
     homepage = "https://github.com/proxmox/pve-manager";
     license = with licenses; [ ];
-    maintainers = with maintainers; [ camillemndn julienmalka ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     platforms = platforms.linux;
   };
 }

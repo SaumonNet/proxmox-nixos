@@ -1,8 +1,9 @@
-{ lib
-, rustPlatform
-, fetchgit
-, perl
-, libxcrypt
+{
+  lib,
+  rustPlatform,
+  fetchgit,
+  perl,
+  libxcrypt,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -35,7 +36,10 @@ rustPlatform.buildRustPackage rec {
     description = "Alternative to perl XS for RUST";
     homepage = "https://git.proxmox.com/?p=perlmod.git";
     license = with licenses; [ ];
-    maintainers = with maintainers; [ camillemndn julienmalka ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     platforms = platforms.linux;
   };
 }

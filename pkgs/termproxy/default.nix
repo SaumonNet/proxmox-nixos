@@ -1,4 +1,8 @@
-{ lib, fetchFromGitHub, rustPlatform }:
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+}:
 
 rustPlatform.buildRustPackage rec {
   pname = "termproxy";
@@ -15,7 +19,6 @@ rustPlatform.buildRustPackage rec {
     lockFile = ./Cargo.lock;
     allowBuiltinFetchGit = true;
   };
-
 
   postPatch = ''
     rm -rf .cargo

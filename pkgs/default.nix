@@ -1,4 +1,8 @@
-{ pkgs, craneLib ? { }, ... }:
+{
+  pkgs,
+  craneLib ? { },
+  ...
+}:
 let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
   ours = {

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 let
@@ -6,7 +11,10 @@ let
 in
 
 {
-  meta.maintainers = with maintainers; [ julienmalka camillemndn ];
+  meta.maintainers = with maintainers; [
+    julienmalka
+    camillemndn
+  ];
 
   options.services.rrdcached = {
     enable = mkEnableOption (mdDoc ''RRD Cache Daemon'');
@@ -15,8 +23,16 @@ in
   config = mkIf cfg.enable {
     systemd.services.rrdcached = {
       description = "LSB: start or stop rrdcached";
-      before = [ "multi-user.target" "graphical.target" ];
-      after = [ "remote-fs.target" "nss-lookup.target" "time-sync.target" "network-online.target" ];
+      before = [
+        "multi-user.target"
+        "graphical.target"
+      ];
+      after = [
+        "remote-fs.target"
+        "nss-lookup.target"
+        "time-sync.target"
+        "network-online.target"
+      ];
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
       unitConfig = {

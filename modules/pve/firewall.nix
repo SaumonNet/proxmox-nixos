@@ -5,8 +5,16 @@
     pve-firewall = {
       description = "Proxmox VE firewall";
       unitConfig = {
-        Wants = [ "pve-cluster.service" "pvefw-logger.service" ];
-        After = [ "pvefw-logger.service" "pve-cluster.service" "network.target" "systemd-modules-load.service" ];
+        Wants = [
+          "pve-cluster.service"
+          "pvefw-logger.service"
+        ];
+        After = [
+          "pvefw-logger.service"
+          "pve-cluster.service"
+          "network.target"
+          "systemd-modules-load.service"
+        ];
         DefaultDependencies = "no";
         Before = [ "shutdown.target" ];
         Conflicts = [ "shutdown.target" ];
@@ -37,5 +45,3 @@
     };
   };
 }
-
-

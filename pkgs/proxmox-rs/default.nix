@@ -59,5 +59,4 @@ craneLib.buildPackage {
     ];
     mainProgram = "proxmox";
   };
-
 }

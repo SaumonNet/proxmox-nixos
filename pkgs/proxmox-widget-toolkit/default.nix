@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, fetchgit
-, markedjs
-, nodePackages
-, sassc
+{
+  lib,
+  stdenv,
+  fetchgit,
+  markedjs,
+  nodePackages,
+  sassc,
 }:
 
 stdenv.mkDerivation rec {
@@ -23,7 +24,10 @@ stdenv.mkDerivation rec {
     sed -i Makefile -e "/BUILD_VERSION=/d" -e "/ESLINT/d"
   '';
 
-  buildInputs = [ nodePackages.uglify-js sassc ];
+  buildInputs = [
+    nodePackages.uglify-js
+    sassc
+  ];
 
   makeFlags = [
     "DESTDIR=$(out)"
@@ -38,7 +42,10 @@ stdenv.mkDerivation rec {
     description = "";
     homepage = "https://git.proxmox.com/git/proxmox-widget-toolkit.git";
     license = with licenses; [ ];
-    maintainers = with maintainers; [ camillemndn julienmalka ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     platforms = platforms.linux;
   };
 }

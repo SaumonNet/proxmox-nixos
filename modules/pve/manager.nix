@@ -4,8 +4,14 @@
   systemd.services = {
     pvedaemon = {
       description = "PVE API Daemon";
-      wants = [ "corosync.service" "pve-cluster.service" ];
-      after = [ "corosync.service" "pve-cluster.service" ];
+      wants = [
+        "corosync.service"
+        "pve-cluster.service"
+      ];
+      after = [
+        "corosync.service"
+        "pve-cluster.service"
+      ];
       serviceConfig = {
         ExecStart = "${pkgs.pve-manager}/bin/pvedaemon start";
         ExecStop = "${pkgs.pve-manager}/bin/pvedaemon stop";
@@ -18,8 +24,18 @@
 
     pveproxy = {
       description = "PVE API Proxy Server";
-      wants = [ "pve-cluster.service" "pvedaemon.service" "sshd.service" "pve-storage.target" ];
-      after = [ "pve-storage.target" "pve-cluster.service" "pvedaemon.service" "sshd.service" ];
+      wants = [
+        "pve-cluster.service"
+        "pvedaemon.service"
+        "sshd.service"
+        "pve-storage.target"
+      ];
+      after = [
+        "pve-storage.target"
+        "pve-cluster.service"
+        "pvedaemon.service"
+        "sshd.service"
+      ];
       serviceConfig = {
         ExecStartPre = [
           "${pkgs.pve-cluster}/bin/pvecm updatecerts -silent"
@@ -41,8 +57,22 @@
       description = "PVE guests";
       environment.PVE_LOG_ID = "pve-guests";
       wantedBy = [ "multi-user.target" ];
-      wants = [ "pvestatd.service" "pveproxy.service" "spiceproxy.service" "pve-firewall.service" "lxc.service" ];
-      after = [ "pveproxy.service" "pvestatd.service" "spiceproxy.service" "pve-firewall.service" "lxc.service" "pve-ha-crm.service" "pve-ha-lrm.service" ];
+      wants = [
+        "pvestatd.service"
+        "pveproxy.service"
+        "spiceproxy.service"
+        "pve-firewall.service"
+        "lxc.service"
+      ];
+      after = [
+        "pveproxy.service"
+        "pvestatd.service"
+        "spiceproxy.service"
+        "pve-firewall.service"
+        "lxc.service"
+        "pve-ha-crm.service"
+        "pve-ha-lrm.service"
+      ];
       unitConfig = {
         RefuseManualStart = true;
         RefuseManualStop = true;
@@ -79,7 +109,11 @@
       description = "Proxmox VE scheduler";
       wantedBy = [ "multi-user.target" ];
       wants = [ "pve-cluster.service" ];
-      after = [ "pve-cluster.service" "pve-guests.service" "pve-storage.target" ];
+      after = [
+        "pve-cluster.service"
+        "pve-guests.service"
+        "pve-storage.target"
+      ];
       serviceConfig = {
         ExecStart = "${pkgs.pve-manager}/bin/pvescheduler start";
         ExecStop = "${pkgs.pve-manager}/bin/pvescheduler stop";
@@ -128,7 +162,16 @@
       description = "PVE Storage Target";
       unitConfig = {
         Wants = [ "remote-fs.target" ];
-        After = [ "remote-fs.target" "ceph.target" "ceph-mon.target" "ceph-osd.target" "ceph-mds.target" "ceph-mgr.target" "glusterd.service" "open-iscsi.service" ];
+        After = [
+          "remote-fs.target"
+          "ceph.target"
+          "ceph-mon.target"
+          "ceph-osd.target"
+          "ceph-mds.target"
+          "ceph-mgr.target"
+          "glusterd.service"
+          "open-iscsi.service"
+        ];
       };
     };
   };

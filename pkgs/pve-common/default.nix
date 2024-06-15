@@ -16,6 +16,7 @@
   mimebase32,
   mimebase64,
   substituteAll,
+  callPackage,
 }:
 
 let
@@ -130,6 +131,8 @@ perl.pkgs.toPerlModule (
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -Ee "s|(/usr)?/s?bin/||"
     '';
+
+    passthru.updateScript = callPackage ../update.nix { inherit src pname; };
 
     meta = with lib; {
       description = "Proxmox Project's Common Perl Code";

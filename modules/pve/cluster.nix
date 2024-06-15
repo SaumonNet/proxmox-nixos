@@ -15,7 +15,10 @@
         "time-sync.target"
         #"rrdcached.service"
       ];
-      before = [ "corosync.service" "cron.service" ];
+      before = [
+        "corosync.service"
+        "cron.service"
+      ];
       #unitConfig = {
       #  DefaultDependencies = false;
       #  Conflicts = [ "shutdown.target" ];
@@ -67,4 +70,3 @@
     };
   };
 }
-

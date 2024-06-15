@@ -1,6 +1,5 @@
 {
   qemu,
-  fetchFromGitHub,
   fetchgit,
   fetchurl,
   ...

@@ -70,6 +70,8 @@ perl.pkgs.toPerlModule (stdenv.mkDerivation rec {
     )    
   '';
 
+  passthru.updateScript = import ../update.nix { inherit src pname; };
+
   meta = with lib; {
     description = "Proxmox rust interface for perl";
     homepage = "https://git.proxmox.com/git/proxmox-perl-rs.git";

@@ -1,7 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, craneLib, ... }:
 let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
   ours = {
+    inherit craneLib;
     markedjs = callPackage ./markedjs { };
     perlmod = callPackage ./perlmod { };
     proxmox-acme = callPackage ./proxmox-acme { };

@@ -10,9 +10,10 @@
   libuuid,
   systemdLibs,
   diffutils,
+  craneLib,
 }:
 
-rustPlatform.buildRustPackage {
+craneLib.buildPackage {
   pname = "proxmox-rs";
   version = "2024-06-13";
 
@@ -22,16 +23,14 @@ rustPlatform.buildRustPackage {
     hash = "sha256-2ND/qP5hDDTov/JwbnVjBH1uAT3EpecerVm24W+1M94=";
   };
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-  };
-
   postPatch = ''
-    cp ${./Cargo.lock} Cargo.lock
     rm .cargo/config
-
-    sed -i proxmox-rrd/tests/file_format_test.rs -e "s|/usr/bin/cmp|${diffutils}/bin/cmp|"
+    cp ${./Cargo.lock} Cargo.lock
   '';
+
+  cargoVendorDir = craneLib.vendorCargoDeps { cargoLock = ./Cargo.lock; };
+
+  doInstallCargoArtifacts = true;
 
   nativeBuildInputs = [
     pkg-config
@@ -49,13 +48,7 @@ rustPlatform.buildRustPackage {
   ];
   LIBCLANG_PATH = "${libclang.lib}/lib";
 
-  installPhase = ''
-    mkdir -p $out/share
-    # cp -r /build/cargo-vendor-dir $out/share
-    cp -r /build/target $out/share
-  '';
-
-  checkFlags = [ "--skip=test_get_current_release_codename" ];
+  cargoTestExtraArgs = "-- --skip=test_get_current_release_codename rrd::tests::load_and_save_rrd_v2 rrd::tests::upgrade_from_rrd_v1";
 
   meta = with lib; {
     description = "";
@@ -66,4 +59,5 @@ rustPlatform.buildRustPackage {
     ];
     mainProgram = "proxmox";
   };
+
 }

@@ -12,6 +12,7 @@
     };
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
+    crane.url = "github:ipetkov/crane/v0.17.3";
   };
 
   description = "Proxmox on NixOS";
@@ -22,6 +23,7 @@
       nixpkgs,
       unstable,
       utils,
+      crane,
       ...
     }:
     let
@@ -168,6 +170,7 @@
               inherit system;
               overlays = [ self.overlays.${system} ];
             };
+            craneLib = crane.mkLib pkgs;
           in
           {
             overlays =
@@ -176,9 +179,12 @@
                 inherit lib;
                 unstable = unstable.legacyPackages.${system};
               }
-              // (import ./pkgs { pkgs = prev; });
+              // (import ./pkgs {
+                inherit craneLib;
+                pkgs = prev;
+              });
 
-            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs; });
+            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs craneLib; });
 
             devShells.default = pkgs.mkShell {
               buildInputs = with pkgs; [

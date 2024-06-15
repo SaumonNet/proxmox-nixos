@@ -18,7 +18,7 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-eWVLHJCRL1dP4sGtSmTwoaWXHz61wxEwNBPJu3fCo30=";
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--flake" ]; };
 
   meta = with lib; {
     description = "A markdown parser and compiler. Built for speed";

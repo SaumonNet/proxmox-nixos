@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
 
   makeFlags = [
     "DESTDIR=$(out)"
-    "MARKEDJS=${markedjs}/lib/node_modules/marked/src/marked.js"
+    "MARKEDJS=${markedjs}/lib/node_modules/marked/marked.min.js"
   ];
 
   postInstall = ''

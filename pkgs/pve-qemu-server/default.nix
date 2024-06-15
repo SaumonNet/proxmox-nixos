@@ -10,6 +10,7 @@
   pve-qemu,
   util-linux,
   uuid,
+  findbin,
 }:
 
 let
@@ -18,7 +19,7 @@ let
     DataDumper
     DigestSHA
     FilePath
-    FindBin
+    findbin
     HTTPMessage
     GetoptLong
     IO

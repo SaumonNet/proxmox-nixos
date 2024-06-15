@@ -4,6 +4,7 @@
   fetchgit,
   perl,
   pve-common,
+  authenpam,
 }:
 
 let

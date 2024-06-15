@@ -37,7 +37,7 @@ let
     posixstrptime = callPackage ./posixstrptime { };
     socket = callPackage ./socket { };
     testharness = callPackage ./testharness { };
-    readtermline = callPackage ./readtermline { };
+    termreadline = callPackage ./termreadline { };
     uuid = callPackage ./uuid { };
   };
 in

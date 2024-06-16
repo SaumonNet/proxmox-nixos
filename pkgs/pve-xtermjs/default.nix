@@ -28,6 +28,7 @@ stdenv.mkDerivation rec {
     ../update.sh
     pname
     src.url
+    "xtermjs: update version to"
   ];
 
   meta = with lib; {

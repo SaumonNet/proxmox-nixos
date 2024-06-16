@@ -3,12 +3,35 @@
 
 set -eu -o pipefail
 
-export PKG_NAME=$1
+PKG_NAME=$1
 REPO_URL=$2
 REPO_NAME=$(echo "${REPO_URL##*/}" | sed 's#/$##; s#\.git$##')
 MESSAGE_PREFIX=${3:-bump version to}
 SOURCE_ROOT=${4:-.}
-export BASE_DIR=$(pwd)
+BASE_DIR=$(pwd)
+shift 4
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --version)
+            if [[ -n $2 && $2 != --* ]]; then
+                VERSION=$2
+                shift 2
+            else
+                echo "Error: --version requires a value"
+                exit 1
+            fi
+            ;;
+        --*)
+            echo "Unknown argument: $1"
+            exit 1
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
 
 
 cd /tmp || { echo "Failed to change directory to /tmp"; exit 1; }
@@ -26,10 +49,16 @@ cd $REPO_NAME
 git fetch origin && git reset --hard @{u} && git clean -fd
 
 # Find the latest commit with a message containing "bump version to"
-LATEST_BUMP_COMMIT=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%H")
-VERSION=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%s" | sed -E "s/$MESSAGE_PREFIX (.*)/\1/")
-echo "Resetting to $LATEST_BUMP_COMMIT"
-git reset --hard $LATEST_BUMP_COMMIT
+if [[ -z "${VERSION+x}" ]]; then
+  echo "Finding latest version"
+  VERSION=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%s" | sed -E "s/$MESSAGE_PREFIX (.*)/\1/")
+else
+  echo "Using $VERSION"
+fi
+REV=$(git log --grep="$MESSAGE_PREFIX $VERSION" -n 1 --pretty=format:"%H")
+
+echo "Resetting to $REV"
+git reset --hard $REV
 
 # Remove debian registry
 find . -type f -name "config" -path "*/.cargo/*" -exec rm -f {} \;
@@ -90,5 +119,5 @@ fi
 
 cd $BASE_DIR
 
-echo "Updating $PKG_NAME with hash: $LATEST_BUMP_COMMIT"
-update-source-version $PKG_NAME $VERSION --rev=$LATEST_BUMP_COMMIT
+echo "Updating $PKG_NAME with hash: $REV"
+update-source-version $PKG_NAME $VERSION --rev=$REV

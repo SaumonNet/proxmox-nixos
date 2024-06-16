@@ -12,7 +12,7 @@ perl536.pkgs.toPerlModule (
     version = "1.4.0";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/librados2-perl536.git";
+      url = "https://git.proxmox.com/git/librados2-perl.git";
       rev = "c2e12db6baa0b302fbaf68dd619362144452829f";
       hash = "sha256-fiCUC+jgSAiaiS5a3xpaaPpAjyp3Y1afZKZLMuB4KZA=";
     };

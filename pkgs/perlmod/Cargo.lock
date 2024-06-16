@@ -39,7 +39,7 @@ dependencies = [
 
 [[package]]
 name = "perlmod-macro"
-version = "0.8.3"
+version = "0.8.4"
 dependencies = [
  "perlmod",
  "proc-macro2",

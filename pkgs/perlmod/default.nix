@@ -8,12 +8,12 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "perlmod";
-  version = "0.13.4-1";
+  version = "0.2.0-3";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/perlmod.git";
-    rev = "677cb0844646d7bfabcebeaaa35e84440d858195";
-    hash = "sha256-w+Uy8G6LSKagwuRt4ja1rgW2/7dWSQ66Qch+dr4NCZ0=";
+    rev = "88d7d3b742057c57a78fa68fd461b4d4bb8a0fce";
+    hash = "sha256-9y6Z6IaIHPgbraT7NGUUsEB/PMWybgRt876sUGHUGjg=";
   };
 
   cargoLock.lockFile = ./Cargo.lock;
@@ -36,7 +36,7 @@ rustPlatform.buildRustPackage rec {
     ../update.sh
     pname
     src.url
-    "bump perlmod to"
+    "bump perlmod-bin to"
     "perlmod"
   ];
 

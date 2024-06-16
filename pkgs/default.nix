@@ -31,6 +31,7 @@ let
     pve-container = callPackage ./pve-container { };
     pve-docs = callPackage ./pve-docs { };
     pve-firewall = callPackage ./pve-firewall { };
+    pve-flutter-frontend = callPackage ./pve-flutter-frontend { };
     pve-guest-common = callPackage ./pve-guest-common { };
     pve-ha-manager = callPackage ./pve-ha-manager { };
     pve-http-server = callPackage ./pve-http-server { };

@@ -12,6 +12,7 @@ let
     digestsha = callPackage ./digest-sha { };
     findbin = callPackage ./find-bin { };
     iosocketip = callPackage ./iosocketip { };
+    extjs = callPackage ./extjs { };
     markedjs = callPackage ./markedjs { };
     mimebase32 = callPackage ./mimebase32 { };
     mimebase64 = callPackage ./mimebase64 { };

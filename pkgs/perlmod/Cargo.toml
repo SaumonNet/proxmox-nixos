@@ -1,0 +1,24 @@
+[package]
+name = "perlmod"
+version = "0.13.4"
+build = "build.rs"
+categories = [ "API bindings" ]
+keywords = [ "ffi", "perl" ]
+description = "ffi & serde code for limited interaction with perl code"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+exclude = [ "debian" ]
+[badges]
+maintenance = { status = "experimental" }
+[dependencies]
+bitflags = "1.2.1"
+libc = "0.2"
+serde = "1.0"
+perlmod-macro = { path = "../perlmod-macro", optional = true, version = "0.8.2" }
+[features]
+default = ["exporter"]
+exporter = ["perlmod-macro"]
+[build-dependencies]
+cc = "1.0.46"

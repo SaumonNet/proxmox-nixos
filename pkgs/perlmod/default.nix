@@ -2,18 +2,18 @@
   lib,
   rustPlatform,
   fetchgit,
-  perl,
+  perl536,
   libxcrypt,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "perlmod";
-  version = "0.13.2-1";
+  version = "0.13.4-1";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/perlmod.git";
-    rev = "5dbce0d3d3d89a9fa2d470444d1c1c8b3a780cbe";
-    hash = "sha256-ByP1jubfoRfc/DmdGwjT+uxU+jz9LE4KSN/jkRxeBxc=";
+    rev = "677cb0844646d7bfabcebeaaa35e84440d858195";
+    hash = "sha256-w+Uy8G6LSKagwuRt4ja1rgW2/7dWSQ66Qch+dr4NCZ0=";
   };
 
   cargoLock.lockFile = ./Cargo.lock;
@@ -24,7 +24,7 @@ rustPlatform.buildRustPackage rec {
     ln -s ${./Cargo.lock} Cargo.lock
   '';
 
-  nativeBuildInputs = [ perl ];
+  nativeBuildInputs = [ perl536 ];
   buildInputs = [ libxcrypt ];
 
   postInstall = ''

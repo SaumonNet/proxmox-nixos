@@ -10,10 +10,9 @@
   fetchgit,
   perl536,
   perlmod,
-  perl,
 }:
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rs";
     version = "0.8.9";
@@ -62,14 +61,14 @@ perl.pkgs.toPerlModule (
       "BUILD_MODE=release"
       "DESTDIR=$(out)"
       "GITVERSION:=${src.rev}"
-      "PERL_INSTALLVENDORARCH=/${perl.libPrefix}/${perl.version}"
-      "PERL_INSTALLVENDORLIB=/${perl.libPrefix}/${perl.version}"
+      "PERL_INSTALLVENDORARCH=/${perl536.libPrefix}/${perl536.version}"
+      "PERL_INSTALLVENDORLIB=/${perl536.libPrefix}/${perl536.version}"
     ];
 
     postInstall = ''
       (
         cd common/pkg
-        PERL_INSTALLVENDORLIB=$out/${perl.libPrefix}/${perl.version} make install
+        PERL_INSTALLVENDORLIB=$out/${perl536.libPrefix}/${perl536.version} make install
       )    
     '';
 

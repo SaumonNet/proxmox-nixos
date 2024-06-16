@@ -3,7 +3,7 @@
   fetchgit,
   fetchurl,
   proxmox-backup-qemu,
-  perl,
+  perl536,
   pkg-config,
   ...
 }:
@@ -28,7 +28,7 @@
 
     nativeBuildInputs = old.nativeBuildInputs ++ [
       proxmox-backup-qemu
-      perl
+      perl536
       pkg-config
     ];
 

@@ -1,9 +1,9 @@
 {
   lib,
   fetchurl,
-  perl,
+  perl536,
 }:
-perl.pkgs.buildPerlPackage rec {
+perl536.pkgs.buildPerlPackage rec {
   pname = "DigestSHA";
   version = "6.04";
   src = fetchurl {

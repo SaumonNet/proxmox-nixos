@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  perl,
+  perl536,
   pve-cluster,
   glib,
   ipset,
@@ -16,10 +16,10 @@
 
 let
   perlDeps = [ pve-cluster ];
-  perlEnv = perl.withPackages (_: perlDeps);
+  perlEnv = perl536.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-firewall";
     version = "5.0.7";
@@ -54,7 +54,7 @@ perl.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=$(out)/bin"
-      "PERLDIR=$(out)/${perl.libPrefix}/${perl.version}"
+      "PERLDIR=$(out)/${perl536.libPrefix}/${perl536.version}"
     ];
 
     postFixup = ''
@@ -65,7 +65,7 @@ perl.pkgs.toPerlModule (
             iptables
           ]
         } \
-        --prefix PERL5LIB : $out/${perl.libPrefix}/${perl.version}
+        --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}
     '';
 
     passthru.updateScript = [

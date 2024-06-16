@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl,
+  perl536,
   pve-cluster,
   pve-rados2,
   ceph,
@@ -28,17 +28,17 @@
 }:
 
 let
-  perlDeps = with perl.pkgs; [
+  perlDeps = with perl536.pkgs; [
     Filechdir
     posixstrptime
     pve-cluster
     pve-rados2
   ];
 
-  perlEnv = perl.withPackages (_: perlDeps);
+  perlEnv = perl536.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-storage";
     version = "8.2.2";
@@ -64,13 +64,13 @@ perl.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=/bin"
-      "PERLDIR=/${perl.libPrefix}/${perl.version}"
+      "PERLDIR=/${perl536.libPrefix}/${perl536.version}"
     ];
 
     postInstall = ''
       sed -i $out/bin/* \
         -e "s/-T//" \
-        -e "1s|$| -I$out/${perl.libPrefix}/${perl.version}|"
+        -e "1s|$| -I$out/${perl536.libPrefix}/${perl536.version}|"
     '';
 
     postFixup = ''
@@ -111,7 +111,7 @@ perl.pkgs.toPerlModule (
         -e "s|/usr/sbin/sbdadm||" \
         -e "s|/usr/sbin/smartctl|${smartmontools}/bin/smartctl|" \
         -e "s|/usr/sbin/stmfadm||" \
-        -e "s|/usr/share/perl5|$out/${perl.libPrefix}/${perl.version}|" \
+        -e "s|/usr/share/perl5|$out/${perl536.libPrefix}/${perl536.version}|" \
     '';
 
     passthru.updateScript = [

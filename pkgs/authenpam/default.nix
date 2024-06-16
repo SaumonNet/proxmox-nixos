@@ -2,10 +2,10 @@
   lib,
   fetchurl,
   linux-pam,
-  perl,
+  perl536,
 }:
 
-perl.pkgs.buildPerlPackage rec {
+perl536.pkgs.buildPerlPackage rec {
   pname = "AuthenPAM";
   version = "0.16";
   src = fetchurl {

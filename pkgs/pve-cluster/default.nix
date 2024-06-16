@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl,
+  perl536,
   pve-access-control,
   pve-apiclient,
   pve-rs,
@@ -25,7 +25,7 @@
 }:
 
 let
-  perlDeps = with perl.pkgs; [
+  perlDeps = with perl536.pkgs; [
     DigestHMAC
     uuid
     rrdtool
@@ -34,10 +34,10 @@ let
     pve-rs
   ];
 
-  perlEnv = perl.withPackages (_: perlDeps);
+  perlEnv = perl536.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-cluster";
     version = "8.0.7";
@@ -81,8 +81,8 @@ perl.pkgs.toPerlModule (
 
     makeFlags = [
       "DESTDIR=$(out)"
-      "PERL_VENDORARCH=${perl.libPrefix}/${perl.version}"
-      "PVEDIR=$(out)/${perl.libPrefix}/${perl.version}/PVE"
+      "PERL_VENDORARCH=${perl536.libPrefix}/${perl536.version}"
+      "PVEDIR=$(out)/${perl536.libPrefix}/${perl536.version}/PVE"
     ];
 
     postInstall = ''
@@ -104,7 +104,7 @@ perl.pkgs.toPerlModule (
               libfaketime
             ]
           } \
-          --prefix PERL5LIB : $out/${perl.libPrefix}/${perl.version}
+          --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}
       done      
     '';
 

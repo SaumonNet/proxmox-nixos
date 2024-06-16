@@ -2,15 +2,15 @@
   lib,
   stdenv,
   fetchgit,
-  perl,
+  perl536,
   unzip,
 }:
 
 let
-  perlDeps = with perl.pkgs; [ AnyEventHTTP ];
+  perlDeps = with perl536.pkgs; [ AnyEventHTTP ];
 in
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-http-server";
     version = "5.1.0";
@@ -24,7 +24,7 @@ perl.pkgs.toPerlModule (
     sourceRoot = "${src.name}/src";
     buildInputs = [ unzip ];
     propagatedBuildInputs = perlDeps;
-    makeFlags = [ "PERL5DIR=$(out)/${perl.libPrefix}/${perl.version}" ];
+    makeFlags = [ "PERL5DIR=$(out)/${perl536.libPrefix}/${perl536.version}" ];
 
     postFixup = ''
       find $out -type f | xargs sed -i \

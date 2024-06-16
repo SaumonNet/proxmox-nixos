@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  perl,
+  perl536,
   proxmox-widget-toolkit,
   proxmox-acme,
   pve-docs,
@@ -25,7 +25,7 @@
 }:
 
 let
-  perlDeps = with perl.pkgs; [
+  perlDeps = with perl536.pkgs; [
     FileReadBackwards
     NetDNS
     PodParser
@@ -35,10 +35,10 @@ let
     pve-http-server
   ];
 
-  perlEnv = perl.withPackages (_: perlDeps);
+  perlEnv = perl536.withPackages (_: perlDeps);
 in
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
     version = "8.2.4";
@@ -78,7 +78,7 @@ perl.pkgs.toPerlModule (
       "PVERELEASE=8.0"
       "VERSION=${version}"
       "REPOID=nixos"
-      "PERLLIBDIR=$(out)/${perl.libPrefix}/${perl.version}"
+      "PERLLIBDIR=$(out)/${perl536.libPrefix}/${perl536.version}"
       "WIDGETKIT=${proxmox-widget-toolkit}/share/javascript/proxmox-widget-toolkit/proxmoxlib.js"
       "BASH_COMPLETIONS="
       "ZSH_COMPLETIONS="
@@ -118,7 +118,7 @@ perl.pkgs.toPerlModule (
               termproxy
             ]
           } \
-          --prefix PERL5LIB : $out/${perl.libPrefix}/${perl.version}
+          --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}
       done      
     '';
 

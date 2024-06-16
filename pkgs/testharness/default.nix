@@ -1,9 +1,9 @@
 {
   lib,
   fetchurl,
-  perl,
+  perl536,
 }:
-perl.pkgs.buildPerlPackage rec {
+perl536.pkgs.buildPerlPackage rec {
   pname = "TestHarness";
   version = "3.44";
   src = fetchurl {

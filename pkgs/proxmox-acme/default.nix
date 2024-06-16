@@ -2,18 +2,18 @@
   lib,
   stdenv,
   fetchgit,
-  perl,
+  perl536,
   acme-sh,
 }:
 
 let
-  perlDeps = with perl.pkgs; [
+  perlDeps = with perl536.pkgs; [
     HTTPDaemon
     HTTPMessage
   ];
 in
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "proxmox-acme";
     version = "1.4.6";
@@ -32,7 +32,7 @@ perl.pkgs.toPerlModule (
 
     makeFlags = [
       "PREFIX=$(out)"
-      "PERLDIR=$(out)/${perl.libPrefix}/${perl.version}"
+      "PERLDIR=$(out)/${perl536.libPrefix}/${perl536.version}"
     ];
 
     propagatedBuildInputs = perlDeps;

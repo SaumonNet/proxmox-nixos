@@ -1,11 +1,11 @@
 {
   lib,
   fetchurl,
-  perl,
+  perl536,
   libuuid,
 }:
 
-perl.pkgs.buildPerlPackage rec {
+perl536.pkgs.buildPerlPackage rec {
   pname = "UUID";
   version = "0.28";
   src = fetchurl {
@@ -13,7 +13,7 @@ perl.pkgs.buildPerlPackage rec {
     hash = "sha256-pcFz+tqXPfCVvQWVmjljvySv1/7w/RiE7/WJyowXu34=";
   };
   buildInputs = [
-    perl.pkgs.DevelChecklib
+    perl536.pkgs.DevelChecklib
     libuuid.dev
   ];
   NIX_CFLAGS_LINK = "-luuid";

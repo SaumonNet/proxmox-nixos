@@ -6,7 +6,7 @@
   coreutils,
   diffutils,
   iproute2,
-  perl,
+  perl536,
   glibc,
   openvswitch,
   proxmox-backup-client,
@@ -20,7 +20,7 @@
 }:
 
 let
-  perlDeps = with perl.pkgs; [
+  perlDeps = with perl536.pkgs; [
     AnyEvent
     Carp
     Clone
@@ -67,7 +67,7 @@ let
   ];
 in
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-common";
     version = "8.2.1";
@@ -100,7 +100,7 @@ perl.pkgs.toPerlModule (
 
     makeFlags = [
       "PREFIX=$(out)"
-      "PERLDIR=$(out)/${perl.libPrefix}/${perl.version}"
+      "PERLDIR=$(out)/${perl536.libPrefix}/${perl536.version}"
     ];
 
     postInstall =
@@ -116,12 +116,12 @@ perl.pkgs.toPerlModule (
       in
       ''
         for h in ${includeHeaders}; do
-          ${perl}/bin/h2ph -d $out ${glibc.dev}/include/$h
+          ${perl536}/bin/h2ph -d $out ${glibc.dev}/include/$h
           mkdir -p $out/include/$(dirname $h)
           mv $out${glibc.dev}/include/''${h%.h}.ph $out/include/$(dirname $h)
         done
         mv $out/_h2ph_pre.ph $out/include
-        cp -r $out/include/* $out/${perl.libPrefix}/${perl.version}
+        cp -r $out/include/* $out/${perl536.libPrefix}/${perl536.version}
         rm -r $out/{nix,include}
       '';
 

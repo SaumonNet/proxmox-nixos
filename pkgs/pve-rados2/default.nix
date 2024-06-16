@@ -2,17 +2,17 @@
   lib,
   stdenv,
   fetchgit,
-  perl,
+  perl536,
   ceph,
 }:
 
-perl.pkgs.toPerlModule (
+perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rados2";
     version = "1.4.0";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/librados2-perl.git";
+      url = "https://git.proxmox.com/git/librados2-perl536.git";
       rev = "c2e12db6baa0b302fbaf68dd619362144452829f";
       hash = "sha256-fiCUC+jgSAiaiS5a3xpaaPpAjyp3Y1afZKZLMuB4KZA=";
     };
@@ -25,7 +25,7 @@ perl.pkgs.toPerlModule (
     '';
 
     buildInputs = [
-      perl
+      perl536
       ceph.dev
     ];
 
@@ -33,8 +33,8 @@ perl.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=/bin"
-      "PERLDIR=/${perl.libPrefix}/${perl.version}"
-      "PERLSODIR=/${perl.libPrefix}/auto"
+      "PERLDIR=/${perl536.libPrefix}/${perl536.version}"
+      "PERLSODIR=/${perl536.libPrefix}/auto"
     ];
 
     passthru.updateScript = [
@@ -45,7 +45,7 @@ perl.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "";
-      homepage = "https://git.proxmox.com/git/librados2-perl.git";
+      homepage = "https://git.proxmox.com/git/librados2-perl536.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

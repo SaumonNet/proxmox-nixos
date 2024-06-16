@@ -12,6 +12,8 @@
   uuid,
   findbin,
   termreadline,
+  socat,
+  vncterm,
 }:
 
 let
@@ -101,8 +103,10 @@ perl536.pkgs.toPerlModule (
         -e "s|/usr/share/kvm|${pve-qemu}/share/qemu|" \
         -Ee "s|(/usr)?/s?bin/kvm|qemu-kvm|" \
         -Ee "s|(/usr)?/s?bin/||" \
+        -e "s|socat|${socat}/bin/socat|" \
+        -e "s|vncterm|${vncterm}/bin/vncterm|" \
         -e "s|qemu-kvm|${pve-qemu}/bin/qemu-kvm|" \
-        -e "s|qemu-system|${pve-qemu}/bin/qemu-system|"
+        -e "s|qemu-system|${pve-qemu}/bin/qemu-system|" \
 
         #-e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         #-e "s|/usr/sbin/qm|$out/bin/qm|" \

@@ -37,7 +37,7 @@ stdenv.mkDerivation rec {
   makeFlags =
     let
       libvncserver-patched = libvncserver.overrideAttrs (
-        _: old: { patches = [ "${src}/vncpatches/tls-auth-pluging.patch" ]; }
+        _: _: { patches = [ "${src}/vncpatches/tls-auth-pluging.patch" ]; }
       );
     in
     [

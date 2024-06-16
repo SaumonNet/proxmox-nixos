@@ -1,6 +1,5 @@
 {
   lib,
-  rustPlatform,
   fetchgit,
   pkg-config,
   openssl,
@@ -9,7 +8,6 @@
   libclang,
   libuuid,
   systemdLibs,
-  diffutils,
   craneLib,
 }:
 

@@ -9,7 +9,6 @@
   libuuid,
   systemdLibs,
   craneLib,
-  cargo-local-registry,
   apt,
   sg3_utils,
   libxcrypt,
@@ -40,17 +39,15 @@ craneLib.buildPackage {
 
   cargoVendorDir = craneLib.vendorCargoDeps {
     cargoLock = ./Cargo.lock;
-    overrideVendorGitCheckout = (
-      ps: drv:
-      if (lib.any (p: isProxmoxRS p) ps) then
+    overrideVendorGitCheckout = ps: drv:
+      if (lib.any isProxmoxRS ps) then
         (drv.overrideAttrs (_old: {
           postPatch = ''
             rm .cargo/config 
           '';
         }))
       else
-        drv
-    );
+        drv;
   };
 
   nativeBuildInputs = [

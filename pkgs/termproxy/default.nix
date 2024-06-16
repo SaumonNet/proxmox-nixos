@@ -36,6 +36,7 @@ rustPlatform.buildRustPackage rec {
     pname
     src.url
     "termproxy: bump version to"
+    pname
   ];
 
   meta = with lib; {

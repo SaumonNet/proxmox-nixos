@@ -7,6 +7,7 @@ export PKG_NAME=$1
 REPO_URL=$2
 REPO_NAME=$(echo "${REPO_URL##*/}" | sed 's#/$##; s#\.git$##')
 MESSAGE_PREFIX=${3:-bump version to}
+SOURCE_ROOT=${4:-.}
 export BASE_DIR=$(pwd)
 
 
@@ -34,11 +35,7 @@ git reset --hard $LATEST_BUMP_COMMIT
 find . -type f -name "config" -path "*/.cargo/*" -exec rm -f {} \;
 
 # If a directory with the package name exists, cd
-if [ -d $PKG_NAME ]; then
-  pushd $PKG_NAME
-else
-  echo "Directory $PKG_NAME does not exist, stay in root"
-fi
+pushd $SOURCE_ROOT
 
 # Find exactly one Cargo.toml files in the directory tree
 cargo_toml=$(find . -type f -name "Cargo.toml")
@@ -76,7 +73,7 @@ elif [ "$count" -eq 1 ]; then
   cp Cargo.toml $BASE_DIR/pkgs/$PKG_NAME/
   popd
 
-  popd || echo "Already at root"
+  popd
   
   # Copy exactly one Cargo.lockfiles in the directory tree
   cargo_lock=$(find . -type f -name "Cargo.lock")

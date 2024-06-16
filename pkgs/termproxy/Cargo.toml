@@ -8,12 +8,9 @@ authors = [
 ]
 edition = "2021"
 license = "AGPL-3"
-
 exclude = [ "build", "debian" ]
-
 [profile.release]
 lto = true
-
 [dependencies]
 anyhow = "1"
 libc = "0.2.107"

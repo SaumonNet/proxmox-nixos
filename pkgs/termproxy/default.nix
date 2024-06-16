@@ -10,8 +10,8 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/pve-xtermjs.git";
-    rev = "9e209b042bad4f3cf524654c1484ec8061a9edfb";
-    hash = "sha256-Ifnv0sYC9nNHuHPpXwTn+2vKSFHpnFn1Gwc59s5kzOE=";
+    rev = "e2e62fc67368ad25a35c6d009f9d85ac5ef97233";
+    hash = "sha256-Inx3LnAelDwvRoLHqMG91lUuQUI/CvNVIZ/EfmeIFUM=";
   };
 
   cargoLock = {

@@ -22,13 +22,15 @@ fi
 
 pushd $REPO_NAME
 
-git reset --hard HEAD && git pull
+git reset --hard HEAD
+git pull
 
 # Find the latest commit with a message containing "bump version to"
 LATEST_BUMP_COMMIT=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%H")
-VERSION=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%s" | grep -oP '(?<=bump version to )[^ ]+')
+VERSION=$(git log --grep="$MESSAGE_PREFIX" -n 1 --pretty=format:"%s" | sed -E "s/$MESSAGE_PREFIX (.*)/\1/")
+git reset --hard $LATEST_BUMP_COMMIT
 
-# Cargo update
+# Cargo.toml update function
 transform_git_deps () {
   local repo_url="https://git.proxmox.com/git/proxmox.git"
   local dependencies=$(toml get Cargo.toml dependencies | jq -r 'keys[]')
@@ -45,11 +47,39 @@ transform_git_deps () {
     fi
   done
 }
-export -f transform_git_deps
 
-cd $PKG_NAME || echo "Directory $PKG_NAME does not exist"
+# Remove debian registry
 find . -type f -name "config" -path "*/.cargo/*" -exec rm -f {} \;
-find . -name "Cargo.toml" -execdir sh -c 'transform_git_deps; cargo generate-lockfile; cp Cargo.{lock,toml} $BASE_DIR/pkgs/$PKG_NAME/' \;
+pushd $PKG_NAME || echo "Directory $PKG_NAME does not exist"
+
+# Find exactly one Cargo.toml files in the directory tree
+cargo_files=$(find . -type f -name "Cargo.toml")
+count=$(echo "$cargo_files" | wc -l)
+if [ "$count" -ne 1 ]; then
+    echo "Error: Found $count Cargo.toml file(s)."
+    exit 1
+fi
+
+# Get the directory containing the Cargo.toml file
+cargo_dir=$(dirname "$cargo_files")
+echo "Found one Cargo.toml file in directory: $cargo_dir"
+pushd "$cargo_dir"
+# Patch Proxmox deps to Git
+transform_git_deps
+cargo generate-lockfile
+cp Cargo.toml $BASE_DIR/pkgs/$PKG_NAME/
+popd
+popd
+
+# Copy exactly one Cargo.lockfiles in the directory tree
+cargo_lock=$(find . -type f -name "Cargo.lock")
+count=$(echo "$cargo_lock" | wc -l)
+if [ "$count" -ne 1 ]; then
+    echo "Error: Found $count Cargo.lock file(s)."
+    exit 1
+fi  
+echo "Found one Cargo.lock file: $cargo_lock"
+cp $cargo_lock $BASE_DIR/pkgs/$PKG_NAME/
 
 popd
 

@@ -38,7 +38,14 @@ let
           { overlays = include-overlays; }
       );
 
-  ourpkgs = pkgs.callPackage ../pkgs { };
+  lock = builtins.fromJSON (builtins.readFile ../flake.lock);
+  crane = fetchTarball {
+    url = "https://github.com/ipetkov/crane/${lock.nodes.crane.locked.rev}.tar.gz";
+    sha256 = lock.nodes.crane.locked.narHash;
+  };
+  craneLib = import crane { inherit pkgs; };
+
+  ourpkgs = pkgs.callPackage ../pkgs { inherit craneLib; };
   inherit (pkgs) lib;
 
   # Remove duplicate elements from the list based on some extracted value. O(n^2) complexity.

@@ -6,6 +6,7 @@
   proxmox-widget-toolkit,
   extjs,
   font-awesome_4,
+  fonts-font-logos,
 }:
 
 let
@@ -44,6 +45,7 @@ perl536.pkgs.toPerlModule (
       ln -s ${proxmox-widget-toolkit}/share/javascript/proxmox-widget-toolkit $out/share/javascript
       ln -s ${extjs}/share/javascript/extjs $out/share/javascript
       ln -s ${fonts-font-awesome}/share/fonts-font-awesome $out/share
+      ln -s ${fonts-font-logos}/share/fonts-font-logos $out/share
     '';
 
     passthru.updateScript = [

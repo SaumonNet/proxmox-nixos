@@ -27,6 +27,12 @@ stdenv.mkDerivation rec {
     cp -r packages/charts/classic/crisp $out/share/javascript/extjs
   '';
 
+  passthru.updateScript = [
+    ../update.sh
+    pname
+    src.url
+  ];
+
   meta = with lib; {
     description = "";
     homepage = "https://git.proxmox.com/git/extjs.git";

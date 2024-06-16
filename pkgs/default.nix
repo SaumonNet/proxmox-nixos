@@ -13,13 +13,13 @@ let
     findbin = callPackage ./find-bin { };
     iosocketip = callPackage ./iosocketip { };
     extjs = callPackage ./extjs { };
+    fonts-font-logos = callPackage ./fonts-font-logos { };
     markedjs = callPackage ./markedjs { };
     mimebase32 = callPackage ./mimebase32 { };
     mimebase64 = callPackage ./mimebase64 { };
     perlmod = callPackage ./perlmod { };
     posixstrptime = callPackage ./posixstrptime { };
     proxmox-acme = callPackage ./proxmox-acme { };
-    # proxmox-rs = callPackage ./proxmox-rs { };
     proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
     pve-access-control = callPackage ./pve-access-control { };

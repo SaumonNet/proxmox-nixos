@@ -99,6 +99,7 @@ craneLib.buildPackage rec {
 
   postInstall = ''
     cp proxmox-backup-qemu.h $out/lib
+    cp target/release/libproxmox_backup_qemu.so $out/lib/libproxmox_backup_qemu.so.0
   '';
 
   LIBCLANG_PATH = "${libclang.lib}/lib";

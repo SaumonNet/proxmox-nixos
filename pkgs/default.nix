@@ -45,6 +45,7 @@ let
     testharness = callPackage ./testharness { };
     uuid = callPackage ./uuid { };
     proxmox-backup = callPackage ./proxmox-backup { };
+    proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
   };
 in
 ours

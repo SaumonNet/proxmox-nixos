@@ -9,12 +9,12 @@
 perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rados2";
-    version = "1.4.0";
+    version = "1.4.1";
 
     src = fetchgit {
       url = "https://git.proxmox.com/git/librados2-perl.git";
-      rev = "c2e12db6baa0b302fbaf68dd619362144452829f";
-      hash = "sha256-fiCUC+jgSAiaiS5a3xpaaPpAjyp3Y1afZKZLMuB4KZA=";
+      rev = "b2017399cac82628e15ec14e95551c14fdfbf14f";
+      hash = "sha256-rHBM4xVwxAO0ZOU9YVw/n98JBzyRDwm0sOEAOhzUARc=";
     };
 
     postPatch = ''

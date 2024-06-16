@@ -9,12 +9,12 @@
 
 stdenv.mkDerivation rec {
   pname = "proxmox-widget-toolkit";
-  version = "4.0.6";
+  version = "4.2.3";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/proxmox-widget-toolkit.git";
-    rev = "81562cea8dbc90f31b625847afb3dca6d43197bb";
-    hash = "sha256-EE1jc2ZXXZ9CXfhyTQ05sjDqwv4sF2WanMepTZQ/lLE=";
+    rev = "1ed4b715bc502fe1e0e8c4110083e9d6a14267ac";
+    hash = "sha256-1T1Y0AOb1372PQrpuWeixJZeSHaKcEFlqXfz+gmUhcs=";
   };
 
   sourceRoot = "${src.name}/src";

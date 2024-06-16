@@ -3,11 +3,23 @@
   stdenv,
   fetchgit,
   perl536,
-  unzip,
+  proxmox-widget-toolkit,
+  extjs,
+  font-awesome_4,
 }:
 
 let
   perlDeps = with perl536.pkgs; [ AnyEventHTTP ];
+  fonts-font-awesome = font-awesome_4.overrideAttrs (
+    _: _: {
+      installPhase = ''
+        mkdir -p $out/share/fonts-font-awesome
+        cp -r css $out/share/fonts-font-awesome
+        cp -r fonts $out/share/fonts-font-awesome
+        cp -r less $out/share/fonts-font-awesome
+      '';
+    }
+  );
 in
 
 perl536.pkgs.toPerlModule (
@@ -22,15 +34,16 @@ perl536.pkgs.toPerlModule (
     };
 
     sourceRoot = "${src.name}/src";
-    buildInputs = [ unzip ];
     propagatedBuildInputs = perlDeps;
     makeFlags = [ "PERL5DIR=$(out)/${perl536.libPrefix}/${perl536.version}" ];
 
     postFixup = ''
       find $out -type f | xargs sed -i \
         -e "s|/usr/share/javascript|$out/share/javascript|"
-      unzip ${./javascript.zip} -d $out/share
-      unzip ${./fonts-font-awesome.zip} -d $out/share
+       mkdir -p $out/share/javascript
+      ln -s ${proxmox-widget-toolkit}/share/javascript/proxmox-widget-toolkit $out/share/javascript
+      ln -s ${extjs}/share/javascript/extjs $out/share/javascript
+      ln -s ${fonts-font-awesome}/share/fonts-font-awesome $out/share
     '';
 
     passthru.updateScript = [

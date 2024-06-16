@@ -6,6 +6,7 @@
   coreutils,
   diffutils,
   iproute2,
+  socat,
   perl536,
   glibc,
   openvswitch,
@@ -92,6 +93,7 @@ perl536.pkgs.toPerlModule (
       coreutils
       diffutils
       iproute2
+      socat
       openvswitch
       proxmox-backup-client
       systemd

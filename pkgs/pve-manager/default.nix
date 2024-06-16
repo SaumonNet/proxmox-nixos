@@ -22,6 +22,7 @@
   pve-xtermjs,
   iproute2,
   termproxy,
+  vncterm,
 }:
 
 let
@@ -116,6 +117,7 @@ perl536.pkgs.toPerlModule (
               pve-qemu
               iproute2
               termproxy
+              vncterm
             ]
           } \
           --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}

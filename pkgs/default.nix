@@ -44,6 +44,7 @@ let
     termreadline = callPackage ./termreadline { };
     testharness = callPackage ./testharness { };
     uuid = callPackage ./uuid { };
+    vncterm = callPackage ./vncterm { };
     proxmox-backup = callPackage ./proxmox-backup { };
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
   };

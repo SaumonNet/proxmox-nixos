@@ -37,6 +37,7 @@ rustPlatform.buildRustPackage rec {
     pname
     src.url
     "bump perlmod to"
+    "perlmod"
   ];
 
   meta = with lib; {

@@ -38,6 +38,12 @@ in
       networking.hosts = {
         "${cfg.localIP}" = [ config.networking.hostName ];
       };
+
+      services.openssh.settings.AcceptEnv = "LANG LC_*";
+      programs.ssh.extraConfig = ''
+        SendEnv LANG LC_*
+      '';
+
       services.rpcbind.enable = true;
       services.rrdcached.enable = true;
       users.users.www-data = {

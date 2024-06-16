@@ -8,8 +8,9 @@
   pkg-config,
   openssl,
   fetchgit,
-  perl,
+  perl536,
   perlmod,
+  perl,
 }:
 
 perl.pkgs.toPerlModule (
@@ -47,7 +48,7 @@ perl.pkgs.toPerlModule (
       rustPlatform.cargoSetupHook
       cargo
       rustc
-      perl
+      perl536
     ];
 
     buildInputs = [

@@ -76,6 +76,7 @@ perl.pkgs.toPerlModule (
       ../update.sh
       pname
       src.url
+      "pve: bump version to"
     ];
 
     meta = with lib; {

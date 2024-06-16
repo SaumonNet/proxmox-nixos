@@ -28,7 +28,7 @@ let
   perlDeps = with perl536.pkgs; [
     DigestHMAC
     uuid
-    rrdtool
+    (rrdtool.override { perl = perl536; })
     pve-access-control
     pve-apiclient
     pve-rs

@@ -10,16 +10,18 @@ let
     authenpam = callPackage ./authenpam { };
     datadumper = callPackage ./authenpam { };
     digestsha = callPackage ./digest-sha { };
-    findbin = callPackage ./find-bin { };
-    iosocketip = callPackage ./iosocketip { };
     extjs = callPackage ./extjs { };
+    findbin = callPackage ./find-bin { };
     fonts-font-logos = callPackage ./fonts-font-logos { };
+    iosocketip = callPackage ./iosocketip { };
     markedjs = callPackage ./markedjs { };
     mimebase32 = callPackage ./mimebase32 { };
     mimebase64 = callPackage ./mimebase64 { };
     perlmod = callPackage ./perlmod { };
     posixstrptime = callPackage ./posixstrptime { };
     proxmox-acme = callPackage ./proxmox-acme { };
+    proxmox-backup = callPackage ./proxmox-backup { };
+    proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
     proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
     pve-access-control = callPackage ./pve-access-control { };
@@ -46,8 +48,6 @@ let
     testharness = callPackage ./testharness { };
     uuid = callPackage ./uuid { };
     vncterm = callPackage ./vncterm { };
-    proxmox-backup = callPackage ./proxmox-backup { };
-    proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
   };
 in
 ours

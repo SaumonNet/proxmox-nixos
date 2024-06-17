@@ -6,11 +6,11 @@
 
 perl536.pkgs.buildPerlPackage rec {
   pname = "Socket";
-  version = "2.037";
+  version = "2.038";
 
   src = fetchurl {
     url = "mirror://cpan/authors/id/P/PE/PEVANS/Socket-${version}.tar.gz";
-    hash = "sha256-hUSIEenidDdEBGNPPCCK+pNu5NIj52JR6phoMVsMgS8=";
+    hash = "sha256-Vj0Rcx/0Qwf6J3mmlY/S0vZkP72aMXTL81AiixWWgfg=";
   };
 
   passthru.updateScript = [

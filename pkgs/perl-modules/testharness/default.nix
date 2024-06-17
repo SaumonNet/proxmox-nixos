@@ -6,11 +6,11 @@
 
 perl536.pkgs.buildPerlPackage rec {
   pname = "TestHarness";
-  version = "3.44";
+  version = "3.48";
 
   src = fetchurl {
     url = "mirror://cpan/authors/id/L/LE/LEONT/Test-Harness-${version}.tar.gz";
-    hash = "sha256-frWR6mtJns5nRf8+gOYM7mafADf5zLxORRFCX1k+Upc=";
+    hash = "sha256-5z/4nIHBpT9rru9oFoQbidM4RAOtl0IqfanR7rIO+cU=";
   };
 
   doCheck = false;

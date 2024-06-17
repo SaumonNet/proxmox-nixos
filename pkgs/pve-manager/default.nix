@@ -104,6 +104,9 @@ perl536.pkgs.toPerlModule (
         -Ee "s|(/usr)?/s?bin/||" \
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
 
+      find $out/bin -type f | xargs sed -i \
+        -e "/ENV{'PATH'}/d"
+
       for bin in $out/{bin/*,share/pve-manager/helpers/pve-startall-delay}; do
         wrapProgram $bin \
           --prefix PATH : ${
@@ -116,6 +119,7 @@ perl536.pkgs.toPerlModule (
               pve-qemu
               iproute2
               termproxy
+              pve-ha-manager
             ]
           } \
           --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}

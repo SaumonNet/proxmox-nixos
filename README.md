@@ -1,6 +1,6 @@
 # Proxmox on NixOS
 
-[! Proxmox on NixOS](proxmox-nixos.png)
+![Proxmox on NixOS](proxmox-nixos.png)
 
 To update, run:
 

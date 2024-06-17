@@ -46,6 +46,7 @@ let
     termproxy = callPackage ./termproxy { };
     termreadline = callPackage ./termreadline { };
     testharness = callPackage ./testharness { };
+    unifont = callPackage ./unifont { };
     uuid = callPackage ./uuid { };
     vncterm = callPackage ./vncterm { };
   };

@@ -6,11 +6,11 @@
 
 perl536.pkgs.buildPerlModule rec {
   pname = "IOSocketIP";
-  version = "0.41";
+  version = "0.42";
 
   src = fetchurl {
     url = "mirror://cpan/authors/id/P/PE/PEVANS/IO-Socket-IP-${version}.tar.gz";
-    hash = "sha256-hJpFojj4OSWIuXciyFA4LE5tFXzQioIt3LkHPHO/FEY=";
+    hash = "sha256-+Xo4RsUKTgZYzhciznzCrK2UcucEeL++nHlPsdtqaxM=";
   };
 
   passthru.updateScript = [

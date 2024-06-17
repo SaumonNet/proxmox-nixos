@@ -45,6 +45,7 @@ let
     JSON
     #libwwwperl
     LinuxInotify2
+    LWPProtocolHttps
     ScalarListUtils
     mimebase32
     mimebase64

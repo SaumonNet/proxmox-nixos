@@ -23,6 +23,7 @@
   iproute2,
   termproxy,
   shadow,
+  wget,
 }:
 
 let
@@ -121,6 +122,7 @@ perl536.pkgs.toPerlModule (
               termproxy
               pve-ha-manager
               shadow
+              wget
             ]
           } \
           --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}

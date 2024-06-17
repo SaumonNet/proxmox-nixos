@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  unifont,
+  unifont_hex,
   libvncserver,
   gnutls,
   libjpeg,
@@ -25,10 +25,10 @@ stdenv.mkDerivation rec {
     sed -i Makefile \
       -e "/architecture.mk/d" \
       -e "/pkg-info/d" \
-      -e "s|/usr/share/unifont/unifont.hex|${unifont}/share/unifont/unifont.hex|" \
+      -e "s|/usr/share/unifont/unifont.hex|${unifont_hex}/share/unifont/unifont.hex|" \
       -e "s|usr/||g" \
       -e "s/Werror/Wno-error/" \
-      -e "s|wchardata.c|${unifont}/share/unifont/wchardata.c|g" \
+      -e "s|wchardata.c|${unifont_hex}/share/unifont/wchardata.c|g" \
       -e "/^\$(VNCLIB)/,5d" \
       -e "/pod2man/d" \
       -e "/man1/d"

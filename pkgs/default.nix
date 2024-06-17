@@ -26,7 +26,7 @@ let
     markedjs = callPackage ./markedjs { };
     perlmod = callPackage ./perlmod { };
     termproxy = callPackage ./termproxy { };
-    unifont = callPackage ./unifont { };
+    unifont_hex = callPackage ./unifont { };
     vncterm = callPackage ./vncterm { };
 
     proxmox-acme = callPackage ./proxmox-acme { };

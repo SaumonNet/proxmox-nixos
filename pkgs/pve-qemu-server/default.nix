@@ -107,6 +107,7 @@ perl536.pkgs.toPerlModule (
         -e "s|vncterm|${vncterm}/bin/vncterm|" \
         -e "s|qemu-kvm|${pve-qemu}/bin/qemu-kvm|" \
         -e "s|qemu-system|${pve-qemu}/bin/qemu-system|" \
+        -e "s|/var/lib/qemu-server|$out/lib/qemu-server|" \
 
         #-e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         #-e "s|/usr/sbin/qm|$out/bin/qm|" \
@@ -116,6 +117,10 @@ perl536.pkgs.toPerlModule (
         #-e "s|/usr/bin/termproxy||" \
         #-e "s|/usr/bin/vma||" \
         #-e "s|/usr/bin/pbs-restore||" \
+        patchShebangs $out/lib/qemu-server/pve-bridge
+        patchShebangs $out/lib/qemu-server/pve-bridgedown
+        patchShebangs $out/lib/qemu-server/pve-bridge-hotplug
+        patchShebangs $out/lib/qemu-server/qmextract
     '';
 
     passthru.updateScript = [

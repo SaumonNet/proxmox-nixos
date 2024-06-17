@@ -9,6 +9,7 @@
   pve-manager,
   pve-qemu-server,
   pve-storage,
+  wget,
 }:
 
 buildEnv {
@@ -23,6 +24,7 @@ buildEnv {
     pve-manager
     pve-qemu-server
     pve-storage
+    wget
   ];
 
   meta = with lib; {

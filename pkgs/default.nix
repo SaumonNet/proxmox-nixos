@@ -9,7 +9,7 @@ let
     inherit craneLib;
 
     authenpam = callPackage ./perl-modules/authenpam { };
-    datadumper = callPackage ./perl-modules/authenpam { };
+    datadumper = callPackage ./perl-modules/datadumper { };
     digestsha = callPackage ./perl-modules/digest-sha { };
     findbin = callPackage ./perl-modules/find-bin { };
     iosocketip = callPackage ./perl-modules/iosocketip { };

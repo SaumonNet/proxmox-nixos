@@ -45,7 +45,7 @@ open STDERR, '>&', $old_stderr;
 print "Latest version: $latest_version";
 
 # Run the update-source-version command with the package name and version
-(my $modified_package_name = $package_name) =~ s/::/_/g;
+(my $modified_package_name = $package_name) =~ s/:://g;
 $modified_package_name = lc($modified_package_name);
 
 my $command = "update-source-version $modified_package_name $latest_version";

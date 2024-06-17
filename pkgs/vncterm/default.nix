@@ -7,6 +7,7 @@
   libjpeg,
   libnsl,
   libpng,
+  bashInteractive,
 }:
 
 stdenv.mkDerivation rec {
@@ -32,6 +33,7 @@ stdenv.mkDerivation rec {
       -e "/man1/d"
 
     sed -i vncterm.c -e "s|/usr|$out|"
+    sed "s|/bin/bash|${bashInteractive}/bin/bash|g" -i vncterm.c
   '';
 
   makeFlags =

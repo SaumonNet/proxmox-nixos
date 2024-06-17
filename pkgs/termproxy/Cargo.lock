@@ -332,7 +332,7 @@ dependencies = [
 [[package]]
 name = "proxmox-io"
 version = "1.0.1"
-source = "git+https://git.proxmox.com/git/proxmox.git#b25edb67de09ab22e33ba4db8d445f1e3c8ebab7"
+source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "endian_trait",
 ]
@@ -340,7 +340,7 @@ dependencies = [
 [[package]]
 name = "proxmox-lang"
 version = "1.1.0"
-source = "git+https://git.proxmox.com/git/proxmox.git#b25edb67de09ab22e33ba4db8d445f1e3c8ebab7"
+source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 
 [[package]]
 name = "proxmox-termproxy"

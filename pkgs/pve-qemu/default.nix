@@ -5,24 +5,40 @@
   proxmox-backup-qemu,
   perl536,
   pkg-config,
-  ...
 }:
 
 (
-  (qemu.overrideAttrs (old: {
+  (qemu.overrideAttrs (old: rec {
     version = "8.1.5";
 
     src = fetchurl {
-      url = "https://download.qemu.org/qemu-8.1.5.tar.xz";
+      url = "https://download.qemu.org/qemu-${version}.tar.xz";
       hash = "sha256-l2Ox7+xP1JeWtQgNCINRLXDLY4nq1lxmHMNoalIjKJY=";
     };
 
+    src_patches = fetchgit {
+      url = "https://git.proxmox.com/git/pve-qemu.git";
+      rev = "e62423e6156b7bf9afd8b670722c66c93fd2ba45";
+      hash = "sha256-jLFc43HHnOGRXDRyMlmcQ5Fg/Wgc3CbgwSh/TgAPDWQ=";
+      fetchSubmodules = false;
+    };
+
+    patches =
+      let
+        series = builtins.readFile "${src_patches}/debian/patches/series";
+        patchList = builtins.filter (patch: builtins.isString patch && patch != "") (
+          builtins.split "\n" series
+        );
+        patchPathsList = map (patch: "${src_patches}/debian/patches/${patch}") patchList;
+      in
+      old.patches ++ patchPathsList;
+
     buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
     propagatedBuildInputs = [ proxmox-backup-qemu ];
+
     preBuild =
       ''
         cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
-
       ''
       + old.preBuild;
 
@@ -31,25 +47,6 @@
       perl536
       pkg-config
     ];
-
-    patches =
-      let
-        src_patches = fetchgit {
-          url = "https://git.proxmox.com/git/pve-qemu.git";
-          rev = "e62423e6156b7bf9afd8b670722c66c93fd2ba45";
-          hash = "sha256-jLFc43HHnOGRXDRyMlmcQ5Fg/Wgc3CbgwSh/TgAPDWQ=";
-          fetchSubmodules = false;
-        };
-        patchesDir = "${src_patches}/debian/patches";
-      in
-      [ old.patches ]
-      ++ map (e: "${patchesDir}/extra/${e}") (
-        builtins.attrNames (builtins.readDir "${patchesDir}/extra/")
-      )
-      ++ map (e: "${patchesDir}/bitmap-mirror/${e}") (
-        builtins.attrNames (builtins.readDir "${patchesDir}/bitmap-mirror/")
-      )
-      ++ map (e: "${patchesDir}/pve/${e}") (builtins.attrNames (builtins.readDir "${patchesDir}/pve/"));
   })).override
   {
     glusterfsSupport = true;

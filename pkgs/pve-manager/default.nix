@@ -22,6 +22,7 @@
   pve-xtermjs,
   iproute2,
   termproxy,
+  shadow,
 }:
 
 let
@@ -100,7 +101,6 @@ perl536.pkgs.toPerlModule (
         -e "s|/usr/share/pve-manager|$out/share/pve-manager|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
-        -e "s|/usr/bin/termproxy|${termproxy}/share/termproxy|" \
         -Ee "s|(/usr)?/s?bin/||" \
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
 
@@ -120,6 +120,7 @@ perl536.pkgs.toPerlModule (
               iproute2
               termproxy
               pve-ha-manager
+              shadow
             ]
           } \
           --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}

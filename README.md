@@ -4,13 +4,13 @@
 
 To update, run:
 
-```
-# To update all:
-nix-shell tasks/update.nix --arg predicate '_: _: true'
+```bash
+# All and commit:
+nix-shell tasks/update.nix --arg predicate '_: _: true' --argstr commit true
 
-# To update only Proxmox packages:
+# Only Proxmox packages:
 nix-shell tasks/update.nix --arg predicate '_: pkg: builtins.match ".*proxmox.*" pkg.src.url == []'
 
-# To update only Perl packages:
+# Only Perl packages:
 nix-shell tasks/update.nix --arg predicate '_: pkg: builtins.match ".*cpan.*" pkg.src.url == []'
 ```

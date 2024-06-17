@@ -76,7 +76,9 @@ perl536.pkgs.toPerlModule (
       ../update.sh
       pname
       src.url
+      "--prefix"
       "pve: bump version to"
+      "--root"
       pname
     ];
 

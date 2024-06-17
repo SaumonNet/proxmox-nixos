@@ -34,7 +34,9 @@ rustPlatform.buildRustPackage rec {
     ../update.sh
     pname
     src.url
+    "--prefix"
     "termproxy: bump version to"
+    "--root"
     pname
   ];
 

@@ -36,8 +36,10 @@ rustPlatform.buildRustPackage rec {
     ../update.sh
     pname
     src.url
+    "--prefix"
     "bump perlmod-bin to"
-    "perlmod"
+    "--root"
+    pname
   ];
 
   meta = with lib; {

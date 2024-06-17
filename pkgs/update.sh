@@ -3,36 +3,35 @@
 
 set -eu -o pipefail
 
+BASE_DIR=$(pwd)
+
+# Ensure at least 2 non-optional arguments
+if [[ $# -lt 2 ]]; then
+    echo "Error: At least 2 arguments are required"
+    exit 1
+fi
+
+# Parse required arguments
 PKG_NAME=$1
 REPO_URL=$2
-REPO_NAME=$(echo "${REPO_URL##*/}" | sed 's#/$##; s#\.git$##')
-MESSAGE_PREFIX=${3:-bump version to}
-SOURCE_ROOT=${4:-.}
-BASE_DIR=$(pwd)
-shift 4
+REPO_NAME=$(basename -s .git "$REPO_URL")
+shift 2
 
+# Default values for optional arguments
+MESSAGE_PREFIX="bump version to"
+SOURCE_ROOT="."
+
+# Parse optional arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --version)
-            if [[ -n $2 && $2 != --* ]]; then
-                VERSION=$2
-                shift 2
-            else
-                echo "Error: --version requires a value"
-                exit 1
-            fi
-            ;;
-        --*)
-            echo "Unknown argument: $1"
-            exit 1
-            ;;
-        *)
-            shift
-            ;;
+        --version) shift; VERSION=${1:?Error: --version requires a value};;
+        --prefix) shift; MESSAGE_PREFIX=${1:?Error: --prefix requires a value};;
+        --root) shift; SOURCE_ROOT=${1:?Error: --root requires a value};;
+        --*) echo "Unknown argument: $1"; exit 1;;
+        *) shift;;
     esac
+    shift
 done
-
-
 
 cd /tmp || { echo "Failed to change directory to /tmp"; exit 1; }
 

@@ -28,7 +28,9 @@ stdenv.mkDerivation rec {
     ../update.sh
     pname
     src.url
+    "--prefix"
     "xtermjs: bump version to"
+    "--root"
     "xterm.js"
   ];
 

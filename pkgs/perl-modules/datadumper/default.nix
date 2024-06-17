@@ -3,15 +3,23 @@
   fetchurl,
   perl536,
 }:
+
 perl536.pkgs.buildPerlPackage rec {
-  pname = "DigestSHA";
-  version = "6.04";
+  pname = "DataDumper";
+  version = "2.183";
+
   src = fetchurl {
-    url = "mirror://cpan/authors/id/M/MS/MSHELOR/Digest-SHA-${version}.tar.gz";
-    hash = "sha256-7pH499uJTufG7gA9qsEKmQVsSUimdO9GrNu2PIGkq+s=";
+    url = "mirror://cpan/authors/id/N/NW/NWCLARK/Data-Dumper-${version}.tar.gz";
+    hash = "sha256-5Cc2iQt9rhs3gY2cXvofH9xS3sBPRGozpIGb8dSrWtM=";
   };
+
+  passthru.updateScript = [
+    ../update.pl
+    "Data::Dumper"
+  ];
+
   meta = with lib; {
-    description = "Perl extension for SHA-1/224/256/384/512";
+    description = "stringified perl data structures, suitable for both printing and eval";
     license = with licenses; [
       artistic1
       gpl1Plus

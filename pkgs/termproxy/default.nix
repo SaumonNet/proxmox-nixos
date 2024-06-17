@@ -27,8 +27,7 @@ rustPlatform.buildRustPackage rec {
   '';
 
   postInstall = ''
-    mkdir $out/share
-    mv $out/bin/proxmox-termproxy $out/share/termproxy
+    mv $out/bin/{proxmox-,}termproxy
   '';
 
   passthru.updateScript = [

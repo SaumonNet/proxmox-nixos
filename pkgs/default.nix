@@ -7,23 +7,34 @@ let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
   ours = {
     inherit craneLib;
-    authenpam = callPackage ./authenpam { };
-    datadumper = callPackage ./authenpam { };
-    digestsha = callPackage ./digest-sha { };
+
+    authenpam = callPackage ./perl-modules/authenpam { };
+    datadumper = callPackage ./perl-modules/authenpam { };
+    digestsha = callPackage ./perl-modules/digest-sha { };
+    findbin = callPackage ./perl-modules/find-bin { };
+    iosocketip = callPackage ./perl-modules/iosocketip { };
+    mimebase32 = callPackage ./perl-modules/mimebase32 { };
+    mimebase64 = callPackage ./perl-modules/mimebase64 { };
+    posixstrptime = callPackage ./perl-modules/posixstrptime { };
+    socket = callPackage ./perl-modules/socket { };
+    termreadline = callPackage ./perl-modules/termreadline { };
+    testharness = callPackage ./perl-modules/testharness { };
+    uuid = callPackage ./perl-modules/uuid { };
+
     extjs = callPackage ./extjs { };
-    findbin = callPackage ./find-bin { };
     fonts-font-logos = callPackage ./fonts-font-logos { };
-    iosocketip = callPackage ./iosocketip { };
     markedjs = callPackage ./markedjs { };
-    mimebase32 = callPackage ./mimebase32 { };
-    mimebase64 = callPackage ./mimebase64 { };
     perlmod = callPackage ./perlmod { };
-    posixstrptime = callPackage ./posixstrptime { };
+    termproxy = callPackage ./termproxy { };
+    unifont = callPackage ./unifont { };
+    vncterm = callPackage ./vncterm { };
+
     proxmox-acme = callPackage ./proxmox-acme { };
     proxmox-backup = callPackage ./proxmox-backup { };
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
     proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
+
     pve-access-control = callPackage ./pve-access-control { };
     pve-apiclient = callPackage ./pve-apiclient { };
     pve-cluster = callPackage ./pve-cluster { };
@@ -42,13 +53,6 @@ let
     pve-rs = callPackage ./pve-rs { };
     pve-storage = callPackage ./pve-storage { };
     pve-xtermjs = callPackage ./pve-xtermjs { };
-    socket = callPackage ./socket { };
-    termproxy = callPackage ./termproxy { };
-    termreadline = callPackage ./termreadline { };
-    testharness = callPackage ./testharness { };
-    unifont = callPackage ./unifont { };
-    uuid = callPackage ./uuid { };
-    vncterm = callPackage ./vncterm { };
   };
 in
 ours

@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "https://git.proxmox.com/git/extjs.git";
+    homepage = "https://git.proxmox.com/?p=extjs.git";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn

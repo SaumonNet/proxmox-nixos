@@ -83,8 +83,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Proxmox rust interface for perl";
-      homepage = "https://git.proxmox.com/git/proxmox-perl-rs.git";
+      description = "Proxmox Rust interface for Perl";
+      homepage = "https://git.proxmox.com/?p=proxmox-perl-rs.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

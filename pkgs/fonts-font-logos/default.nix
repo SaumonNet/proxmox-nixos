@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "https://git.proxmox.com/git/fonts-font-logos.git";
+    homepage = "https://git.proxmox.com/?p=fonts-font-logos.git";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn

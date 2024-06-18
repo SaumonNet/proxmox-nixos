@@ -140,7 +140,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox Project's Common Perl Code";
-      homepage = "https://github.com/proxmox/pve-common";
+      homepage = "https://git.proxmox.com/?p=pve-common.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

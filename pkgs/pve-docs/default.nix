@@ -56,8 +56,8 @@ stdenv.mkDerivation rec {
   ];
 
   meta = with lib; {
-    description = "READ ONLY mirror, see https://pve.proxmox.com/wiki/Developer_Documentation";
-    homepage = "https://github.com/proxmox/pve-docs";
+    description = "Proxmox VE Documentation";
+    homepage = "https://git.proxmox.com/?p=pve-docs.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

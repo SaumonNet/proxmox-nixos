@@ -41,9 +41,13 @@ rustPlatform.buildRustPackage rec {
   ];
 
   meta = with lib; {
+    description = "xterm.js helper utility";
+    homepage = "https://git.proxmox.com/?p=pve-xtermjs.git";
+    license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn
       julienmalka
     ];
+    platforms = platforms.linux;
   };
 }

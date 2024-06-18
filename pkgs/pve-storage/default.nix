@@ -121,8 +121,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Read-Only Mirror of the Proxmox VE Storage Library";
-      homepage = "https://github.com/proxmox/pve-storage";
+      description = "The Proxmox VE Storage Library";
+      homepage = "https://git.proxmox.com/?p=pve-storage.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

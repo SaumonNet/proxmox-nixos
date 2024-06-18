@@ -22,8 +22,8 @@ buildNpmPackage rec {
 
   meta = with lib; {
     description = "A markdown parser and compiler. Built for speed";
-    homepage = "https://github.com/markedjs/marked";
-    license = with licenses; [ ];
+    homepage = "https://marked.js.org/";
+    license = licenses.mit;
     maintainers = with maintainers; [
       camillemndn
       julienmalka

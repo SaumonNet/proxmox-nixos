@@ -35,8 +35,8 @@ stdenv.mkDerivation rec {
   ];
 
   meta = with lib; {
-    description = "";
-    homepage = "git://git.proxmox.com/git/proxmox-acme.git";
+    description = "xterm.js webclient";
+    homepage = "https://git.proxmox.com/?p=pve-xtermjs.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

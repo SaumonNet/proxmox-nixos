@@ -51,9 +51,7 @@ perl536.pkgs.toPerlModule (
       hash = "sha256-onNnxvQ7YrdnrFpl+z7Z+xUyEZsMcU6Qxn/kjYLan+8=";
     };
 
-    patches = [
-      ./0001-no-apt-update.patch
-    ];
+    patches = [ ./0001-no-apt-update.patch ];
 
     postPatch = ''
       sed -i {defines.mk,configs/Makefile} -e "s,/usr,,"
@@ -140,8 +138,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Read-Only mirror of the Proxmox VE Manager API and Web UI repository";
-      homepage = "https://github.com/proxmox/pve-manager";
+      description = "The Proxmox VE Manager API and Web UI repository";
+      homepage = "https://git.proxmox.com/?p=pve-manager.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

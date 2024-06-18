@@ -81,8 +81,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Proxmox VE High Availabillity Manager - read-only source mirror";
-      homepage = "https://github.com/proxmox/pve-ha-manager";
+      description = "Proxmox VE High Availabillity Manager";
+      homepage = "https://git.proxmox.com/?p=pve-ha-manager.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

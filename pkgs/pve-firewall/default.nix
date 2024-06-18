@@ -76,7 +76,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Firewall test scripts";
-      homepage = "https://github.com/proxmox/pve-firewall";
+      homepage = "https://git.proxmox.com/?p=pve-firewall.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

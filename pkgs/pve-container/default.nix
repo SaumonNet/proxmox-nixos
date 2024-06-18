@@ -74,8 +74,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Proxmox VE container manager & runtime - read-only mirror";
-      homepage = "https://github.com/proxmox/pve-container";
+      description = "Proxmox VE container manager & runtime";
+      homepage = "https://git.proxmox.com/?p=pve-container.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

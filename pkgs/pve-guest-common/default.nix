@@ -30,8 +30,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "";
-      homepage = "https://github.com/proxmox/pve-guest-common";
+      description = "Proxmox VE guest-related modules";
+      homepage = "https://git.proxmox.com/?p=pve-guest-common.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

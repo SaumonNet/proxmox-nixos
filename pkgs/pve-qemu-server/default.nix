@@ -131,7 +131,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE's Virtual Machine Manager";
-      homepage = "https://github.com/proxmox/qemu-server";
+      homepage = "https://git.proxmox.com/?p=qemu-server.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

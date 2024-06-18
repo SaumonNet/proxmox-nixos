@@ -48,8 +48,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "";
-      homepage = "git://git.proxmox.com/git/proxmox-acme.git";
+      description = "ACME library and helpers for perl-based Proxmox projects";
+      homepage = "https://git.proxmox.com/?p=proxmox-acme.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

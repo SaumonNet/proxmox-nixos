@@ -12,7 +12,7 @@
   wget,
 }:
 
-buildEnv {
+buildEnv rec {
   name = "proxmox-ve-${pve-manager.version}";
 
   paths = [
@@ -28,9 +28,9 @@ buildEnv {
   ];
 
   meta = with lib; {
-    description = "Read-Only mirror of the Proxmox VE Managaer API and Web UI repository";
-    homepage = "https://github.com/proxmox/pve-manager";
-    license = with licenses; [ ];
+    description = "A complete, open-source server management platform for enterprise virtualization";
+    homepage = "https://proxmox.com/proxmox-virtual-environment/";
+    license = concatMap (pkg: toList pkg.meta.license) paths;
     maintainers = with maintainers; [
       camillemndn
       julienmalka

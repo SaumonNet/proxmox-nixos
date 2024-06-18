@@ -43,7 +43,7 @@ rustPlatform.buildRustPackage rec {
   ];
 
   meta = with lib; {
-    description = "Alternative to perl XS for RUST";
+    description = "Alternative to Perl XS for Rust";
     homepage = "https://git.proxmox.com/?p=perlmod.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [

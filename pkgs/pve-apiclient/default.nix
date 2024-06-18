@@ -36,8 +36,8 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Read-Only mirror of perl536 API client library";
-      homepage = "https://github.com/proxmox/pve-apiclient";
+      description = "perl API client library";
+      homepage = "https://git.proxmox.com/?p=pve-apiclient.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

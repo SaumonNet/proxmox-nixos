@@ -122,6 +122,8 @@
                 localIP = self.machines.proxmox-dev.ipv4.local;
               };
 
+              services.proxmox-backup.enable = true;
+
               security.pam.services."proxmox-ve-auth" = {
                 logFailures = true;
                 nodelay = true;

@@ -52,111 +52,113 @@
           };
         };
 
-      nixosConfigurations.proxmox-dev = lib.nixosSystem {
-        system = "x86_64-linux";
-        extraModules = lib.attrValues self.nixosModules;
-        inherit pkgs lib;
-        modules = [
-          (
-            { config, ... }:
-            {
-              imports = [ ./hardware-configuration.nix ];
+      nixosConfigurations = {
+        proxmox-dev = lib.nixosSystem {
+          system = "x86_64-linux";
+          extraModules = lib.attrValues self.nixosModules;
+          inherit pkgs lib;
+          modules = [
+            (
+              { config, ... }:
+              {
+                imports = [ ./hardware-configuration.nix ];
 
-              networking = {
-                hostName = "proxmox-dev";
-                useNetworkd = true;
-                nftables.enable = true;
+                networking = {
+                  hostName = "proxmox-dev";
+                  useNetworkd = true;
+                  nftables.enable = true;
 
-                firewall.allowedTCPPorts = [
-                  80
-                  443
-                  5900
-                  5901
-                  5902
-                ];
-
-                firewall.allowedUDPPorts = [
-                  80
-                  443
-                  5900
-                  5901
-                  5902
-                ];
-              };
-
-              systemd.network.networks."10-lan" = {
-                matchConfig.Name = [ "ens18" ];
-                networkConfig = {
-                  Bridge = "vmbr0";
-                };
-              };
-
-              systemd.network.netdevs."vmbr0" = {
-                netdevConfig = {
-                  Name = "vmbr0";
-                  Kind = "bridge";
-                };
-              };
-
-              systemd.network.networks."10-lan-bridge" = {
-                matchConfig.Name = "vmbr0";
-                networkConfig = {
-                  IPv6AcceptRA = true;
-                  DHCP = "ipv4";
-                };
-                linkConfig.RequiredForOnline = "routable";
-              };
-
-              boot.specialFileSystems."/dev/pts" = {
-                fsType = "devpts";
-                options = [
-                  "nosuid"
-                  "noexec"
-                  "mode=620"
-                  "ptmxmode=0000"
-                  "gid=${toString config.ids.gids.tty}"
-                ];
-              };
-
-              services.proxmox-ve.enable = true;
-
-              # services.proxmox-backup.enable = true;
-
-              services.tailscale.enable = true;
-              services.openssh.enable = true;
-
-              nix.buildMachines = [
-                {
-                  hostName = "epyc.infra.newtype.fr";
-                  system = "x86_64-linux";
-                  maxJobs = 10;
-                  speedFactor = 2;
-                  supportedFeatures = [
-                    "nixos-test"
-                    "benchmark"
-                    "big-parallel"
-                    "kvm"
+                  firewall.allowedTCPPorts = [
+                    80
+                    443
+                    5900
+                    5901
+                    5902
                   ];
-                  mandatoryFeatures = [ ];
-                }
-              ];
-              nix.distributedBuilds = true;
-              nix.extraOptions = ''
-                builders-use-substitutes = true
-              '';
 
-              users.users.root.openssh.authorizedKeys.keys = [
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmuMNGkWQ7ozpC2UU0+jqMsRw1zVgT2Q9ORmLcTXpK2 camille@zeppelin"
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINg9kUL5kFcPOWmGy/7kJZMlG2+Ls79XiWgvO8p+OQ3f camille@genesis"
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMBW7rTtfZL9wtrpCVgariKdpN60/VeAzXkh9w3MwbO julien@enigma"
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGa+7n7kNzb86pTqaMn554KiPrkHRGeTJ0asY1NjSbpr julien@tower"
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIADCpuBL/kSZShtXD6p/Nq9ok4w1DnlSoxToYgdOvUqo julien@telecom"
-              ];
+                  firewall.allowedUDPPorts = [
+                    80
+                    443
+                    5900
+                    5901
+                    5902
+                  ];
+                };
 
-              system.stateVersion = "23.11";
-            }
-          )
-        ];
+                systemd.network.networks."10-lan" = {
+                  matchConfig.Name = [ "ens18" ];
+                  networkConfig = {
+                    Bridge = "vmbr0";
+                  };
+                };
+
+                systemd.network.netdevs."vmbr0" = {
+                  netdevConfig = {
+                    Name = "vmbr0";
+                    Kind = "bridge";
+                  };
+                };
+
+                systemd.network.networks."10-lan-bridge" = {
+                  matchConfig.Name = "vmbr0";
+                  networkConfig = {
+                    IPv6AcceptRA = true;
+                    DHCP = "ipv4";
+                  };
+                  linkConfig.RequiredForOnline = "routable";
+                };
+
+                boot.specialFileSystems."/dev/pts" = {
+                  fsType = "devpts";
+                  options = [
+                    "nosuid"
+                    "noexec"
+                    "mode=620"
+                    "ptmxmode=0000"
+                    "gid=${toString config.ids.gids.tty}"
+                  ];
+                };
+
+                services.proxmox-ve.enable = true;
+
+                # services.proxmox-backup.enable = true;
+
+                services.tailscale.enable = true;
+                services.openssh.enable = true;
+
+                nix.buildMachines = [
+                  {
+                    hostName = "epyc.infra.newtype.fr";
+                    system = "x86_64-linux";
+                    maxJobs = 10;
+                    speedFactor = 2;
+                    supportedFeatures = [
+                      "nixos-test"
+                      "benchmark"
+                      "big-parallel"
+                      "kvm"
+                    ];
+                    mandatoryFeatures = [ ];
+                  }
+                ];
+                nix.distributedBuilds = true;
+                nix.extraOptions = ''
+                  builders-use-substitutes = true
+                '';
+
+                users.users.root.openssh.authorizedKeys.keys = [
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmuMNGkWQ7ozpC2UU0+jqMsRw1zVgT2Q9ORmLcTXpK2 camille@zeppelin"
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINg9kUL5kFcPOWmGy/7kJZMlG2+Ls79XiWgvO8p+OQ3f camille@genesis"
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMBW7rTtfZL9wtrpCVgariKdpN60/VeAzXkh9w3MwbO julien@enigma"
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGa+7n7kNzb86pTqaMn554KiPrkHRGeTJ0asY1NjSbpr julien@tower"
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIADCpuBL/kSZShtXD6p/Nq9ok4w1DnlSoxToYgdOvUqo julien@telecom"
+                ];
+
+                system.stateVersion = "23.11";
+              }
+            )
+          ];
+        };
       };
 
       colmena =
@@ -200,9 +202,38 @@
               // (import ./pkgs {
                 inherit craneLib;
                 pkgs = prev;
-              });
+              })
+              // {
+                proxmox-iso =
+                  (lib.nixosSystem {
+                    extraModules = lib.attrValues self.nixosModules;
+                    pkgs = prev;
+                    inherit system;
+                    modules = [
+                      "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                      (_: {
+                        services.proxmox-ve.enable = true;
+                        isoImage.isoBaseName = "nixos-proxmox-ve";
+                      })
+                    ];
+                  }).config.system.build.isoImage;
+              };
 
-            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs craneLib; });
+            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs craneLib; }) // {
+              proxmox-iso =
+                (lib.nixosSystem {
+                  extraModules = lib.attrValues self.nixosModules;
+                  inherit pkgs system;
+                  modules = [
+                    "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                    (_: {
+                      services.proxmox-ve.enable = true;
+                      isoImage.isoBaseName = "nixos-proxmox-ve";
+                    })
+                  ];
+                }).config.system.build.isoImage.overrideAttrs
+                  { pname = "proxmox-iso"; };
+            };
 
             checks =
               self.packages.${system}

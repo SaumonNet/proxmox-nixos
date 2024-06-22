@@ -44,20 +44,28 @@ in
         SendEnv LANG LC_*
       '';
 
+      security.pam.services."proxmox-ve-auth" = {
+        logFailures = true;
+        nodelay = true;
+      };
+
       services.rpcbind.enable = true;
       services.rrdcached.enable = true;
+
       users.users.www-data = {
         isSystemUser = true;
         group = "www-data";
       };
       users.groups.www-data = { };
+
       environment.systemPackages = [ pkgs.proxmox-ve ];
       environment.etc.issue.enable = false;
+
       networking.firewall.allowedTCPPorts = [
-        8006
-        111
         80
+        111
         443
+        8006
       ];
     }
   ]);

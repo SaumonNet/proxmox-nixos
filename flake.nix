@@ -61,10 +61,12 @@
           (
             { config, ... }:
             {
+              imports = [ ./hardware-configuration.nix ];
+
               networking = {
                 hostName = "proxmox-dev";
-
                 useNetworkd = true;
+                nftables.enable = true;
 
                 firewall.allowedTCPPorts = [
                   80
@@ -73,6 +75,7 @@
                   5901
                   5902
                 ];
+
                 firewall.allowedUDPPorts = [
                   80
                   443
@@ -80,8 +83,8 @@
                   5901
                   5902
                 ];
-                nftables.enable = true;
               };
+
               systemd.network.networks."10-lan" = {
                 matchConfig.Name = [ "ens18" ];
                 networkConfig = {
@@ -115,19 +118,13 @@
                   "gid=${toString config.ids.gids.tty}"
                 ];
               };
-              imports = [ ./hardware-configuration.nix ];
 
               services.proxmox-ve = {
                 enable = true;
                 localIP = self.machines.proxmox-dev.ipv4.local;
               };
 
-              services.proxmox-backup.enable = true;
-
-              security.pam.services."proxmox-ve-auth" = {
-                logFailures = true;
-                nodelay = true;
-              };
+              # services.proxmox-backup.enable = true;
 
               services.tailscale.enable = true;
               services.openssh.enable = true;

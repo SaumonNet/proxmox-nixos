@@ -1,6 +1,6 @@
 {
   lib,
-  fetchFromGitHub,
+  fetchgit,
   craneLib,
   pkg-config,
   clang,
@@ -24,9 +24,8 @@ craneLib.buildPackage rec {
   pname = "proxmox-backup-qemu";
   version = "unstable-2023-11-03";
 
-  src = fetchFromGitHub {
-    owner = "proxmox";
-    repo = "proxmox-backup-qemu";
+  src = fetchgit {
+    url = "https://git.proxmox.com/git/${pname}.git";
     rev = "afc3670334a5c911a14725bc9df2a96ac8066781";
     hash = "sha256-9d73I+JL47MHLhvEnLSbO4xcYVu187oN9YKkTzwUlSk=";
   };
@@ -47,7 +46,8 @@ craneLib.buildPackage rec {
 
   cargoVendorDir = craneLib.vendorCargoDeps {
     cargoLock = ./Cargo.lock;
-    overrideVendorGitCheckout = ps: drv:
+    overrideVendorGitCheckout =
+      ps: drv:
       if (lib.any isProxmoxRS ps) then
         (drv.overrideAttrs (_old: {
           postPatch = ''
@@ -99,5 +99,4 @@ craneLib.buildPackage rec {
   LIBCLANG_PATH = "${libclang.lib}/lib";
 
   cargoTestExtraArgs = "-- --skip=test_get_current_release_codename rrd::tests::load_and_save_rrd_v2 rrd::tests::upgrade_from_rrd_v1";
-
 }

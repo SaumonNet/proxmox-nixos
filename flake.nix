@@ -180,6 +180,11 @@
         }) self.nixosConfigurations;
 
       checks = self.packages;
+
+      nixosTests = import ./tests {
+        inherit pkgs;
+        extraBaseModules = self.nixosModules;
+      };
     }
     //
       utils.lib.eachSystem

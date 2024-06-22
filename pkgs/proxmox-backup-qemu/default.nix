@@ -22,12 +22,13 @@ let
 in
 craneLib.buildPackage rec {
   pname = "proxmox-backup-qemu";
-  version = "unstable-2023-11-03";
+  version = "1.3.2";
 
   src = fetchgit {
     url = "https://git.proxmox.com/git/${pname}.git";
     rev = "afc3670334a5c911a14725bc9df2a96ac8066781";
     hash = "sha256-9d73I+JL47MHLhvEnLSbO4xcYVu187oN9YKkTzwUlSk=";
+    fetchSubmodules = false;
   };
 
   postPatch = ''

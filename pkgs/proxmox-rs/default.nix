@@ -49,8 +49,9 @@ craneLib.buildPackage rec {
   cargoTestExtraArgs = "-- --skip=test_get_current_release_codename rrd::tests::load_and_save_rrd_v2 rrd::tests::upgrade_from_rrd_v1";
 
   passthru.updateScript = [
-    ../update.sh
+    ../update.py
     pname
+    "--url"
     src.url
   ];
 

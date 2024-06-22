@@ -39,8 +39,9 @@ stdenv.mkDerivation rec {
   '';
 
   passthru.updateScript = [
-    ../update.sh
+    ../update.py
     pname
+    "--url"
     src.url
   ];
 

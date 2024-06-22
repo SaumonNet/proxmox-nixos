@@ -109,8 +109,9 @@ perl536.pkgs.toPerlModule (
     '';
 
     passthru.updateScript = [
-      ../update.sh
+      ../update.py
       pname
+      "--url"
       src.url
     ];
 

@@ -39,7 +39,8 @@ craneLib.buildPackage {
 
   cargoVendorDir = craneLib.vendorCargoDeps {
     cargoLock = ./Cargo.lock;
-    overrideVendorGitCheckout = ps: drv:
+    overrideVendorGitCheckout =
+      ps: drv:
       if (lib.any isProxmoxRS ps) then
         (drv.overrideAttrs (_old: {
           postPatch = ''
@@ -84,5 +85,4 @@ craneLib.buildPackage {
     ];
     mainProgram = "proxmox";
   };
-
 }

@@ -31,8 +31,9 @@ rustPlatform.buildRustPackage rec {
   '';
 
   passthru.updateScript = [
-    ../update.sh
+    ../update.py
     pname
+    "--url"
     src.url
     "--prefix"
     "termproxy: bump version to"

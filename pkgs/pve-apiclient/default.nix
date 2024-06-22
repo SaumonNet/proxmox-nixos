@@ -30,8 +30,9 @@ perl536.pkgs.toPerlModule (
     propagatedBuildInputs = perlDeps;
 
     passthru.updateScript = [
-      ../update.sh
+      ../update.py
       pname
+      "--url"
       src.url
     ];
 

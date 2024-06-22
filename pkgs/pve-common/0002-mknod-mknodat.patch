@@ -1,0 +1,26 @@
+diff --git a/PVE/Syscall.pm b/PVE/Syscall.pm
+index 9ef3d5d..dca8b4f 100644
+--- a/PVE/Syscall.pm
++++ b/PVE/Syscall.pm
+@@ -16,7 +16,7 @@ BEGIN {
+ 	openat => &SYS_openat,
+ 	close => &SYS_close,
+ 	mkdirat => &SYS_mkdirat,
+-	mknod => &SYS_mknod,
++	mknodat => &SYS_mknodat,
+ 	faccessat => &SYS_faccessat,
+ 	setresuid => &SYS_setresuid,
+ 	fchownat => &SYS_fchownat,
+diff --git a/PVE/Tools.pm b/PVE/Tools.pm
+index 766c809..643a05d 100644
+--- a/PVE/Tools.pm
++++ b/PVE/Tools.pm
+@@ -1753,7 +1753,7 @@ sub mkdirat($$$) {
+ 
+ sub mknod($$$) {
+     my ($filename, $mode, $dev) = @_;
+-    return syscall(PVE::Syscall::SYS_mknod, $filename, int($mode), int($dev)) == 0;
++    return syscall(PVE::Syscall::SYS_mknodat, 'AT_FDCWD', $filename, int($mode), int($dev)) == 0;
+ }
+ 
+ sub fchownat($$$$$) {

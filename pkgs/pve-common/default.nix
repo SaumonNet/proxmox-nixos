@@ -82,9 +82,11 @@ perl536.pkgs.toPerlModule (
 
     patches = [
       (substituteAll {
-        src = ./ss_fix_path.patch;
+        src = ./0001-ss_fix_path.patch;
         sspath = "${iproute2}/bin/";
       })
+
+      ./0002-mknod-mknodat.patch
     ];
 
     propagatedBuildInputs = [

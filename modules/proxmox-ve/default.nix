@@ -16,14 +16,7 @@ in
     camillemndn
   ];
 
-  options.services.proxmox-ve = {
-    enable = mkEnableOption (mdDoc ''Proxmox VE'');
-    localIP = mkOption {
-      description = mdDoc ''Local IP'';
-      type = types.str;
-      example = "192.168.0.2";
-    };
-  };
+  options.services.proxmox-ve.enable = mkEnableOption (mdDoc ''Proxmox VE'');
 
   config = mkIf cfg.enable (mkMerge [
     (import ./cluster.nix { inherit pkgs; })
@@ -39,7 +32,6 @@ in
       networking.hosts = {
         "127.0.0.2" = lib.mkForce [ ];
         "::1" = lib.mkForce [ ];
-        "${cfg.localIP}" = [ config.networking.hostName ];
       };
 
       services.openssh = {

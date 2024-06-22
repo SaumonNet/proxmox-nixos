@@ -46,6 +46,7 @@
         ExecStart = "${pkgs.corosync}/bin/corosync -f $COROSYNC_OPTIONS";
         ExecStop = "${pkgs.corosync}/bin/corosync-cfgtool -H --force";
         Type = "notify";
+        StateDirectory = "corosync";
 
         # In typical systemd deployments, both standard outputs are forwarded to
         # journal (stderr is what's relevant in the pristine corosync configuration),
@@ -69,4 +70,6 @@
       };
     };
   };
+
+  systemd.tmpfiles.rules = [ "d /etc/corosync 0755 root root -" ];
 }

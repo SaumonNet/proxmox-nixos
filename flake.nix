@@ -118,10 +118,7 @@
                 ];
               };
 
-              services.proxmox-ve = {
-                enable = true;
-                localIP = self.machines.proxmox-dev.ipv4.local;
-              };
+              services.proxmox-ve.enable = true;
 
               # services.proxmox-backup.enable = true;
 

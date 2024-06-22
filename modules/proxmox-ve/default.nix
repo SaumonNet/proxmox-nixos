@@ -36,7 +36,10 @@ in
         "glusterfs"
       ];
 
-      networking.hosts = lib.mkForce { "${cfg.localIP}" = [ config.networking.hostName ]; };
+      networking.hosts = {
+        "127.0.0.2" = lib.mkForce [ ];
+        "${cfg.localIP}" = [ config.networking.hostName ];
+      };
 
       services.openssh.settings.AcceptEnv = "LANG LC_*";
       programs.ssh.extraConfig = ''

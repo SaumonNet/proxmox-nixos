@@ -86,7 +86,7 @@ perl536.pkgs.toPerlModule (
     meta = with lib; {
       description = "Proxmox Rust interface for Perl";
       homepage = "https://git.proxmox.com/?p=proxmox-perl-rs.git";
-      license = with licenses; [ ];
+      license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn
         julienmalka

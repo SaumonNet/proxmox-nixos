@@ -116,9 +116,9 @@ perl536.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Cluster FS and Tools";
+      description = "Proxmox VE Cluster FS and Tools";
       homepage = "https://git.proxmox.com/?p=pve-cluster.git";
-      license = with licenses; [ ];
+      license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn
         julienmalka

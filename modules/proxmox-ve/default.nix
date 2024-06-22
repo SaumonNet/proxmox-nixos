@@ -35,9 +35,8 @@ in
         "fuse"
         "glusterfs"
       ];
-      networking.hosts = {
-        "${cfg.localIP}" = [ config.networking.hostName ];
-      };
+
+      networking.hosts = lib.mkForce { "${cfg.localIP}" = [ config.networking.hostName ]; };
 
       services.openssh.settings.AcceptEnv = "LANG LC_*";
       programs.ssh.extraConfig = ''

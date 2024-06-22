@@ -40,10 +40,7 @@
         ExecStartPre = [
           "${pkgs.pve-cluster}/bin/pvecm updatecerts -silent"
           "${pkgs.coreutils}/bin/touch /var/lock/pveproxy.lck"
-          "${pkgs.coreutils}/bin/mkdir /var/log/pveproxy"
           "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/lock/pveproxy.lck"
-          "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/log/pveproxy"
-          "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/lib/pve-manager"
         ];
         ExecStart = "${pkgs.pve-manager}/bin/pveproxy start";
         ExecStop = "${pkgs.pve-manager}/bin/pveproxy stop";
@@ -162,6 +159,8 @@
 
     # spiceproxy = { };
   };
+
+  systemd.tmpfiles.rules = [ "d /var/log/pveproxy 0755 www-data www-data -" ];
 
   systemd.targets = {
     pve-storage = {

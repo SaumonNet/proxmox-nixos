@@ -11,6 +11,7 @@
 
   testScript = ''
     machine.start()
-    assert "started" in machine.succeed("pveproxy status")
+    machine.wait_for_unit("pveproxy.service")
+    assert "running" in machine.succeed("pveproxy status")
   '';
 }

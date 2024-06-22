@@ -40,6 +40,7 @@
         ExecStartPre = [
           "${pkgs.pve-cluster}/bin/pvecm updatecerts -silent"
           "${pkgs.coreutils}/bin/touch /var/lock/pveproxy.lck"
+          "${pkgs.coreutils}/bin/mkdir /var/log/pveproxy"
           "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/lock/pveproxy.lck"
           "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/log/pveproxy"
           "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/lib/pve-manager"
@@ -49,6 +50,7 @@
         ExecReload = "${pkgs.pve-manager}/bin/pveproxy restart";
         PIDFile = "/run/pveproxy/pveproxy.pid";
         Type = "forking";
+        StateDirectory = "pve-manager";
         Restart = "on-failure";
       };
     };
@@ -115,6 +117,10 @@
         "pve-storage.target"
       ];
       serviceConfig = {
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/touch /var/lib/pve-manager/pve-replication-state.lck"
+          "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/lib/pve-manager/pve-replication-state.lck"
+        ];
         ExecStart = "${pkgs.pve-manager}/bin/pvescheduler start";
         ExecStop = "${pkgs.pve-manager}/bin/pvescheduler stop";
         ExecReload = "${pkgs.pve-manager}/bin/pvescheduler restart";

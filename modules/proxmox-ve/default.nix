@@ -42,7 +42,10 @@ in
         "${cfg.localIP}" = [ config.networking.hostName ];
       };
 
-      services.openssh.settings.AcceptEnv = "LANG LC_*";
+      services.openssh = {
+        enable = true;
+        settings.AcceptEnv = "LANG LC_*";
+      };
       programs.ssh.extraConfig = ''
         SendEnv LANG LC_*
       '';

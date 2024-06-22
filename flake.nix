@@ -32,7 +32,6 @@
       pkgs = import nixpkgs {
         system = "x86_64-linux";
         overlays = [ self.overlays."x86_64-linux" ];
-        config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ ];
       };
     in
     {
@@ -178,13 +177,6 @@
             buildOnTarget = lib.mkDefault true;
           };
         }) self.nixosConfigurations;
-
-      checks = self.packages;
-
-      nixosTests = import ./tests {
-        inherit pkgs;
-        extraBaseModules = self.nixosModules;
-      };
     }
     //
       utils.lib.eachSystem
@@ -214,6 +206,13 @@
               });
 
             packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs craneLib; });
+
+            checks =
+              self.packages.${system}
+              // (import ./tests {
+                inherit pkgs;
+                extraBaseModules = self.nixosModules;
+              });
 
             devShells.default = pkgs.mkShell {
               buildInputs = with pkgs; [

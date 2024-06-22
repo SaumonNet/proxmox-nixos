@@ -38,6 +38,7 @@ in
 
       networking.hosts = {
         "127.0.0.2" = lib.mkForce [ ];
+        "::1" = lib.mkForce [ ];
         "${cfg.localIP}" = [ config.networking.hostName ];
       };
 

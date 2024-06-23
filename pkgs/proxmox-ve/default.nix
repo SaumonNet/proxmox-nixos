@@ -9,6 +9,8 @@
   pve-manager,
   pve-qemu-server,
   pve-storage,
+  termproxy,
+  vncterm,
   wget,
 }:
 
@@ -24,6 +26,8 @@ buildEnv rec {
     pve-manager
     pve-qemu-server
     pve-storage
+    termproxy
+    vncterm
     wget
   ];
 

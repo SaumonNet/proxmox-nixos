@@ -204,7 +204,7 @@
                 pkgs = prev;
               })
               // {
-                proxmox-iso =
+                nixos-proxmox-ve-iso =
                   (lib.nixosSystem {
                     extraModules = lib.attrValues self.nixosModules;
                     pkgs = prev;
@@ -220,7 +220,7 @@
               };
 
             packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs craneLib; }) // {
-              proxmox-iso =
+              nixos-proxmox-ve-iso =
                 (lib.nixosSystem {
                   extraModules = lib.attrValues self.nixosModules;
                   inherit pkgs system;
@@ -231,8 +231,7 @@
                       isoImage.isoBaseName = "nixos-proxmox-ve";
                     })
                   ];
-                }).config.system.build.isoImage.overrideAttrs
-                  { pname = "proxmox-iso"; };
+                }).config.system.build.isoImage;
             };
 
             checks =

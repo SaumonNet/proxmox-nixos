@@ -7,6 +7,9 @@
     crane.url = "github:ipetkov/crane/v0.17.3";
   };
 
+  nixConfig.extra-substituters = "https://cache.saumon.network/proxmox-nixos";
+  nixConfig.extra-trusted-public-keys = "proxmox-nixos:nveXDuVVhFDRFx8Dn19f1WDEaNRJjPrF2CPD2D+m1ys=";
+
   description = "Proxmox on NixOS";
 
   outputs =

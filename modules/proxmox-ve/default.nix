@@ -34,6 +34,12 @@ in
         "::1" = lib.mkForce [ ];
       };
 
+      # create the /etc/network/interfaces file for proxmox
+      systemd.tmpfiles.rules = [
+        "d /etc/network 0755 root root -"
+        "f /etc/network/interfaces 0755 root root -"
+      ];
+
       services.openssh = {
         enable = true;
         settings.AcceptEnv = "LANG LC_*";

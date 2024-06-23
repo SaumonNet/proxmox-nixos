@@ -10,6 +10,12 @@ This project is a port of the [Proxmox Hypervisor](https://www.proxmox.com/) on 
 
 Proxmox-NixOS has been tested on real hardware with most basic features of Proxmox (booting VMs, user management, etc), more involved setups (clusters, HA, etc) are still under development and testing.
 
+## 🗃️ Cache
+
+Some Proxmox packages have a quite power intensive build process. We make a cache available to download directly the artifacts:
+- address: `https://cache.saumon.network/proxmox-nixos`
+- public key: `proxmox-nixos:nveXDuVVhFDRFx8Dn19f1WDEaNRJjPrF2CPD2D+m1ys=`
+
 ## 🚀 Quick start
 
 ### With [`npins`](https://github.com/andir/npins)

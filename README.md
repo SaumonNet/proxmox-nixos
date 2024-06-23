@@ -6,6 +6,10 @@ This project is a port of the [Proxmox Hypervisor](https://www.proxmox.com/) on 
 
 ⚠️ Proxmox-NixOS is still **experimental** and we do not advise running it on production machines. Do it at your own risk and only if you are ready to fix issues by yourself.
 
+## 🚦 Supported features
+
+Proxmox-NixOS has been tested on real hardware with most basic features of Proxmox (booting VMs, user management, etc), more involved setups (clusters, HA, etc) are still under development and testing.
+
 ## 🚀 Quick start
 
 ### With [`npins`](https://github.com/andir/npins)
@@ -121,3 +125,8 @@ networking.bridges.vmbr0.interfaces = [ "ens18" ];
 networking.interfaces.vmbr0.useDHCP = lib.mkDefault true;
 ```
 
+## 🚧 Roadmap
+
+- Support for clusters / HA with Ceph
+- More coverage of NixOS tests
+- Proxmox backup server

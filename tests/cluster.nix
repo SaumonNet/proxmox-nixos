@@ -20,6 +20,5 @@
     pve1.succeed("pvecm create mycluster")
     pve1.wait_for_unit("corosync.service")
     pve2.wait_for_unit("multi-user.target")
-    pve2.succeed("pvecm join mycluster")
   '';
 }

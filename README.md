@@ -136,3 +136,8 @@ networking.interfaces.vmbr0.useDHCP = lib.mkDefault true;
 - Support for clusters / HA with Ceph
 - More coverage of NixOS tests
 - Proxmox backup server
+
+## Thanks
+
+This project has received support from [NLNet](https://nlnet.nl/).
+<pre><img alt="Logo of NLnet Foundation" src="https://nlnet.nl/logo/banner.svg" width="320px" height="120px" />     <img alt="Logo of NGI Assure" src="https://nlnet.nl/image/logos/NGIAssure_tag.svg" width="320px" height="120px" /></pre>

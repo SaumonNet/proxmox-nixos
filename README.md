@@ -34,6 +34,9 @@ in
 {
   imports = [ proxmox-nixos.nixosModules.default ];
   services.proxmox-ve.enable = true;
+  nixpkgs.overlays = [
+    proxmox-nixos.overlays.x86_64-linux
+  ];
   # The rest of your configuration...
 }
 ```
@@ -53,7 +56,7 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
 
   outputs = { self, nixpkgs, proxmox-nixos, ...}: {
     nixosConfigurations = {
-      yourHost = nixpkgs.lib.nixosSystem {
+      yourHost = nixpkgs.lib.nixosSystem rec {
         system = "x86_64-linux";
         modules = [
 
@@ -61,6 +64,9 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
 
           ({ pkgs, lib, ... }: {
             services.proxmox-ve.enable = true;
+            nixpkgs.overlays = [
+              proxmox-nixos.overlays.${system}
+            ];
 
             # The rest of your configuration...
           })

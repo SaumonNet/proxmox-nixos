@@ -13,5 +13,5 @@ let
 in
 {
   test-pve-basic = runTest ./basic.nix;
-  test-pve-vm = runTest ./vm.nix;
+  test-pve-vm = runTest (import ./vm.nix { inherit pkgs; });
 }

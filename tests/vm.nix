@@ -2,7 +2,7 @@
 
 {
 
-  name = "proxmox-ve";
+  name = "pve-vm";
 
   nodes.mypve = {
     services.proxmox-ve.enable = true;

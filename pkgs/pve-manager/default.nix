@@ -51,7 +51,10 @@ perl536.pkgs.toPerlModule (
       hash = "sha256-onNnxvQ7YrdnrFpl+z7Z+xUyEZsMcU6Qxn/kjYLan+8=";
     };
 
-    patches = [ ./0001-no-apt-update.patch ];
+    patches = [
+      ./0001-no-apt-update.patch
+      ./0002-no-repo-status.patch
+    ];
 
     postPatch = ''
       sed -i {defines.mk,configs/Makefile} -e "s,/usr,,"

@@ -4,7 +4,7 @@
 
 This project is a port of the [Proxmox Hypervisor](https://www.proxmox.com/) on NixOS.
 
-⚠️ Proxmox-NixOS is still **experimental** and we do not advise it to run in on production machines. Do it at your own risk and only if you are ready to fix issues by yourself.
+⚠️ Proxmox-NixOS is still **experimental** and we do not advise running it on production machines. Do it at your own risk and only if you are ready to fix issues by yourself.
 
 ## Quick start
 

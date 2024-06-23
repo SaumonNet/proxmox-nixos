@@ -34,7 +34,7 @@ in
 {
   imports = [ proxmox-nixos.nixosModules.default ];
   services.proxmox-ve.enable = true;
-  # The rest of your configurations...
+  # The rest of your configuration...
 }
 ```
 
@@ -62,7 +62,7 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
           ({ pkgs, lib, ... }: {
             services.proxmox-ve.enable = true;
 
-            # The rest of your configurations...
+            # The rest of your configuration...
           })
         ];
       };

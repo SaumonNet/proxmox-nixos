@@ -6,7 +6,7 @@ This project is a port of the [Proxmox Hypervisor](https://www.proxmox.com/) on 
 
 ⚠️ Proxmox-NixOS is still **experimental** and we do not advise running it on production machines. Do it at your own risk and only if you are ready to fix issues by yourself.
 
-## Quick start
+## 🚀 Quick start
 
 ### With [`npins`](https://github.com/andir/npins)
 
@@ -77,7 +77,7 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
 }
 ```
 
-## Networking
+## 🌐 Networking
 
 To get internet in your VMs, you need to add a network device to the VM, connected to a bridge. To get this working, follow this 2 steps:
 1) Create the bridge in `System->Network->Create->Linux Bridge`. This operation has no effect on your system and is just a quirk for Proxmox to know the existence of your bridge.

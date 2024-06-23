@@ -15,7 +15,7 @@ Add `proxmox-nixos` as a dependency of your npins project.
 ```console
 $ npins add github SaumonNet proxmox-nixos -b main
 [INFO ] Adding 'proxmox-nixos' …
-    repository: https://github.com/saumonnet/proxmox-nixos.git
+    repository: https://github.com/SaumonNet/proxmox-nixos.git
     branch: main
     revision: ...
     url: https://github.com/saumonnet/proxmox-nixos/archive/$revision.tar.gz

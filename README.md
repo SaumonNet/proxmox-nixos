@@ -141,6 +141,10 @@ networking.interfaces.vmbr0.useDHCP = lib.mkDefault true;
 
 Most packages are regularly and automatically updated thanks to [a modified version](https://github.com/SaumonNet/proxmox-nixos-update) of the [`nixpkgs-update`](https://github.com/nix-community/nixpkgs-update) bot, whose logs are available [here](https://proxmox-nixos-update-logs.saumon.network/).
 
+## 📬 Help / Discussions
+
+There is [a matrix room](https://matrix.to/#/#proxmox-nixos:matrix.org) for discussions about Proxmox-NixOS.
+
 ## Thanks
 
 This project has received support from [NLNet](https://nlnet.nl/).

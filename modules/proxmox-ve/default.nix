@@ -16,13 +16,17 @@ in
     camillemndn
   ];
 
+  imports = [
+    ./cluster.nix
+    # ./firewall.nix
+    # ./ha-manager.nix
+    ./manager.nix
+    ./rrdcached.nix
+  ];
+
   options.services.proxmox-ve.enable = mkEnableOption (mdDoc ''Proxmox VE'');
 
   config = mkIf cfg.enable (mkMerge [
-    (import ./cluster.nix { inherit pkgs; })
-    # (import ./firewall.nix { inherit pkgs; })
-    # (import ./ha-manager.nix { inherit pkgs; })
-    (import ./manager.nix { inherit pkgs; })
     {
       boot.supportedFilesystems = [
         "fuse"

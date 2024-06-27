@@ -1,6 +1,11 @@
-{ pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+lib.mkIf config.services.proxmox-ve.enable {
   systemd.services = {
     pve-firewall = {
       description = "Proxmox VE firewall";

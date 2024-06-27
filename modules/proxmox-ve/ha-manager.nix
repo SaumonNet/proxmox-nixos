@@ -1,6 +1,11 @@
-{ pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+lib.mkIf config.services.proxmox-ve.enable {
   systemd.services = {
     pve-ha-lrm = {
       description = "PVE Local HA Resource Manager Daemon";

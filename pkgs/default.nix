@@ -1,5 +1,6 @@
 {
   pkgs,
+  pkgs-stable,
   craneLib ? { },
   ...
 }:
@@ -47,7 +48,7 @@ let
     pve-http-server = callPackage ./pve-http-server { };
     pve-manager = callPackage ./pve-manager { };
     pve-novnc = callPackage ./pve-novnc { };
-    pve-qemu = callPackage ./pve-qemu { };
+    pve-qemu = callPackage ./pve-qemu { qemu_8 = pkgs-stable.qemu; };
     pve-qemu-server = callPackage ./pve-qemu-server { };
     pve-rados2 = callPackage ./pve-rados2 { };
     pve-rs = callPackage ./pve-rs { };

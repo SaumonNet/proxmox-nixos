@@ -20,6 +20,19 @@ Some Proxmox packages have a quite power intensive build process. We make a cach
 
 ### With [`npins`](https://github.com/andir/npins)
 
+#### To enable npins
+first add npins as systemPackage or `nix-shell -p npins`
+then initialize npins in /etc/nixos
+```bash
+cd /etc/nixos
+sudo npins init
+sudo npins add github SaumonNet proxmox-nixos -b main
+```
+
+
+
+```
+
 Add `proxmox-nixos` as a dependency of your npins project.
 
 ```console
@@ -36,13 +49,13 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
 
 ```nix
 # file: configuration.nix
-{ pkgs, lib, ... }:
+{  config, pkgs, lib, ... }:
 let
     sources = import ./npins;
     proxmox-nixos = import sources.proxmox-nixos;
 in
 {
-  imports = [ proxmox-nixos.nixosModules.proxmox-ve ];
+  imports = [ ./hardware-configuration.nix proxmox-nixos.nixosModules.proxmox-ve ];
   services.proxmox-ve.enable = true;
   nixpkgs.overlays = [
     proxmox-nixos.overlays.x86_64-linux

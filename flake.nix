@@ -1,7 +1,8 @@
 {
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-24.05";
-    unstable.url = "nixpkgs/nixos-unstable";
+    # Used for qemu
+    nixpkgs-stable.url = "nixpkgs/nixos-24.05";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
     crane.url = "github:ipetkov/crane/v0.17.3";
@@ -16,7 +17,7 @@
     {
       self,
       nixpkgs,
-      unstable,
+      nixpkgs-stable,
       utils,
       crane,
       ...
@@ -41,16 +42,13 @@
               overlays = [ self.overlays.${system} ];
             };
             craneLib = crane.mkLib pkgs;
+            pkgs-stable = nixpkgs-stable.legacyPackages.${system};
           in
           {
             overlays =
               _: prev:
-              {
-                inherit lib;
-                unstable = unstable.legacyPackages.${system};
-              }
-              // (import ./pkgs {
-                inherit craneLib;
+              (import ./pkgs {
+                inherit craneLib pkgs-stable;
                 pkgs = prev;
               })
               // {
@@ -69,7 +67,7 @@
                   }).config.system.build.isoImage;
               };
 
-            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs craneLib; }) // {
+            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs pkgs-stable craneLib; }) // {
               nixos-proxmox-ve-iso =
                 (lib.nixosSystem {
                   extraModules = lib.attrValues self.nixosModules;

@@ -57,7 +57,7 @@ in
     # Legacy ovmf vm creation
     machine.succeed(
       "qm create 102 --kvm 0 --bios ovmf -cdrom local:iso/minimal.iso",
-      "qm start 101",
+      "qm start 102",
       "qm stop 102 --timeout 0"
     )
 

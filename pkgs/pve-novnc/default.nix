@@ -10,6 +10,12 @@ novnc.overrideAttrs (old: rec {
     hash = "sha256-5U2hSBNJVjG5/kkiEnicKOeEgVYmIJE0OIZRpslvXXg=";
   };
 
+  src = fetchgit {
+    url = "https://github.com/novnc/novnc";
+    rev = "v1.4.0";
+    hash = "sha256-G7Rtv7pQFR9UrzhYXDyBf+FRqtjo5NAXU7m/HeXhI1k=";
+  };
+
   patches =
     let
       series = builtins.readFile "${src_patches}/debian/patches/series";

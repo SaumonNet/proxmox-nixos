@@ -1,5 +1,5 @@
 {
-  qemu_8,
+  qemu,
   fetchgit,
   fetchurl,
   proxmox-backup-qemu,
@@ -8,7 +8,7 @@
 }:
 
 (
-  (qemu_8.overrideAttrs (old: rec {
+  (qemu.overrideAttrs (old: rec {
     version = "8.1.5";
 
     src = fetchurl {

@@ -86,6 +86,7 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
   };
 }
 ```
+⚠️ Do not override the `nixpkgs` input of the flake, as the only tested and supported version of Proxmox-NixOS is with the upstream `nixpkgs`.
 
 ## 🌐 Networking
 

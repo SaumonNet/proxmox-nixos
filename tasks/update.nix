@@ -22,7 +22,7 @@ let
       (
         let
           lock = builtins.fromJSON (builtins.readFile ../flake.lock);
-          nixpkgsName = lock.nodes.root.inputs.nixpkgs;
+          nixpkgsName = lock.nodes.root.inputs.nixpkgs-stable;
         in
         fetchTarball {
           url = "https://github.com/NixOS/nixpkgs/archive/${lock.nodes.${nixpkgsName}.locked.rev}.tar.gz";

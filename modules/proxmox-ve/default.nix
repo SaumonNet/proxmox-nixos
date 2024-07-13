@@ -21,6 +21,7 @@ in
     # ./firewall.nix
     # ./ha-manager.nix
     ./manager.nix
+    ./qemu-server.nix
     ./rrdcached.nix
   ];
 

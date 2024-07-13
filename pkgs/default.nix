@@ -1,10 +1,15 @@
 {
   pkgs,
+  pkgs-stable ? pkgs,
   craneLib ? { },
   ...
 }:
 let
-  callPackage = pkgs.lib.callPackageWith (pkgs // ours);
+  callPackage = pkgs.lib.callPackageWith (pkgs // ours // {
+    # Any package that is used for override should be listed here to make this flake
+    # work on anything other than nixos release.
+    inherit (pkgs-stable) qemu novnc;
+  });
   ours = {
     inherit craneLib;
 

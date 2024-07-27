@@ -63,6 +63,7 @@ lib.mkIf config.services.proxmox-ve.enable {
       wantedBy = [ "multi-user.target" ];
       wants = [
         "pvestatd.service"
+        "qmeventd.service"
         "pveproxy.service"
         "spiceproxy.service"
         "pve-firewall.service"
@@ -71,6 +72,7 @@ lib.mkIf config.services.proxmox-ve.enable {
       after = [
         "pveproxy.service"
         "pvestatd.service"
+        "qmeventd.service"
         "spiceproxy.service"
         "pve-firewall.service"
         "lxc.service"

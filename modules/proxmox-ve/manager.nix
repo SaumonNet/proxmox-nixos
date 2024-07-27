@@ -145,6 +145,15 @@ lib.mkIf config.services.proxmox-ve.enable {
       };
     };
 
+    qmeventd = {
+      description = "PVE Qemu Event Daemon";
+      before = [ "pve-ha-lrm.service" "pve-guests.service" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.proxmox-ve}/bin/qmeventd /var/run/qmeventd.sock";
+        Type = "forking";
+      };
+    };
+
     # pvenetcommit = {
     #   description = "Commit Proxmox VE network changes";
     #   wantedBy = [ "multi-user.target" ];

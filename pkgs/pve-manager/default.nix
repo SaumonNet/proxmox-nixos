@@ -9,6 +9,7 @@
   pve-docs,
   pve-ha-manager,
   pve-http-server,
+  cdrkit,
   ceph,
   gnupg,
   graphviz,
@@ -125,6 +126,7 @@ perl536.pkgs.toPerlModule (
           --prefix PATH : ${
             lib.makeBinPath [
               ceph
+              cdrkit ## cloud-init
               gzip
               openssh
               gnupg

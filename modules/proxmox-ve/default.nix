@@ -66,7 +66,7 @@ in
       };
       users.groups.www-data = { };
 
-      environment.systemPackages = [ pkgs.proxmox-ve ];
+      environment.systemPackages = [ pkgs.proxmox-ve pkgs.pve-qemu pkgs.cifs-utils pkgs.samba];
       environment.etc.issue.enable = false;
 
       networking.firewall.allowedTCPPorts = [

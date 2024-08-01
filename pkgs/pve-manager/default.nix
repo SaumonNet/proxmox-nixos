@@ -9,6 +9,7 @@
   pve-docs,
   pve-ha-manager,
   pve-http-server,
+  cdrkit,
   ceph,
   gnupg,
   graphviz,
@@ -17,6 +18,7 @@
   openvswitch,
   openssh,
   pve-qemu,
+  pve-qemu-server,
   tzdata,
   pve-novnc,
   pve-xtermjs,
@@ -24,6 +26,9 @@
   termproxy,
   shadow,
   wget,
+  bash,
+  zstd,
+  system-sendmail, rsync, busybox, cstream, lvm2
 }:
 
 let
@@ -35,6 +40,7 @@ let
     proxmox-acme
     pve-ha-manager
     pve-http-server
+    pve-qemu-server
   ];
 
   perlEnv = perl536.withPackages (_: perlDeps);
@@ -108,7 +114,9 @@ perl536.pkgs.toPerlModule (
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
         -Ee "s|(/usr)?/s?bin/||" \
-        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
+        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
+        -e "s|/usr/share/perl5/.plug|${pve-qemu-server}/${perl536.libPrefix}/${perl536.version}/\$plug|"
+
 
       find $out/bin -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d"
@@ -118,6 +126,7 @@ perl536.pkgs.toPerlModule (
           --prefix PATH : ${
             lib.makeBinPath [
               ceph
+              cdrkit ## cloud-init
               gzip
               openssh
               gnupg
@@ -128,6 +137,9 @@ perl536.pkgs.toPerlModule (
               pve-ha-manager
               shadow
               wget
+
+              ## dependencies of backup and restore
+              bash zstd system-sendmail rsync busybox cstream lvm2
             ]
           } \
           --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}

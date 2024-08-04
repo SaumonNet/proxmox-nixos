@@ -9,6 +9,7 @@
   perl536,
   glibc,
   openvswitch,
+  pciutils,
   proxmox-backup-client,
   systemd,
   tzdata,
@@ -87,6 +88,11 @@ perl536.pkgs.toPerlModule (
       })
 
       ./0002-mknod-mknodat.patch
+
+      (substituteAll {
+        src = ./0003-pci-id-path.patch;
+        pciutils = "${pciutils}";
+      })
     ];
 
     propagatedBuildInputs = [

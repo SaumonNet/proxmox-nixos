@@ -1,0 +1,13 @@
+diff --git a/src/PVE/SysFSTools.pm b/src/PVE/SysFSTools.pm
+index 57f0ac8..13d0bdf 100644
+--- a/PVE/SysFSTools.pm
++++ b/PVE/SysFSTools.pm
+@@ -14,7 +14,7 @@ my $pciregex = "($domainregex):([a-f0-9]{2}):([a-f0-9]{2})\.([a-f0-9])";
+ my $parse_pci_ids = sub {
+     my $ids = {};
+ 
+-    open(my $fh, '<', "/usr/share/misc/pci.ids")
++    open(my $fh, '<', "@pciutils@/share/pci.ids")
+ 	or return $ids;
+ 
+     my $curvendor;

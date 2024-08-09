@@ -1,7 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-24.05";
-    unstable.url = "nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "nixpkgs/nixos-24.05";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
     crane.url = "github:ipetkov/crane/v0.17.3";
@@ -15,14 +14,13 @@
   outputs =
     {
       self,
-      nixpkgs,
-      unstable,
+      nixpkgs-stable,
       utils,
       crane,
       ...
     }:
     let
-      inherit (nixpkgs) lib;
+      inherit (nixpkgs-stable) lib;
     in
     {
       nixosModules = import ./modules;
@@ -36,7 +34,7 @@
         (
           system:
           let
-            pkgs = import nixpkgs {
+            pkgs = import nixpkgs-stable {
               inherit system;
               overlays = [ self.overlays.${system} ];
             };
@@ -45,11 +43,7 @@
           {
             overlays =
               _: prev:
-              {
-                inherit lib;
-                unstable = unstable.legacyPackages.${system};
-              }
-              // (import ./pkgs {
+              (import ./pkgs {
                 inherit craneLib;
                 pkgs = prev;
               })
@@ -60,7 +54,7 @@
                     pkgs = prev;
                     inherit system;
                     modules = [
-                      "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                      "${nixpkgs-stable}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
                       (_: {
                         services.proxmox-ve.enable = true;
                         isoImage.isoBaseName = "nixos-proxmox-ve";
@@ -75,7 +69,7 @@
                   extraModules = lib.attrValues self.nixosModules;
                   inherit pkgs system;
                   modules = [
-                    "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                    "${nixpkgs-stable}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
                     (_: {
                       services.proxmox-ve.enable = true;
                       isoImage.isoBaseName = "nixos-proxmox-ve";

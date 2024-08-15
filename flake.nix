@@ -42,11 +42,14 @@
           in
           {
             overlays =
-              _: prev:
-              (import ./pkgs {
+              final: prev:
+              {
+                inherit lib;
+                unstable = unstable.legacyPackages.${system};
+              }
+              // (import ./pkgs {
                 inherit craneLib;
-                pkgs = prev;
-                pkgs-stable = pkgs;
+                pkgs = final;
               })
               // {
                 nixos-proxmox-ve-iso =

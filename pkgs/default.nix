@@ -58,6 +58,8 @@ let
     pve-rs = callPackage ./pve-rs { };
     pve-storage = callPackage ./pve-storage { };
     pve-xtermjs = callPackage ./pve-xtermjs { };
+
+    linstor-proxmox = callPackage ./linstor-proxmox { };
   };
 in
 ours

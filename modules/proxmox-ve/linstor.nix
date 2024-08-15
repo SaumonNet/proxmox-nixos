@@ -31,15 +31,29 @@ in
         after = [ "network-online.target" ];
         before = [ "pvedaemon.service" ];
         serviceConfig = {
-          ExecStart = "${pkgs.linstor-server}/bin/linstor-controller";
           Type = "notify";
-          PrivateTmp = true;
-          SuccessExitStatus = "0 143 129";
+          ExecStart = "${pkgs.linstor-server}/bin/linstor-controller";
           Restart = "on-failure";
+          # if killed by signal 143 -> SIGTERM, 129 -> SIGHUP
+          SuccessExitStatus = "0 143 129";
+          PrivateTmp = true;
         };
       };
 
-    };
+      linstor-satellite = {
+        description = "LINSTOR Satellite Service";
+        wantedBy = [ "multi-user.target" ];
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        before = [ "pvedaemon.service" ];
 
+        serviceConfig = {
+          Type = "simple";
+          ExecStart = "${pkgs.linstor-server}/bin/linstor-satellite --logs=/var/log/linstor-satellite --config-directory=/etc/linstor";
+          SuccessExitStatus = "0 143 129";
+          PrivateTmp = true;
+        };
+      };
+    };
   };
 }

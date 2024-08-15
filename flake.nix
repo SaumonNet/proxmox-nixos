@@ -46,6 +46,7 @@
               (import ./pkgs {
                 inherit craneLib;
                 pkgs = prev;
+                pkgs-stable = pkgs;
               })
               // {
                 nixos-proxmox-ve-iso =

@@ -36,6 +36,7 @@ perl536.pkgs.toPerlModule (
     ];
 
     buildInputs = [ perlEnv ];
+    propagatedBuildInputs = perlDeps;
 
     passthru.updateScript = nix-update-script { extraArgs = [ "--flake" ]; };
 
@@ -43,7 +44,7 @@ perl536.pkgs.toPerlModule (
       description = "Integration pluging bridging LINSTOR to Proxmox VE";
       homepage = "https://github.com/LINBIT/linstor-proxmox";
       changelog = "https://github.com/LINBIT/linstor-proxmox/blob/${src.rev}/CHANGELOG.md";
-      license = [ ];
+      license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn
         julienmalka

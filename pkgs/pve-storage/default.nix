@@ -5,6 +5,8 @@
   perl536,
   pve-cluster,
   pve-rados2,
+  enableLinstor ? false,
+  linstor-proxmox,
   ceph,
   coreutils,
   e2fsprogs,
@@ -28,12 +30,15 @@
 }:
 
 let
-  perlDeps = with perl536.pkgs; [
-    Filechdir
-    posixstrptime
-    pve-cluster
-    pve-rados2
-  ];
+  perlDeps =
+    with perl536.pkgs;
+    [
+      Filechdir
+      posixstrptime
+      pve-cluster
+      pve-rados2
+    ]
+    ++ lib.optional enableLinstor linstor-proxmox;
 
   perlEnv = perl536.withPackages (_: perlDeps);
 in
@@ -67,11 +72,15 @@ perl536.pkgs.toPerlModule (
       "PERLDIR=/${perl536.libPrefix}/${perl536.version}"
     ];
 
-    postInstall = ''
-      sed -i $out/bin/* \
-        -e "s/-T//" \
-        -e "1s|$| -I$out/${perl536.libPrefix}/${perl536.version}|"
-    '';
+    postInstall =
+      ''
+        sed -i $out/bin/* \
+          -e "s/-T//" \
+          -e "1s|$| -I$out/${perl536.libPrefix}/${perl536.version}|"
+      ''
+      + lib.optionalString enableLinstor ''
+        cp -rs ${linstor-proxmox}/lib $out
+      '';
 
     postFixup = ''
       find $out -type f | xargs sed -i \
@@ -111,7 +120,7 @@ perl536.pkgs.toPerlModule (
         -e "s|/usr/sbin/sbdadm||" \
         -e "s|/usr/sbin/smartctl|${smartmontools}/bin/smartctl|" \
         -e "s|/usr/sbin/stmfadm||" \
-        -e "s|/usr/share/perl5|$out/${perl536.libPrefix}/${perl536.version}|" \
+        -e "s|/usr/share/perl5|$out/${perl536.libPrefix}/${perl536.version}|"
     '';
 
     passthru.updateScript = [

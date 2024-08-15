@@ -1,7 +1,7 @@
 {
   lib,
   buildEnv,
-  linstor-proxmox,
+  linstor-client,
   pve-access-control,
   pve-cluster,
   pve-container,
@@ -24,14 +24,14 @@ buildEnv rec {
     pve-cluster
     pve-container
     pve-firewall
-    pve-ha-manager
-    pve-manager
+    (pve-ha-manager.override { inherit enableLinstor; })
+    (pve-manager.override { inherit enableLinstor; })
     pve-qemu-server
-    pve-storage
+    (pve-storage.override { inherit enableLinstor; })
     termproxy
     vncterm
     wget
-  ] ++ lib.optional enableLinstor linstor-proxmox;
+  ] ++ lib.optionals enableLinstor [ linstor-client ];
 
   meta = with lib; {
     description = "A complete, open-source server management platform for enterprise virtualization";

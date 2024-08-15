@@ -38,6 +38,6 @@ python3.pkgs.buildPythonApplication rec {
       camillemndn
       julienmalka
     ];
-    mainProgram = "linstor-client";
+    mainProgram = "linstor";
   };
 }

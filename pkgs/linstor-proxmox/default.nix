@@ -3,7 +3,6 @@
   stdenv,
   fetchFromGitHub,
   perl536,
-  pve-storage,
   nix-update-script,
 }:
 
@@ -12,7 +11,6 @@ let
     JSONXS
     RESTClient
     TypesSerialiser
-    pve-storage
   ];
 
   perlEnv = perl536.withPackages (_: perlDeps);

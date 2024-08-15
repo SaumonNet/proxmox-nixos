@@ -59,6 +59,8 @@ let
     pve-storage = callPackage ./pve-storage { };
     pve-xtermjs = callPackage ./pve-xtermjs { };
 
+    linstor-api-py = callPackage ./linstor-api-py { };
+    linstor-client = callPackage ./linstor-client { };
     linstor-proxmox = callPackage ./linstor-proxmox { };
   };
 in

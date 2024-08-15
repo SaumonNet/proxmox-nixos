@@ -1,6 +1,7 @@
 {
   lib,
   buildEnv,
+  linstor-proxmox,
   pve-access-control,
   pve-cluster,
   pve-container,
@@ -12,6 +13,7 @@
   termproxy,
   vncterm,
   wget,
+  enableLinstor ? false,
 }:
 
 buildEnv rec {
@@ -29,7 +31,7 @@ buildEnv rec {
     termproxy
     vncterm
     wget
-  ];
+  ] ++ lib.optional enableLinstor linstor-proxmox;
 
   meta = with lib; {
     description = "A complete, open-source server management platform for enterprise virtualization";

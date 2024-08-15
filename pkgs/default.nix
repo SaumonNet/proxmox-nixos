@@ -1,15 +1,12 @@
 {
   pkgs,
-  pkgs-stable ? pkgs,
+  pkgs-unstable,
   craneLib ? { },
   ...
 }:
 let
-  callPackage = pkgs.lib.callPackageWith (pkgs // ours // {
-    # Any package that is used for override should be listed here to make this flake
-    # work on anything other than nixos release.
-    inherit (pkgs-stable) qemu novnc;
-  });
+  callPackage = pkgs.lib.callPackageWith (pkgs // ours);
+
   ours = {
     inherit craneLib;
 
@@ -62,8 +59,8 @@ let
     linstor-api-py = callPackage ./linstor-api-py { };
     linstor-client = callPackage ./linstor-client { };
     linstor-proxmox = callPackage ./linstor-proxmox { };
-    linstor-server = pkgs.unstable.callPackage ./linstor-server {
-      protobuf = pkgs.unstable.protobuf_23;
+    linstor-server = pkgs-unstable.callPackage ./linstor-server {
+      protobuf = pkgs-unstable.protobuf_23;
       jre = pkgs.jdk11_headless;
     };
   };

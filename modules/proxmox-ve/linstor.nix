@@ -20,5 +20,24 @@ in
 
   config = mkIf cfg.enable {
     services.proxmox-ve.package = pkgs.proxmox-ve.override { enableLinstor = true; };
+
+    systemd.services = {
+      linstor-controller = {
+        description = "Linstor Controller";
+        wantedBy = [ "multi-user.target" ];
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        before = [ "pvedaemon.service" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.linstor-server}/bin/linstor-controller";
+          Type = "notify";
+          PrivateTmp = true;
+          SuccessExitStatus = "0 143 129";
+          Restart = "on-failure";
+        };
+      };
+
+    };
+
   };
 }

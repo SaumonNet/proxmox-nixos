@@ -40,12 +40,25 @@
               inherit system;
               overlays = [ self.overlays.${system} ];
             };
-            pkgs-unstable = import nixpkgs-unstable { inherit system; };
+            pkgs-unstable = import nixpkgs-unstable {
+              inherit system;
+              overlays = [
+                (_: prev: {
+                  pacemaker = prev.pacemaker.overrideAttrs (_: {
+                    env.NIX_CFLAGS_COMPILE = toString (
+                      [ "-Wno-error=deprecated-declarations" ]
+                      ++ lib.optionals prev.stdenv.cc.isGNU [ "-Wno-error=strict-prototypes" ]
+                    );
+                  });
+
+                })
+              ];
+            };
             craneLib = crane.mkLib pkgs;
           in
           {
             overlays =
-              final: _:
+              final: prev:
               (import ./pkgs { inherit pkgs pkgs-unstable craneLib; })
               // {
                 nixos-proxmox-ve-iso =

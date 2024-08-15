@@ -4,6 +4,7 @@
 
   nodes = {
     pve1 = {
+      boot.kernelModules = [ "drbd" ];
       services.proxmox-ve = {
         enable = true;
         linstor.enable = true;
@@ -11,6 +12,7 @@
       virtualisation.memorySize = 2048;
     };
     pve2 = {
+      boot.kernelModules = [ "drbd" ];
       services.proxmox-ve = {
         enable = true;
         linstor.enable = true;

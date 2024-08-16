@@ -36,7 +36,10 @@
     pve1.wait_for_unit("multi-user.target")
     pve2.wait_for_unit("multi-user.target")
 
-    pve1.succeed("linstor node create pve1 192.168.0.1")
+    pve1.wait_for_unit("linstor-satellite.service")
+    pve1.wait_for_unit("linstor-controller.service")
+
+    pve1.succeed("linstor node create pve1 192.168.0.1 >&2")
     pve1.succeed("vgcreate linstor_vg /dev/vdb")
     pve1.succeed("lvcreate -l 80%FREE -T linstor_vg/thinpool")
     pve1.succeed("linstor storage-pool create lvmthin pve1 pve-storage linstor_vg/thinpool")

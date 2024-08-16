@@ -16,10 +16,18 @@ in
     camillemndn
   ];
 
-  options.services.proxmox-ve.linstor.enable = mkEnableOption "Linstor for Proxmox VE";
+  options.services.proxmox-ve.linstor = {
+    enable = mkEnableOption "Linstor for Proxmox VE";
+    openFirewall = mkEnableOption "opening the default ports in the firewall for Linstor Satellite";
+  };
 
   config = mkIf cfg.enable {
     boot.extraModulePackages = with config.boot.kernelPackages; [ drbd ];
+
+    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
+      3366
+      3367
+    ];
 
     services.proxmox-ve.package = pkgs.proxmox-ve.override { enableLinstor = true; };
 

@@ -23,6 +23,10 @@ in
 
   config = mkIf cfg.enable {
     boot.extraModulePackages = with config.boot.kernelPackages; [ drbd ];
+    boot.kernelModules = [
+      "dm_thin_pool"
+      "drbd"
+    ];
 
     networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
       3366

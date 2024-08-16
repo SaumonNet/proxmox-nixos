@@ -28,6 +28,7 @@ lib.mkIf cfg.enable {
         PIDFile = "/run/pvedaemon.pid";
         Type = "forking";
         Restart = "on-failure";
+        CacheDirectory = "linstor-proxmox";
       };
     };
 

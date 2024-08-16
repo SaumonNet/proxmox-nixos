@@ -19,6 +19,8 @@ in
   options.services.proxmox-ve.linstor.enable = mkEnableOption "Linstor for Proxmox VE";
 
   config = mkIf cfg.enable {
+    boot.extraModulePackages = with config.boot.kernelPackages; [ drbd ];
+
     services.proxmox-ve.package = pkgs.proxmox-ve.override { enableLinstor = true; };
 
     systemd.services = {

@@ -4,7 +4,6 @@
 
   nodes = {
     pve1 = {
-      boot.kernelModules = [ "drbd" ];
       services.proxmox-ve = {
         enable = true;
         linstor.enable = true;
@@ -40,6 +39,7 @@
     pve1.succeed(f"echo \"{storageCfg}\" >> /etc/pve/storage.cfg")
     pve1.succeed("cat /etc/pve/storage.cfg")
     assert "9.2" in pve1.succeed("modinfo drbd")
+    assert "drbd" in pve1.succeed("cat /proc/modules")
 
     pve1.succeed("linstor node create pve1 192.168.0.1")
   '';

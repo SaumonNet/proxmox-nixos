@@ -25,6 +25,7 @@
   termproxy,
   shadow,
   wget,
+  util-linux,
 }:
 
 let
@@ -121,6 +122,7 @@ perl536.pkgs.toPerlModule (
               ceph
               gzip
               openssh
+              util-linux
               gnupg
               openvswitch
               pve-qemu

@@ -13,6 +13,7 @@
   termproxy,
   vncterm,
   wget,
+  util-linux,
   enableLinstor ? false,
 }:
 
@@ -31,6 +32,7 @@ buildEnv rec {
     termproxy
     vncterm
     wget
+    util-linux
   ] ++ lib.optionals enableLinstor [ linstor-client ];
 
   meta = with lib; {

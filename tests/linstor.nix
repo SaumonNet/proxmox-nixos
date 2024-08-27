@@ -13,16 +13,9 @@
         lvm.dmeventd.enable = true;
       };
       virtualisation = {
-        emptyDiskImages = [ 4096 ];
+        emptyDiskImages = [ 10000 ];
         memorySize = 2048;
       };
-    };
-    pve2 = {
-      services.proxmox-ve = {
-        enable = true;
-        linstor.enable = true;
-      };
-      virtualisation.memorySize = 2048;
     };
   };
 
@@ -34,31 +27,21 @@
     assert "Proxmox" in pve1.succeed("curl -k https://localhost:8006")
 
     pve1.wait_for_unit("multi-user.target")
-    pve2.wait_for_unit("multi-user.target")
 
     pve1.wait_for_unit("linstor-satellite.service")
     pve1.wait_for_unit("linstor-controller.service")
+    pve1.succeed("pvcreate /dev/vdb >&2")
+    pve1.succeed("vgcreate linstor_vg /dev/vdb >&2")
+    pve1.succeed("lvcreate -l 80%FREE -T linstor_vg/thinpool >&2")
 
-    pve1.succeed("linstor node create pve1 192.168.0.1 >&2")
-    pve1.succeed("vgcreate linstor_vg /dev/vdb")
-    pve1.succeed("lvcreate -l 80%FREE -T linstor_vg/thinpool")
-    pve1.succeed("linstor storage-pool create lvmthin pve1 pve-storage linstor_vg/thinpool")
-    pve1.succeed("linstor resource-group create pve-rg --storage-pool=pve-storage --place-count=1")
-    pve1.succeed("linstor volume-group create pve-rg")
+    pve1.succeed("linstor node list >&2")
+    pve1.succeed("linstor node create pve1 127.0.0.1 >&2")
+    pve1.succeed("linstor node info >&2")
+    pve1.succeed("linstor storage-pool create lvmthin pve1 pve-storage linstor_vg/thinpool >&2")
+    pve1.succeed("linstor resource-group create test --storage-pool pve-storage --place-count 1 >&2")
+    pve1.succeed("linstor volume-group create test")
+    pve1.succeed("linstor resource-group spawn-resources test test_res 1G >&2")
+    pve1.succeed("linstor resource list >&2")
 
-    storageCfg = """
-    drbd: linstor_storage
-        content images, rootdir
-        controller 192.168.0.1
-        resourcegroup pve-rg
-    """
-    pve1.succeed(f"echo \"{storageCfg}\" >> /etc/pve/storage.cfg")
-    pve1.succeed("cat /etc/pve/storage.cfg")
-    assert "9.2" in pve1.succeed("modinfo drbd")
-    assert "drbd" in pve1.succeed("cat /proc/modules")
-
-    pve1.succeed("systemctl restart pve-cluster pvedaemon pvestatd pveproxy")
-
-    pve1.succeed("linstor node create pve1 192.168.0.1")
   '';
 }

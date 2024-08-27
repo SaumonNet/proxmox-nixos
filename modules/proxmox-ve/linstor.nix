@@ -28,6 +28,25 @@ in
       "drbd"
     ];
 
+    services.drbd = {
+      enable = true;
+      config = ''
+            global {
+        	usage-count yes;
+
+        	# Decide what kind of udev symlinks you want for "implicit" volumes
+        	# (those without explicit volume <vnr> {} block, implied vnr=0):
+        	# /dev/drbd/by-resource/<resource>/<vnr>   (explicit volumes)
+        	# /dev/drbd/by-resource/<resource>         (default for implict)
+        	udev-always-use-vnr; # treat implicit the same as explicit volumes
+
+        	# minor-count dialog-refresh disable-ip-verification
+        	# cmd-timeout-short 5; cmd-timeout-medium 121; cmd-timeout-long 600;
+        }
+        include "/var/lib/linstor.d/*.res";
+      '';
+    };
+
     networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
       3366
       3367

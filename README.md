@@ -132,6 +132,67 @@ networking.bridges.vmbr0.interfaces = [ "ens18" ];
 networking.interfaces.vmbr0.useDHCP = lib.mkDefault true;
 ```
 
+## 🧱 Declarative VMs
+
+The utility `nixmoxer` allows one to bootstrap NixOS virtual machines on an
+existing Proxmox hypervisor, using the API.
+
+First, configure the virtual machine settings using the options of the NixOS module
+`virtualisation.proxmox` of your `nixosConfigurations.myvm`:
+
+```nix
+# myvm.nix
+{ config, ... }:
+
+{
+  imports = [ ./disko.nix ];
+
+  networking.hostName = "myvm";
+
+  virtualisation.proxmox = {
+    node = "myproxmoxnode";
+    iso = "/path/to/my/installation/cd.iso";
+    vmid = 101;
+    memory = 4096;
+    cores = 4;
+    sockets = 2;
+    net = [
+      {
+        model = "virtio";
+        bridge = "vmbr0";
+      }
+    ];
+    scsi = [ { file = "local:16"; } ]; # This will create a 16GB volume in 'local'
+  };
+
+  # The rest of your configuration...
+}
+```
+
+For more options, you can consult the module in [modules/declarative/default.nix](modules/declarative/default.nix),
+or the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/qemu) of the Proxmox API. 
+
+Then configure the access to the Proxmox API:
+
+```sh
+# nixmoxer.conf
+host=192.168.0.3
+user=root
+password=<password>
+verify_ssl=0
+```
+
+Now you can bootstrap `myvm` using `nixmoxer`:
+
+```console
+$ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
+```
+
+Note that once this command has been run, the storage has been created and the VM has been initialised,
+subsequent changes to the configuration in `virtualisation.proxmox` will have no impact.
+
+Then, the NixOS VM can be rebuilt with the usual tools like `nixos-rebuild`, `colmena`, etc.
+
 ## 🚧 Roadmap
 
 - Support for clusters / HA with Ceph

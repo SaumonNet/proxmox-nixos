@@ -13,6 +13,7 @@ Proxmox-NixOS has been tested on real hardware with most basic features of Proxm
 ## 🗃️ Cache
 
 Some Proxmox packages have a quite power intensive build process. We make a cache available to download directly the artifacts:
+
 - address: `https://cache.saumon.network/proxmox-nixos`
 - public key: `proxmox-nixos:nveXDuVVhFDRFx8Dn19f1WDEaNRJjPrF2CPD2D+m1ys=`
 
@@ -86,13 +87,15 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
   };
 }
 ```
+
 ⚠️ Do not override the `nixpkgs-stable` input of the flake, as the only tested and supported version of Proxmox-NixOS is with the upstream stable NixOS release.
 
 ## 🌐 Networking
 
 To get internet in your VMs, you need to add a network device to the VM, connected to a bridge. To get this working, follow this 2 steps:
-1) Create the bridge in `System->Network->Create->Linux Bridge`. This operation has no effect on your system and is just a quirk for Proxmox to know the existence of your bridge.
-2) Configure your networking through NixOS configuration so that the bridge you created in the Proxmox web interface actually exists!
+
+1. Create the bridge in `System->Network->Create->Linux Bridge`. This operation has no effect on your system and is just a quirk for Proxmox to know the existence of your bridge.
+2. Configure your networking through NixOS configuration so that the bridge you created in the Proxmox web interface actually exists!
 
 ### Example NixOS networking configurations
 
@@ -134,6 +137,11 @@ networking.interfaces.vmbr0.useDHCP = lib.mkDefault true;
 
 ## 🧱 Declarative VMs
 
+### Using the module [`virtualisation.proxmox`](modules/declarative-vms)
+
+_This solution is available even for the admin of a particular VM with only
+a restricted API access to the Proxmox Hypervisor._
+
 The utility `nixmoxer` allows one to bootstrap NixOS virtual machines on an
 existing Proxmox hypervisor, using the API.
 
@@ -169,8 +177,8 @@ First, configure the virtual machine settings using the options of the NixOS mod
 }
 ```
 
-For more options, you can consult the module in [modules/declarative/default.nix](modules/declarative/default.nix),
-or the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/qemu) of the Proxmox API. 
+You can find an exhaustive list of options in [modules/declarative-vms/options.nix](modules/declarative-vms/options.nix),
+or in the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/qemu) of the Proxmox API.
 
 Then configure the access to the Proxmox API:
 
@@ -188,10 +196,57 @@ Now you can bootstrap `myvm` using `nixmoxer`:
 $ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
 ```
 
-Note that once this command has been run, the storage has been created and the VM has been initialised,
+⚠️ The current limitation is that once this command has been run, the storage has been created and the VM has been initialised,
 subsequent changes to the configuration in `virtualisation.proxmox` will have no impact.
 
-Then, the NixOS VM can be rebuilt with the usual tools like `nixos-rebuild`, `colmena`, etc.
+Then, the NixOS VM can be rebuilt with usual tools like `nixos-rebuild`, `colmena`, etc.
+
+### Using the module [`services.proxmox-ve.vms`](modules/proxmox-ve/vms.nix)
+
+_This solution is only available for the admin of a Proxmox Hypervisor on NixOS_.
+
+This configuration will create two VMs on a Proxmox-NixOS Hypervisor. Then you can attach an
+iso and configuration your VMs as usual.
+
+```nix
+# configuration.nix
+{
+  services.proxmox-ve = {
+    enable = true;
+    vms = {
+      myvm1 = {
+        vmid = 100;
+        memory = 4096;
+        cores = 4;
+        sockets = 2;
+        kvm = false;
+        net = [
+          {
+            model = "virtio";
+            bridge = "vmbr0";
+          }
+        ];
+        scsi = [ { file = "local:16"; } ];
+      };
+      myvm2 = {
+        vmid = 101;
+        memory = 8192;
+        cores = 2;
+        sockets = 2;
+        scsi = [ { file = "local:32"; } ];
+      };
+    };
+  };
+
+  # The rest of your configuration...
+}
+```
+
+You can find an exhaustive list of options in [modules/declarative-vms/options.nix](modules/declarative-vms/options.nix),
+or in the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/qemu) of the Proxmox API.
+
+⚠️ The current limitation is that if for instance VM `myvm1` has already been initialised,
+subsequent changes to the configuration in `services.proxmox-ve.vms.myvm1` will have no impact.
 
 ## 🚧 Roadmap
 
@@ -210,4 +265,5 @@ There is [a matrix room](https://matrix.to/#/#proxmox-nixos:matrix.org) for disc
 ## Thanks
 
 This project has received support from [NLNet](https://nlnet.nl/).
+
 <pre><img alt="Logo of NLnet Foundation" src="https://nlnet.nl/logo/banner.svg" width="320px" height="120px" />     <img alt="Logo of NGI Assure" src="https://nlnet.nl/image/logos/NGIAssure_tag.svg" width="320px" height="120px" /></pre>

@@ -23,6 +23,7 @@ in
     ./linstor.nix
     ./manager.nix
     ./rrdcached.nix
+    ./vms.nix
   ];
 
   options.services.proxmox-ve = {

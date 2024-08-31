@@ -10,6 +10,7 @@
   pve-qemu-server,
   pve-storage,
   pve-qemu,
+  enableLinstor ? false,
 }:
 
 let
@@ -18,7 +19,7 @@ let
     pve-firewall
     pve-guest-common
     pve-qemu-server
-    pve-storage
+    (pve-storage.override { inherit enableLinstor; })
   ];
   perlEnv = perl536.withPackages (_: perlDeps);
 in

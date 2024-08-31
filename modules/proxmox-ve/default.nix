@@ -20,11 +20,16 @@ in
     ./cluster.nix
     # ./firewall.nix
     # ./ha-manager.nix
+    ./linstor.nix
     ./manager.nix
     ./rrdcached.nix
   ];
 
-  options.services.proxmox-ve.enable = mkEnableOption (mdDoc ''Proxmox VE'');
+  options.services.proxmox-ve = {
+    enable = mkEnableOption "Proxmox VE";
+
+    package = mkPackageOption pkgs "proxmox-ve" { };
+  };
 
   config = mkIf cfg.enable (mkMerge [
     {
@@ -66,7 +71,7 @@ in
       };
       users.groups.www-data = { };
 
-      environment.systemPackages = [ pkgs.proxmox-ve ];
+      environment.systemPackages = [ cfg.package ];
       environment.etc.issue.enable = false;
 
       networking.firewall.allowedTCPPorts = [

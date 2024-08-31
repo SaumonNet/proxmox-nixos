@@ -9,6 +9,7 @@
   pve-docs,
   pve-ha-manager,
   pve-http-server,
+  enableLinstor ? false,
   ceph,
   gnupg,
   graphviz,
@@ -24,6 +25,7 @@
   termproxy,
   shadow,
   wget,
+  util-linux,
 }:
 
 let
@@ -33,7 +35,7 @@ let
     PodParser
     TemplateToolkit
     proxmox-acme
-    pve-ha-manager
+    (pve-ha-manager.override { inherit enableLinstor; })
     pve-http-server
   ];
 
@@ -120,12 +122,13 @@ perl536.pkgs.toPerlModule (
               ceph
               gzip
               openssh
+              util-linux
               gnupg
               openvswitch
               pve-qemu
               iproute2
               termproxy
-              pve-ha-manager
+              (pve-ha-manager.override { inherit enableLinstor; })
               shadow
               wget
             ]

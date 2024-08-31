@@ -63,6 +63,7 @@ let
       protobuf = pkgs-unstable.protobuf_23;
       jre = pkgs.jdk11_headless;
     };
+    nixmoxer = callPackage ./nixmoxer { };
   };
 in
 ours

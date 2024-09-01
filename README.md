@@ -248,6 +248,11 @@ or in the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#
 ⚠️ The current limitation is that if for instance VM `myvm1` has already been initialised,
 subsequent changes to the configuration in `services.proxmox-ve.vms.myvm1` will have no impact.
 
+
+### Note
+
+Truly declarative configuration of virtual machines is very difficult with Proxmox-NixOS because there is essentially 2 sources of truth (the NixOS configuration and the Proxmox web interface) that have to be reconciliated. If you want truly declarative VMs configurations we recommend the amazing project [microvms.nix](https://github.com/astro/microvm.nix).
+
 ## 🚧 Roadmap
 
 - Support for clusters / HA with Ceph

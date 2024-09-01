@@ -5,6 +5,9 @@
   ...
 }:
 
+let
+  cfg = config.virtualisation.proxmox;
+in
 with lib;
 
 {

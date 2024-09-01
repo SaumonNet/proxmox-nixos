@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -21,5 +26,21 @@ with lib;
     };
 
     autoInstall = mkEnableOption "Automatically install the NixOS configuration on the VM";
+
+    iso = mkOption {
+      default = null;
+      type = types.package;
+      description = "Iso that will be inserted into the VM. Not compatible with the autoInstall option";
+    };
+
   };
+
+  config = lib.mkIf cfg.autoInstall {
+    virtualisation.proxmox.iso =
+      let
+        isoConfig = import ./iso.nix config.system.build;
+      in
+      (pkgs.nixos isoConfig).config.system.build.isoImage;
+  };
+
 }

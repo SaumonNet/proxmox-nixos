@@ -4,10 +4,8 @@ import json
 import logging
 import os
 import requests_toolbelt
-import shutil
 import subprocess
 import sys
-import tempfile
 import time
 import urllib3
 
@@ -47,20 +45,6 @@ class Proxmox:
                             x["name"], node_name), vms_node))
         return vms
 
-    def storage_exists(self, node, storage):
-        """
-        Check if a specific storage exists on a node.
-
-        Args:
-            node (str): The name of the node.
-            storage (str): The name of the storage.
-
-        Returns:
-            bool: True if the storage exists, False otherwise.
-        """
-        storages = self.api.nodes(node).storage.get()
-        return storage in map(lambda x: x["storage"], storages)
-
     def iso_exists(self, node, storage, iso):
         """
         Check if a specific ISO file exists in a storage on a node.
@@ -89,18 +73,23 @@ class Proxmox:
             ValueError: If the storage does not exist or the ISO already exists.
         """
         iso_name = os.path.basename(iso)
+        if self.iso_exists(node, storage, iso_name):
+            logging.error(click.style(
+                f'The specified iso already exists on {node}/local.', fg='red'))
+            logging.info(click.style(
+                'Do you wish to destroy it? Type "destroy" to do so:', fg='yellow'))
+            verify_before_destructive_action("yes")
+            self.delete_iso(node, storage, iso_name)
+
+
         logging.info(click.style(
             f'Uploading iso "{iso_name}" to "{node}/{storage}"...', fg='cyan'))
-
-        if self.iso_exists(node, storage, iso_name):
-            error_message = f'The iso "{iso_name}" already exists on storage "{storage}" on node "{node}"'
-            logging.error(click.style(error_message, fg='red'))
-            raise ValueError(error_message)
 
         self.api.nodes(node).storage(storage).upload.create(
             content="iso",
             filename=open(iso, "rb"),
         )
+
 
     def delete_iso(self, node, storage, iso):
         """
@@ -174,58 +163,6 @@ class Proxmox:
             index = names.index(vm_name)
             return True, ids[index], nodes[index]
         return False, None, None
-
-    def volume_exists(self, node, storage, volume_name):
-        """
-        Check if a specific volume exists in a storage on a node.
-
-        Args:
-            node (str): The name of the node.
-            storage (str): The name of the storage.
-            volume_name (str): The name of the volume.
-
-        Returns:
-            bool: True if the volume exists, False otherwise.
-        """
-        volumes = self.api.nodes(node).storage(storage).content.get()
-        return f"{storage}:{volume_name}" in map(lambda x: x["volid"], volumes)
-
-    def create_volume(self, node, storage, volume_name, volume_size, vmid):
-        """
-        Create a new volume in a specific storage on a node.
-
-        Args:
-            node (str): The name of the node.
-            storage (str): The name of the storage.
-            volume_name (str): The name of the new volume.
-            volume_size (str): The size of the new volume.
-            vmid (int): The VM ID associated with the new volume.
-
-        Raises:
-            ValueError: If the volume already exists.
-        """
-        # Check if the volume already exists
-        if self.volume_exists(node, storage, volume_name):
-            error_message = f'The volume "{volume_name}" already exists on storage "{storage}" on node "{node}".'
-            logging.error(click.style(error_message, fg='red'))
-            raise ValueError(error_message)
-
-        logging.info(click.style(
-            f'Creating volume "{volume_name}" with size "{volume_size}" on storage "{storage}" on node "{node}" for VM ID {vmid}...',
-            fg='cyan'
-        ))
-
-        # Create the volume using the API
-        self.api.nodes(node).storage(storage).content.post(
-            filename=volume_name,
-            node=node,
-            size=volume_size,
-            storage=storage,
-            vmid=vmid
-        )
-
-        logging.info(click.style(
-            f'Volume "{volume_name}" created successfully.', fg='green'))
 
     def destroy_vm(self, vmid, node):
         """
@@ -330,7 +267,7 @@ def eval_config(machine, flake):
         result = subprocess.run(
             ["nix", "eval", "--json"]
             + ([] if flake else ["-f", "default.nix"])
-            + [f"nixosConfigurations.{machine}.config.virtualisation.proxmox"],
+            + [("#" if flake else"")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox"],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -346,7 +283,7 @@ def eval_config(machine, flake):
         sys.exit(1)
 
 
-def build_iso(to_eval, flake):
+def build_iso(machine, flake):
     """
     Build the iso specified by the user
 
@@ -354,35 +291,13 @@ def build_iso(to_eval, flake):
         machine (str): The name of the machine.
         flake (bool): A flag indicating whether to use the Nix flake system.
     """
-    logging.info(click.style('Evaluating iso...', fg='cyan'))
-
-    try:
-        result = subprocess.run(
-            ["nix", "eval", "--json"]
-            + ([] if flake else ["-f", to_eval]),
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-        logging.info(click.style(
-            'Iso evaluation completed successfully.', fg='green'))
-        iso_path = result.stdout
-
-    except subprocess.CalledProcessError as e:
-        logging.error(click.style('Machine evaluation failed:', fg='red'))
-        logging.error(click.style(e.stderr, fg='red'))
-        sys.exit(1)
-
-
-
 
     logging.info(click.style('Building iso...', fg='cyan'))
 
     try:
         subprocess.run(
             ["nix", "--print-build-logs", "build"]
-            + ([] if flake else ["-f", to_eval]),
+            + ([] if flake else ["-f", "default.nix", ("#" if flake else "")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox.iso"]),
             check=True,
             stdout=sys.stdout,
             stderr=sys.stderr,
@@ -391,8 +306,6 @@ def build_iso(to_eval, flake):
         logging.info(click.style(
             'Iso built successfully.', fg='green'))
 
-        return iso_path.strip().replace('"', '')
-
     except subprocess.CalledProcessError as e:
         logging.error(click.style('ISO building failed', fg='red'))
         logging.error(click.style(e.stderr, fg='red'))
@@ -400,6 +313,9 @@ def build_iso(to_eval, flake):
 
 
 def find_iso(path):
+    """
+    Find the iso file path inside the output folder
+    """
     iso_folder = os.path.join(path, "iso")
 
     if not os.path.exists(iso_folder):
@@ -618,29 +534,6 @@ def authenticate_promox():
             f"Authentication failed:\n {str(e)}", fg='red'))
         sys.exit(1)
 
-
-def get_share_folder():
-    path = __file__
-    path_splitted = path.split("/")
-    return "/".join(path_splitted[:4]) + "/share"
-
-
-def populate_template(flake, machine_name):
-    share_folder = get_share_folder()
-    with open(f"{share_folder}/eval-non-flake.nix", "r") as file:
-        content = file.read()
-
-    new_content = content.replace("placeholder", machine_name)
-    new_content = content.replace(
-        "placeholder_config", os.path.join(os.getcwd(), 'default.nix'))
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".nix", dir="/tmp") as temp_file:
-        temp_file.write(new_content.encode('utf-8'))
-        temp_file_path = temp_file.name
-    shutil.copyfile(f"{share_folder}/iso.nix", "/tmp/iso.nix")
-
-    return temp_file_path
-
-
 @click.command()
 @click.option('--flake', is_flag=True)
 @click.argument('machine')
@@ -656,28 +549,16 @@ def bootstrap(flake, machine):
     config = eval_config(machine, flake)
     config = json.loads(config)
     node = config['node']
-
-    # If there is an iso present, upload it
-    if int(config['autoInstall']) == 1:
-        to_eval = populate_template(flake, machine)
-        path_iso = build_iso(to_eval, flake)
-        iso_file = find_iso(path_iso)
-        try:
-            proxmox.upload_iso(node, "local", path_iso+f"/iso/{iso_file}")
-        except ValueError as e:
-            logging.error(click.style(
-                f'The specified iso already exists on {node}/local.', fg='red'))
-            logging.info(click.style(
-                'Do you wish to destroy it? Type "destroy" to do so:', fg='yellow'))
-            verify_before_destructive_action("yes")
-            proxmox.delete_iso(node, "local", iso_file)
-            proxmox.upload_iso(node, "local", path_iso+f"/iso/{iso_file}")
-
-        config["cdrom"] = f"local:iso/{iso_file}"
-
     config.pop('autoInstall', None)
+
+    build_iso(machine, flake)
+    iso_file = find_iso(config["iso"])
+    proxmox.upload_iso(node, "local", config["iso"]+f"/iso/{iso_file}")
+    config["cdrom"] = f"local:iso/{iso_file}"
+
+    config.pop('iso', None)
     proxmox.create_vm(node, config)
-    logging.info(click.style("Virtual machine successfully created!.", fg='green'))
+    logging.info(click.style("Virtual machine successfully created!", fg='green'))
 
 
 def run_main():

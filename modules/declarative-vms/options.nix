@@ -497,28 +497,33 @@ in
               '';
             };
             efitype = mkOption {
-              type = types.enum [
-                "2m"
-                "4m"
-              ];
-              default = "2m";
-              example = "4m";
+              type = types.nullOr (
+                types.enum [
+                  "2m"
+                  "4m"
+                ]
+              );
+              default = "4m";
+              example = "2m";
               description = "Specify the EFI vars disk size type.";
             };
             format = mkOption {
-              type = types.str;
+              type = types.nullOr types.str;
               example = "qcow2";
+              default = null;
               description = "Specify the disk format.";
             };
             import-from = mkOption {
-              type = types.str;
+              type = types.nullOr types.str;
               example = "source-volume";
+              default = null;
               description = "Specify the source volume to import from.";
             };
             pre-enrolled-keys = mkEnableOption "Whether to pre-enroll keys.";
             size = mkOption {
-              type = types.str;
+              type = types.nullOr types.str;
               example = "10GiB";
+              default = null;
               description = "Specify the size of the disk. This parameter is ignored if 'file' specifies an EFI vars disk.";
             };
           };

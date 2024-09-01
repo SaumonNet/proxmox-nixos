@@ -159,7 +159,7 @@ First, configure the virtual machine settings using the options of the NixOS mod
 
   virtualisation.proxmox = {
     node = "myproxmoxnode";
-    iso = "/path/to/my/installation/cd.iso";
+    iso = <derivation for your iso>;
     vmid = 101;
     memory = 4096;
     cores = 4;
@@ -196,10 +196,10 @@ Now you can bootstrap `myvm` using `nixmoxer`:
 $ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
 ```
 
-⚠️ The current limitation is that once this command has been run, the storage has been created and the VM has been initialised,
-subsequent changes to the configuration in `virtualisation.proxmox` will have no impact.
+`nixmoxer` will setup the VM on the Proxmox node and attach the specified iso. Instead of specified an iso, setting `autoInstall = true;` will automatically generate an iso that will automatically install the configuration to the VM being bootstrapped.
 
-Then, the NixOS VM can be rebuilt with usual tools like `nixos-rebuild`, `colmena`, etc.
+
+⚠️ `nixmoxer` shall only be used for the initial bootstraping of a VM, the NixOS VM can be rebuilt with usual tools like `nixos-rebuild`, `colmena`, etc. Changes to the `virtualisation.proxmox` options after the boostraping have no impact.
 
 ### Using the module [`services.proxmox-ve.vms`](modules/proxmox-ve/vms.nix)
 

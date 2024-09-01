@@ -15,9 +15,4 @@ python3Packages.buildPythonApplication rec {
     requests_toolbelt
   ];
 
-  postInstall = ''
-    mkdir -p $out/share
-    cp iso.nix $out/share
-    cp eval-non-flake.nix $out/share
-  '';
 }

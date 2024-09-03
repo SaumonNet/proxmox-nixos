@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nixmoxer"
+version = "1.0.0"
+description = "Declarative proxmox VM bootstrap"
+authors = [
+    {name = "Julien Malka"},
+    {name = "Camille Mondon"}
+]
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}  # You can specify your preferred license here
+dependencies = [
+   "proxmoxer",
+   "requests_toolbelt"
+]
+[project.scripts]
+nixmoxer = "main:run_main"

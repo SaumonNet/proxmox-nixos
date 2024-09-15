@@ -17,6 +17,7 @@ in
   ];
 
   imports = [
+    ./bridges.nix
     ./cluster.nix
     # ./firewall.nix
     # ./ha-manager.nix

@@ -18,6 +18,7 @@ in
 
   imports = [
     ./ceph.nix
+    ./bridges.nix
     ./cluster.nix
     # ./firewall.nix
     # ./ha-manager.nix

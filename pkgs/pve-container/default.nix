@@ -17,12 +17,12 @@ in
 perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-container";
-    version = "5.1.11";
+    version = "5.2.0";
 
     src = fetchgit {
       url = "https://git.proxmox.com/git/${pname}.git";
-      rev = "d08a6337632dcbb262d877bd9d880586104d49bb";
-      hash = "sha256-dAo5y/UEvYFtM56x1VOTqKF1G+5T3RfefN1aYSjHZWo=";
+      rev = "b48a5f2ea2a07a62bdf25791b6691fa887e67373";
+      hash = "sha256-WDrfQed0NiITcTZAlL/Tu/RvVjaBOnNgcMA/39LZj48=";
     };
 
     sourceRoot = "${src.name}/src";

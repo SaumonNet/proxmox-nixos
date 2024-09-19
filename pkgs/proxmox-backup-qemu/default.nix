@@ -25,7 +25,7 @@ craneLib.buildPackage rec {
   version = "1.3.2";
 
   src = fetchgit {
-    url = "https://git.proxmox.com/git/${pname}.git";
+    url = "git://git.proxmox.com/git/${pname}.git";
     rev = "afc3670334a5c911a14725bc9df2a96ac8066781";
     hash = "sha256-9d73I+JL47MHLhvEnLSbO4xcYVu187oN9YKkTzwUlSk=";
     fetchSubmodules = false;

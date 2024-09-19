@@ -20,7 +20,7 @@ pico-args = "0.4"
 ureq = { version = "2.4", default-features = false, features = [ "gzip" ] }
 
 [dependencies.proxmox-lang ]
-git = "https://git.proxmox.com/git/proxmox.git"
+git = "git://git.proxmox.com/git/proxmox.git"
 
 [dependencies.proxmox-io ]
-git = "https://git.proxmox.com/git/proxmox.git"
+git = "git://git.proxmox.com/git/proxmox.git"

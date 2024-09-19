@@ -49,7 +49,7 @@ perl536.pkgs.toPerlModule (
     version = "8.2.3";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
+      url = "git://git.proxmox.com/git/${pname}.git";
       rev = "13a81873ba22f37ecc0613de3f3ef994b064e3b9";
       hash = "sha256-5svyUnjqejtuK+skNwg0C8wGKClbh0WSwB/khN9I/c0=";
     };
@@ -132,7 +132,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE Storage Library";
-      homepage = "https://git.proxmox.com/?p=pve-storage.git";
+      homepage = "git://git.proxmox.com/?p=pve-storage.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

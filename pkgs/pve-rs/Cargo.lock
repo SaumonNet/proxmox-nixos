@@ -1045,7 +1045,7 @@ checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 [[package]]
 name = "perlmod"
 version = "0.13.4"
-source = "git+https://git.proxmox.com/git/perlmod.git#f95893f1bc75b3812866fb5f028f0569c0d8255a"
+source = "git+git://git.proxmox.com/git/perlmod.git#f95893f1bc75b3812866fb5f028f0569c0d8255a"
 dependencies = [
  "bitflags 1.3.2",
  "cc",
@@ -1057,7 +1057,7 @@ dependencies = [
 [[package]]
 name = "perlmod-macro"
 version = "0.8.4"
-source = "git+https://git.proxmox.com/git/perlmod.git#f95893f1bc75b3812866fb5f028f0569c0d8255a"
+source = "git+git://git.proxmox.com/git/perlmod.git#f95893f1bc75b3812866fb5f028f0569c0d8255a"
 dependencies = [
  "proc-macro2 1.0.85",
  "quote 1.0.36",
@@ -1154,7 +1154,7 @@ dependencies = [
 [[package]]
 name = "proxmox-api-macro"
 version = "1.0.8"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "proc-macro2 1.0.85",
@@ -1165,7 +1165,7 @@ dependencies = [
 [[package]]
 name = "proxmox-apt"
 version = "0.10.10"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "hex",
@@ -1180,7 +1180,7 @@ dependencies = [
 [[package]]
 name = "proxmox-http"
 version = "0.9.1"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
@@ -1194,7 +1194,7 @@ dependencies = [
 [[package]]
 name = "proxmox-http-error"
 version = "0.1.0"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "http",
@@ -1204,7 +1204,7 @@ dependencies = [
 [[package]]
 name = "proxmox-human-byte"
 version = "0.1.3"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "proxmox-schema",
@@ -1215,7 +1215,7 @@ dependencies = [
 [[package]]
 name = "proxmox-io"
 version = "1.0.1"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "endian_trait",
 ]
@@ -1223,12 +1223,12 @@ dependencies = [
 [[package]]
 name = "proxmox-lang"
 version = "1.1.0"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 
 [[package]]
 name = "proxmox-notify"
 version = "0.4.0"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "const_format",
@@ -1253,7 +1253,7 @@ dependencies = [
 [[package]]
 name = "proxmox-openid"
 version = "0.10.0"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "http",
@@ -1272,7 +1272,7 @@ dependencies = [
 [[package]]
 name = "proxmox-resource-scheduling"
 version = "0.3.0"
-source = "git+https://git.proxmox.com/git/proxmox-resource-scheduling.git#09c43554fa4e211504319107997b8c5eaba270ec"
+source = "git+git://git.proxmox.com/git/proxmox-resource-scheduling.git#09c43554fa4e211504319107997b8c5eaba270ec"
 dependencies = [
  "anyhow",
  "lazy_static",
@@ -1282,7 +1282,7 @@ dependencies = [
 [[package]]
 name = "proxmox-schema"
 version = "3.1.1"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "const_format",
@@ -1297,7 +1297,7 @@ dependencies = [
 [[package]]
 name = "proxmox-section-config"
 version = "2.0.2"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "hex",
@@ -1310,7 +1310,7 @@ dependencies = [
 [[package]]
 name = "proxmox-serde"
 version = "0.1.1"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
@@ -1322,7 +1322,7 @@ dependencies = [
 [[package]]
 name = "proxmox-subscription"
 version = "0.4.3"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
@@ -1341,7 +1341,7 @@ dependencies = [
 [[package]]
 name = "proxmox-sys"
 version = "0.5.6"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
@@ -1360,7 +1360,7 @@ dependencies = [
 [[package]]
 name = "proxmox-tfa"
 version = "4.1.2"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "base32",
@@ -1382,7 +1382,7 @@ dependencies = [
 [[package]]
 name = "proxmox-time"
 version = "1.1.6"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "anyhow",
  "bitflags 1.3.2",
@@ -1395,7 +1395,7 @@ dependencies = [
 [[package]]
 name = "proxmox-uuid"
 version = "1.0.2"
-source = "git+https://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
+source = "git+git://git.proxmox.com/git/proxmox.git#5295da1b8af6a72a1e01563a2b50e1c686244e5a"
 dependencies = [
  "js-sys",
  "libc",

@@ -20,7 +20,7 @@ perl536.pkgs.toPerlModule (
     version = "5.1.11";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
+      url = "git://git.proxmox.com/git/${pname}.git";
       rev = "d08a6337632dcbb262d877bd9d880586104d49bb";
       hash = "sha256-dAo5y/UEvYFtM56x1VOTqKF1G+5T3RfefN1aYSjHZWo=";
     };
@@ -76,7 +76,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE container manager & runtime";
-      homepage = "https://git.proxmox.com/?p=pve-container.git";
+      homepage = "git://git.proxmox.com/?p=pve-container.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

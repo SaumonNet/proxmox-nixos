@@ -74,7 +74,7 @@ perl536.pkgs.toPerlModule (
     version = "8.2.1";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
+      url = "git://git.proxmox.com/git/${pname}.git";
       rev = "1a6005ad2377b6586e084b3840ac622752b666b8";
       hash = "sha256-fMgkeaOoaJDk9yf3O4uZSTs0p7H4uUYyy1Ii3J02uNw=";
     };
@@ -149,7 +149,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox Project's Common Perl Code";
-      homepage = "https://git.proxmox.com/?p=pve-common.git";
+      homepage = "git://git.proxmox.com/?p=pve-common.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

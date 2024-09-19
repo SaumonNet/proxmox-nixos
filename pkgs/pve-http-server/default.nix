@@ -29,7 +29,7 @@ perl536.pkgs.toPerlModule (
     version = "5.1.0";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
+      url = "git://git.proxmox.com/git/${pname}.git";
       rev = "da8543517ef48516304426bc8225133f093f3413";
       hash = "sha256-6f4WqWnG2YA5GYbaojZdkZghTBfSECTw+lcrgNoAPZU=";
     };
@@ -57,7 +57,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE HTTP Server";
-      homepage = "https://git.proxmox.com/?p=pve-http-server.git";
+      homepage = "git://git.proxmox.com/?p=pve-http-server.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

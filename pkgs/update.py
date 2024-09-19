@@ -32,7 +32,7 @@ def main():
 
     base_dir = os.getcwd()
     pkg_name = args.pkg_name
-    repo_url = args.url if args.url else f'https://git.proxmox.com/git/{pkg_name}.git'
+    repo_url = args.url if args.url else f'git://git.proxmox.com/git/{pkg_name}.git'
     old_version = run_command(f'nix eval .#{pkg_name}.version').strip('"')
 
     repo_name = os.path.basename(repo_url).replace('.git', '')
@@ -115,16 +115,16 @@ def main():
                         print(f"Patching Cargo dependency '{dep}' to use Git.")
                     if dep == 'perlmod':
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/perlmod.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/perlmod.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                     elif dep == 'proxmox-resource-scheduling':
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/proxmox-resource-scheduling.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox-resource-scheduling.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                     elif dep.startswith('proxmox-'):
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/proxmox.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                     elif dep.startswith('pbs-'):
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/proxmox-backup.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox-backup.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                 print("Finished patching Git dependencies.")
 
             transform_git_deps()

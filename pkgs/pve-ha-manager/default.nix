@@ -10,6 +10,7 @@
   pve-qemu-server,
   pve-storage,
   pve-qemu,
+  enableLinstor ? false,
 }:
 
 let
@@ -18,7 +19,7 @@ let
     pve-firewall
     pve-guest-common
     pve-qemu-server
-    pve-storage
+    (pve-storage.override { inherit enableLinstor; })
   ];
   perlEnv = perl536.withPackages (_: perlDeps);
 in
@@ -29,7 +30,7 @@ perl536.pkgs.toPerlModule (
     version = "4.0.5";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
+      url = "git://git.proxmox.com/git/${pname}.git";
       rev = "800a0c3e485f175d914fb7b59dfcd0cd375998de";
       hash = "sha256-zY0tB4Uby3uFlPHNy75weYioSln/Bt4wzf+u7ba4nSE=";
     };
@@ -83,7 +84,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE High Availabillity Manager";
-      homepage = "https://git.proxmox.com/?p=pve-ha-manager.git";
+      homepage = "git://git.proxmox.com/?p=pve-ha-manager.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

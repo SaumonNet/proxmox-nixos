@@ -5,7 +5,11 @@
   ...
 }:
 
-lib.mkIf config.services.proxmox-ve.enable {
+let
+  cfg = config.services.proxmox-ve;
+in
+
+lib.mkIf cfg.enable {
   systemd.services = {
     pve-cluster = {
       description = "The Proxmox VE cluster filesystem";
@@ -29,7 +33,7 @@ lib.mkIf config.services.proxmox-ve.enable {
       #  Conflicts = [ "shutdown.target" ];
       #};
       serviceConfig = {
-        ExecStart = "${pkgs.pve-cluster}/bin/pmxcfs";
+        ExecStart = "${cfg.package}/bin/pmxcfs";
         KillMode = "mixed";
         Restart = "on-failure";
         TimeoutStopSec = 10;

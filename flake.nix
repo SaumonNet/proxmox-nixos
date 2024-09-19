@@ -1,7 +1,7 @@
 {
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-24.05";
-    unstable.url = "nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "nixpkgs/nixos-24.05";
+    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
     crane.url = "github:ipetkov/crane/v0.17.3";
@@ -15,14 +15,14 @@
   outputs =
     {
       self,
-      nixpkgs,
-      unstable,
+      nixpkgs-stable,
+      nixpkgs-unstable,
       utils,
       crane,
       ...
     }:
     let
-      inherit (nixpkgs) lib;
+      inherit (nixpkgs-stable) lib;
     in
     {
       nixosModules = import ./modules;
@@ -36,31 +36,38 @@
         (
           system:
           let
-            pkgs = import nixpkgs {
+            pkgs = import nixpkgs-stable {
               inherit system;
               overlays = [ self.overlays.${system} ];
+            };
+            pkgs-unstable = import nixpkgs-unstable {
+              inherit system;
+              overlays = [
+                (_: prev: {
+                  pacemaker = prev.pacemaker.overrideAttrs (_: {
+                    env.NIX_CFLAGS_COMPILE = toString (
+                      [ "-Wno-error=deprecated-declarations" ]
+                      ++ lib.optionals prev.stdenv.cc.isGNU [ "-Wno-error=strict-prototypes" ]
+                    );
+                  });
+
+                })
+              ];
             };
             craneLib = crane.mkLib pkgs;
           in
           {
             overlays =
-              _: prev:
-              {
-                inherit lib;
-                unstable = unstable.legacyPackages.${system};
-              }
-              // (import ./pkgs {
-                inherit craneLib;
-                pkgs = prev;
-              })
+              final: prev:
+              (import ./pkgs { inherit pkgs pkgs-unstable craneLib; })
               // {
                 nixos-proxmox-ve-iso =
                   (lib.nixosSystem {
                     extraModules = lib.attrValues self.nixosModules;
-                    pkgs = prev;
+                    pkgs = final;
                     inherit system;
                     modules = [
-                      "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                      "${nixpkgs-stable}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
                       (_: {
                         services.proxmox-ve.enable = true;
                         isoImage.isoBaseName = "nixos-proxmox-ve";
@@ -69,20 +76,22 @@
                   }).config.system.build.isoImage;
               };
 
-            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs craneLib; }) // {
-              nixos-proxmox-ve-iso =
-                (lib.nixosSystem {
-                  extraModules = lib.attrValues self.nixosModules;
-                  inherit pkgs system;
-                  modules = [
-                    "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-                    (_: {
-                      services.proxmox-ve.enable = true;
-                      isoImage.isoBaseName = "nixos-proxmox-ve";
-                    })
-                  ];
-                }).config.system.build.isoImage;
-            };
+            packages =
+              utils.lib.filterPackages system (import ./pkgs { inherit pkgs pkgs-unstable craneLib; })
+              // {
+                nixos-proxmox-ve-iso =
+                  (lib.nixosSystem {
+                    extraModules = lib.attrValues self.nixosModules;
+                    inherit pkgs system;
+                    modules = [
+                      "${nixpkgs-stable}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                      (_: {
+                        services.proxmox-ve.enable = true;
+                        isoImage.isoBaseName = "nixos-proxmox-ve";
+                      })
+                    ];
+                  }).config.system.build.isoImage;
+              };
 
             checks =
               if (system == "x86_64-linux") then

@@ -5,7 +5,11 @@
   ...
 }:
 
-lib.mkIf config.services.proxmox-ve.enable {
+let
+  cfg = config.services.proxmox-ve;
+in
+
+lib.mkIf cfg.enable {
   systemd.services = {
     pvedaemon = {
       description = "PVE API Daemon";
@@ -18,12 +22,13 @@ lib.mkIf config.services.proxmox-ve.enable {
         "pve-cluster.service"
       ];
       serviceConfig = {
-        ExecStart = "${pkgs.pve-manager}/bin/pvedaemon start";
-        ExecStop = "${pkgs.pve-manager}/bin/pvedaemon stop";
-        ExecReload = "${pkgs.pve-manager}/bin/pvedaemon restart";
+        ExecStart = "${cfg.package}/bin/pvedaemon start";
+        ExecStop = "${cfg.package}/bin/pvedaemon stop";
+        ExecReload = "${cfg.package}/bin/pvedaemon restart";
         PIDFile = "/run/pvedaemon.pid";
         Type = "forking";
         Restart = "on-failure";
+        CacheDirectory = "linstor-proxmox";
       };
     };
 
@@ -43,13 +48,13 @@ lib.mkIf config.services.proxmox-ve.enable {
       ];
       serviceConfig = {
         ExecStartPre = [
-          "${pkgs.pve-cluster}/bin/pvecm updatecerts -silent"
+          "${cfg.package}/bin/pvecm updatecerts -silent"
           "${pkgs.coreutils}/bin/touch /var/lock/pveproxy.lck"
           "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/lock/pveproxy.lck"
         ];
-        ExecStart = "${pkgs.pve-manager}/bin/pveproxy start";
-        ExecStop = "${pkgs.pve-manager}/bin/pveproxy stop";
-        ExecReload = "${pkgs.pve-manager}/bin/pveproxy restart";
+        ExecStart = "${cfg.package}/bin/pveproxy start";
+        ExecStop = "${cfg.package}/bin/pveproxy stop";
+        ExecReload = "${cfg.package}/bin/pveproxy restart";
         PIDFile = "/run/pveproxy/pveproxy.pid";
         Type = "forking";
         StateDirectory = "pve-manager";
@@ -84,11 +89,11 @@ lib.mkIf config.services.proxmox-ve.enable {
         RefuseManualStop = true;
       };
       serviceConfig = {
-        #ExecStartPre = "${pkgs.pve-manager}/share/pve-manager/helpers/pve-startall-delay";
-        ExecStart = "${pkgs.pve-manager}/bin/pvesh --nooutput create /nodes/localhost/startall";
+        #ExecStartPre = "${cfg.package}/share/pve-manager/helpers/pve-startall-delay";
+        ExecStart = "${cfg.package}/bin/pvesh --nooutput create /nodes/localhost/startall";
         ExecStop = pkgs.writeShellScript "pve-guests-stop" ''
-          -${pkgs.pve-manager}/bin/vzdump -stop
-          ${pkgs.pve-manager}/bin/pvesh --nooutput create /nodes/localhost/stopall
+          -${cfg.package}/bin/vzdump -stop
+          ${cfg.package}/bin/pvesh --nooutput create /nodes/localhost/stopall
         '';
         Type = "oneshot";
         RemainAfterExit = true;
@@ -105,7 +110,7 @@ lib.mkIf config.services.proxmox-ve.enable {
         Before = [ "console-getty.service" ];
       };
       serviceConfig = {
-        ExecStart = "${pkgs.pve-manager}/bin/pvebanner";
+        ExecStart = "${cfg.package}/bin/pvebanner";
         Type = "oneshot";
         RemainAfterExit = true;
       };
@@ -125,9 +130,9 @@ lib.mkIf config.services.proxmox-ve.enable {
           "${pkgs.coreutils}/bin/touch /var/lib/pve-manager/pve-replication-state.lck"
           "${pkgs.coreutils}/bin/chown -R www-data:www-data /var/lib/pve-manager/pve-replication-state.lck"
         ];
-        ExecStart = "${pkgs.pve-manager}/bin/pvescheduler start";
-        ExecStop = "${pkgs.pve-manager}/bin/pvescheduler stop";
-        ExecReload = "${pkgs.pve-manager}/bin/pvescheduler restart";
+        ExecStart = "${cfg.package}/bin/pvescheduler start";
+        ExecStop = "${cfg.package}/bin/pvescheduler stop";
+        ExecReload = "${cfg.package}/bin/pvescheduler restart";
         PIDFile = "/var/run/pvescheduler.pid";
         KillMode = "process";
         Type = "forking";
@@ -139,9 +144,9 @@ lib.mkIf config.services.proxmox-ve.enable {
       wants = [ "pve-cluster.service" ];
       after = [ "pve-cluster.service" ];
       serviceConfig = {
-        ExecStart = "${pkgs.pve-manager}/bin/pvestatd start";
-        ExecStop = "${pkgs.pve-manager}/bin/pvestatd stop";
-        ExecReload = "${pkgs.pve-manager}/bin/pvestatd restart";
+        ExecStart = "${cfg.package}/bin/pvestatd start";
+        ExecStop = "${cfg.package}/bin/pvestatd stop";
+        ExecReload = "${cfg.package}/bin/pvestatd restart";
         PIDFile = "/run/pvestatd.pid";
         Type = "forking";
       };

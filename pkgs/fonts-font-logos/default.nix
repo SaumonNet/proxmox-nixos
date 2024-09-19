@@ -9,7 +9,7 @@ stdenv.mkDerivation rec {
   version = "1.0.1-3";
 
   src = fetchgit {
-    url = "https://git.proxmox.com/git/fonts-font-logos.git";
+    url = "git://git.proxmox.com/git/fonts-font-logos.git";
     rev = "063091d1a7ea70eba36c5684d20428ba215cb769";
     hash = "sha256-eSlnOqbXFLLlomFCb6IWdgzHAqqHn4sSTG5rEC4Tasg=";
   };
@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "https://git.proxmox.com/?p=fonts-font-logos.git";
+    homepage = "git://git.proxmox.com/?p=fonts-font-logos.git";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn

@@ -17,7 +17,7 @@
     };
 
     src_patches = fetchgit {
-      url = "https://git.proxmox.com/git/pve-qemu.git";
+      url = "git://git.proxmox.com/git/pve-qemu.git";
       rev = "e62423e6156b7bf9afd8b670722c66c93fd2ba45";
       hash = "sha256-jLFc43HHnOGRXDRyMlmcQ5Fg/Wgc3CbgwSh/TgAPDWQ=";
       fetchSubmodules = false;

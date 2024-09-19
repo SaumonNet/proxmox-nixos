@@ -1,0 +1,32 @@
+diff --git a/Makefile b/Makefile
+index 0646cedd7..6d932bae3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,7 +16,7 @@ GENSRC=./server/generated-src
+ VERSINFO=$(GENRES)/version-info.properties
+ 
+ # echo v0.1 to get it started
+-VERSION ?= $(shell echo $(shell git describe --tags || echo "v0.1") | sed -e 's/^v//;s/^[^0-9]*//;s/\(.*\)-g/\1-/')
++VERSION ?= $(shell echo $(shell git describe --tags ) | sed -e 's/^v//;s/^[^0-9]*//;s/\(.*\)-g/\1-/')
+ GITHASH := $(shell git rev-parse HEAD)
+ DEBVERSION = $(shell echo $(VERSION) | sed -e 's/-/~/g')
+ 
+diff --git a/build.gradle b/build.gradle
+index 846bc752b..053a33c46 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -173,13 +173,8 @@ project(':server') {
+      * tarball, and it is then skipped when the package is finally built.
+      */
+     tasks.register('generateProto', Exec) {
+-        doFirst {
+-            if (!protoc.exists()) {
+-                throw new GradleException("'protoc' binary not found; run the task 'getProtoc' to download the binary")
+-            }
+-        }
+ 
+-        commandLine 'make', '-C', "${projectDir}/proto", "PROTOC=" + protoc, 'proto'
++        commandLine 'make', '-C', "${projectDir}/proto", "PROTOC=protoc", 'proto'
+ 
+         inputs.files(fileTree("${projectDir}/proto"))
+         outputs.dir(file("${projectDir}/generated-src"))

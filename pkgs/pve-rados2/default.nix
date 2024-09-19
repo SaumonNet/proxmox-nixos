@@ -12,7 +12,7 @@ perl536.pkgs.toPerlModule (
     version = "1.4.1";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/librados2-perl.git";
+      url = "git://git.proxmox.com/git/librados2-perl.git";
       rev = "b2017399cac82628e15ec14e95551c14fdfbf14f";
       hash = "sha256-rHBM4xVwxAO0ZOU9YVw/n98JBzyRDwm0sOEAOhzUARc=";
     };
@@ -46,7 +46,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Perl bindings for librados";
-      homepage = "https://git.proxmox.com/?p=librados2-perl.git";
+      homepage = "git://git.proxmox.com/?p=librados2-perl.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

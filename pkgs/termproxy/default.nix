@@ -9,7 +9,7 @@ rustPlatform.buildRustPackage rec {
   version = "1.0.1";
 
   src = fetchgit {
-    url = "https://git.proxmox.com/git/pve-xtermjs.git";
+    url = "git://git.proxmox.com/git/pve-xtermjs.git";
     rev = "e2e62fc67368ad25a35c6d009f9d85ac5ef97233";
     hash = "sha256-Inx3LnAelDwvRoLHqMG91lUuQUI/CvNVIZ/EfmeIFUM=";
   };
@@ -43,7 +43,7 @@ rustPlatform.buildRustPackage rec {
 
   meta = with lib; {
     description = "xterm.js helper utility";
-    homepage = "https://git.proxmox.com/?p=pve-xtermjs.git";
+    homepage = "git://git.proxmox.com/?p=pve-xtermjs.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

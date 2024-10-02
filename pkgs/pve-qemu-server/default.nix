@@ -7,6 +7,7 @@
   json_c,
   pkg-config,
   proxmox-backup-client,
+  pve-edk2-firmware,
   pve-qemu,
   util-linux,
   uuid,
@@ -108,7 +109,7 @@ perl536.pkgs.toPerlModule (
         -e "s|qemu-kvm|${pve-qemu}/bin/qemu-kvm|" \
         -e "s|qemu-system|${pve-qemu}/bin/qemu-system|" \
         -e "s|/var/lib/qemu-server|$out/lib/qemu-server|" \
-
+        -e "s|/usr/share/pve-edk2-firmware|${pve-edk2-firmware}/usr/share/pve-edk2-firmware|" \
         #-e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         #-e "s|/usr/sbin/qm|$out/bin/qm|" \
         #-e "s|/usr/bin/qemu|${pve-qemu}/bin/qemu|" \

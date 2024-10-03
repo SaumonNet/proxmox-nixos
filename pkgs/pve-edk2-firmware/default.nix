@@ -3,12 +3,12 @@
   python3,
   pkgs, 
   pkgsCross,
-  stdenvNoCC, 
+  stdenv, 
   fetchgit,
   ... 
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
   version = "4.2023.08-4";
 
@@ -27,49 +27,50 @@ stdenvNoCC.mkDerivation rec {
     dpkg fakeroot qemu
     bc dosfstools acpica-tools mtools nasm libuuid
     qemu-utils libisoburn python3
-    pkgsCross.aarch64-multiplatform.buildPackages.gcc
-    pkgsCross.riscv64.buildPackages.gcc
-    pkgsCross.gnu64.buildPackages.gcc
-  ];
+  ] ++ (lib.optional (stdenv.hostPlatform.system != "aarch64-linux") pkgsCross.aarch64-multiplatform.stdenv.cc)
+    ++ (lib.optional (stdenv.hostPlatform.system != "x86_64-linux") pkgsCross.gnu64.stdenv.cc)
+    ++ (lib.optional (stdenv.hostPlatform.system != "riscv64-linux") pkgsCross.riscv64.stdenv.cc);
 
-  prePatch = 
-  let
-    pythonPath = python3.pkgs.makePythonPath (with python3.pkgs; [ pexpect ]);
-  in
-  ''
-    patchShebangs .
-    substituteInPlace ./debian/rules \
-      --replace-warn /bin/bash ${pkgs.bash}/bin/bash
-    substituteInPlace ./Makefile ./debian/rules \
-      --replace-warn /usr/share/dpkg ${pkgs.dpkg}/share/dpkg
-    substituteInPlace ./debian/rules \
-      --replace-warn 'PYTHONPATH=$(CURDIR)/debian/python' 'PYTHONPATH=$(CURDIR)/debian/python:${pythonPath}'
+  depsBuildBuild = [ stdenv.cc ];
 
-    # Skip dh calls because we don't need debhelper
-    substituteInPlace ./debian/rules \
-      --replace-warn 'dh $@' ': dh $@'
+  postPatch = 
+    let
+      pythonPath = python3.pkgs.makePythonPath (with python3.pkgs; [ pexpect ]);
+    in
+    ''
+      patchShebangs .
+      substituteInPlace ./debian/rules \
+        --replace-warn /bin/bash ${pkgs.bash}/bin/bash
+      substituteInPlace ./Makefile ./debian/rules \
+        --replace-warn /usr/share/dpkg ${pkgs.dpkg}/share/dpkg
+      substituteInPlace ./debian/rules \
+        --replace-warn 'PYTHONPATH=$(CURDIR)/debian/python' 'PYTHONPATH=$(CURDIR)/debian/python:${pythonPath}'
 
-    # Patch cross compiler paths
-    substituteInPlace ./debian/rules ./**/CMakeLists.txt \
-      --replace-warn 'aarch64-linux-gnu-' 'aarch64-unknown-linux-gnu-'
-    substituteInPlace ./debian/rules ./**/CMakeLists.txt \
-      --replace-warn 'riscv64-linux-gnu-' 'riscv64-unknown-linux-gnu-'
-  '';
+      # Skip dh calls because we don't need debhelper
+      substituteInPlace ./debian/rules \
+        --replace-warn 'dh $@' ': dh $@'
+
+      # Patch cross compiler paths
+      substituteInPlace ./debian/rules ./**/CMakeLists.txt \
+        --replace-warn 'aarch64-linux-gnu-' '${pkgsCross.aarch64-multiplatform.stdenv.cc.targetPrefix}'
+      substituteInPlace ./debian/rules ./**/CMakeLists.txt \
+        --replace-warn 'riscv64-linux-gnu-' '${pkgsCross.riscv64.stdenv.cc.targetPrefix}'
+    '';
 
   buildPhase = 
-  let
-    mainVersion = builtins.head (lib.splitString "-" version);
-  in
-  ''
-    # Set up build directory (src)
-    make ${pname}_${mainVersion}.orig.tar.gz
-    pushd ${pname}-${mainVersion}
+    let
+      mainVersion = builtins.head (lib.splitString "-" version);
+    in
+    ''
+      # Set up build directory (src)
+      make ${pname}_${mainVersion}.orig.tar.gz
+      pushd ${pname}-${mainVersion}
 
-    # Apply patches using dpkg 
-    dpkg-source -b .
+      # Apply patches using dpkg 
+      dpkg-source -b .
 
-    make -f debian/rules override_dh_auto_build
-  '';
+      make -f debian/rules override_dh_auto_build
+    '';
 
   installPhase = ''
     # Patch paths in produced .install scripts

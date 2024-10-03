@@ -55,6 +55,11 @@ stdenv.mkDerivation rec {
         --replace-warn 'aarch64-linux-gnu-' '${pkgsCross.aarch64-multiplatform.stdenv.cc.targetPrefix}'
       substituteInPlace ./debian/rules ./**/CMakeLists.txt \
         --replace-warn 'riscv64-linux-gnu-' '${pkgsCross.riscv64.stdenv.cc.targetPrefix}'
+      sed -i '/^EDK2_TOOLCHAIN *=/a export $(EDK2_TOOLCHAIN)_BIN=${pkgsCross.gnu64.stdenv.cc.targetPrefix}' ./debian/rules
+
+      # Patch paths in produced .install scripts
+      substituteInPlace ./debian/*.install \
+        --replace-warn '/usr/share/pve-edk2-firmware' "$out"
     '';
 
   buildPhase = 
@@ -62,21 +67,13 @@ stdenv.mkDerivation rec {
       mainVersion = builtins.head (lib.splitString "-" version);
     in
     ''
-      # Set up build directory (src)
       make ${pname}_${mainVersion}.orig.tar.gz
       pushd ${pname}-${mainVersion}
-
-      # Apply patches using dpkg 
       dpkg-source -b .
-
       make -f debian/rules override_dh_auto_build
     '';
 
   installPhase = ''
-    # Patch paths in produced .install scripts
-    substituteInPlace ./debian/*.install \
-      --replace-warn '/usr/share/pve-edk2-firmware' "$out"
-
     # Copy files as mentioned in install scripts
     for ins in ./debian/*.install; do
       while IFS= read -r line; do

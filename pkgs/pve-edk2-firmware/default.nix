@@ -2,12 +2,13 @@
   lib,
   python3,
   pkgs, 
-  stdenv, 
+  pkgsCross,
+  stdenvNoCC, 
   fetchgit,
   ... 
 }:
 
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation rec {
   pname = "pve-edk2-firmware";
   version = "4.2023.08-4";
 
@@ -20,12 +21,15 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ ];
 
-  hardeningDisable = [ "format" ];
+  hardeningDisable = [ "all" ];
 
   nativeBuildInputs = with pkgs; [
     dpkg fakeroot qemu
     bc dosfstools acpica-tools mtools nasm libuuid
     qemu-utils libisoburn python3
+    pkgsCross.aarch64-multiplatform.buildPackages.gcc
+    pkgsCross.riscv64.buildPackages.gcc
+    pkgsCross.gnu64.buildPackages.gcc
   ];
 
   prePatch = 
@@ -40,6 +44,12 @@ stdenv.mkDerivation rec {
       --replace-warn /usr/share/dpkg ${pkgs.dpkg}/share/dpkg
     substituteInPlace ./debian/rules \
       --replace-warn 'PYTHONPATH=$(CURDIR)/debian/python' 'PYTHONPATH=$(CURDIR)/debian/python:${pythonPath}'
+
+    # Patch cross compiler paths
+    substituteInPlace ./debian/rules ./**/CMakeLists.txt \
+      --replace-warn 'aarch64-linux-gnu-' 'aarch64-unknown-linux-gnu-'
+    substituteInPlace ./debian/rules ./**/CMakeLists.txt \
+      --replace-warn 'riscv64-linux-gnu-' 'riscv64-unknown-linux-gnu-'
   '';
 
   buildPhase = 
@@ -54,17 +64,25 @@ stdenv.mkDerivation rec {
     # Apply patches using dpkg 
     dpkg-source -b .
 
-    make -f debian/rules build-ovmf
-    make -f debian/rules build-ovmf32
+    make -f debian/rules build-qemu-efi-aarch64 build-ovmf build-ovmf32 build-qemu-efi-riscv64
   '';
 
   installPhase = ''
-    mkdir -p $out/legacy
-    cp -r ./debian/ovmf32-install/. $out/
-    cp -r ./debian/ovmf-install/. $out/
-    cp -r ./debian/legacy-2M-builds/. $out/legacy/
-    cp ./debian/PkKek-1-snakeoil.key $out/
-    cp ./debian/PkKek-1-snakeoil.pem $out/
+    # Patch paths in produced .install scripts
+    substituteInPlace ./debian/*.install \
+      --replace-warn '/usr/share/pve-edk2-firmware' "$out"
+
+    # Copy files as mentioned in install scripts
+    for ins in ./debian/*.install; do
+      while IFS= read -r line; do
+        read -ra paths <<< "$line"
+        dest="''${paths[-1]}"
+        mkdir -p "$dest"
+        for src in "''${paths[@]::''${#paths[@]}-1}"; do
+          cp $src "$dest"
+        done
+      done < "$ins"
+    done
   '';
 
   meta = {

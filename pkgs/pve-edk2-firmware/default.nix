@@ -21,7 +21,7 @@ stdenvNoCC.mkDerivation rec {
 
   buildInputs = [ ];
 
-  hardeningDisable = [ "all" ];
+  hardeningDisable = [ "format" "fortify" "trivialautovarinit" ];
 
   nativeBuildInputs = with pkgs; [
     dpkg fakeroot qemu
@@ -45,6 +45,10 @@ stdenvNoCC.mkDerivation rec {
     substituteInPlace ./debian/rules \
       --replace-warn 'PYTHONPATH=$(CURDIR)/debian/python' 'PYTHONPATH=$(CURDIR)/debian/python:${pythonPath}'
 
+    # Skip dh calls because we don't need debhelper
+    substituteInPlace ./debian/rules \
+      --replace-warn 'dh $@' ': dh $@'
+
     # Patch cross compiler paths
     substituteInPlace ./debian/rules ./**/CMakeLists.txt \
       --replace-warn 'aarch64-linux-gnu-' 'aarch64-unknown-linux-gnu-'
@@ -64,7 +68,7 @@ stdenvNoCC.mkDerivation rec {
     # Apply patches using dpkg 
     dpkg-source -b .
 
-    make -f debian/rules build-qemu-efi-aarch64 build-ovmf build-ovmf32 build-qemu-efi-riscv64
+    make -f debian/rules override_dh_auto_build
   '';
 
   installPhase = ''

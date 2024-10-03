@@ -87,6 +87,13 @@ stdenv.mkDerivation rec {
     done
   '';
 
+  passthru.updateScript = [
+    ../update.py
+    pname
+    "--url"
+    src.url
+  ];
+
   meta = {
     description = "edk2 based UEFI firmware modules for virtual machines";
     homepage = "git://git.proxmox.com/git/${pname}.git";

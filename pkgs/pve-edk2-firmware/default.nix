@@ -59,7 +59,7 @@ stdenv.mkDerivation rec {
 
       # Patch paths in produced .install scripts
       substituteInPlace ./debian/*.install \
-        --replace-warn '/usr/share/pve-edk2-firmware' "$out"
+        --replace-warn '/usr/share/pve-edk2-firmware' "$out/usr/share/pve-edk2-firmware"
     '';
 
   buildPhase = 

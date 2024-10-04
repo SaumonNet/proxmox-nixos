@@ -22,6 +22,7 @@ in
     # ./ha-manager.nix
     ./linstor.nix
     ./manager.nix
+    ./qemu-server.nix
     ./rrdcached.nix
     ./vms.nix
   ];

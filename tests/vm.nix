@@ -18,5 +18,6 @@
     machine.succeed("cp ${pkgs.nixos-proxmox-ve-iso}/iso/*.iso /var/lib/vz/template/iso/nixos-proxmox-ve.iso")
     machine.succeed("qm create 100 --kvm 0 -cdrom local:iso/nixos-proxmox-ve.iso")
     machine.succeed("qm start 100")
+    machine.succeed("qm shutdown 100")
   '';
 }

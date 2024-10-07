@@ -16,7 +16,9 @@
     assert "running" in machine.succeed("pveproxy status")
     machine.succeed("mkdir -p /var/lib/vz/template/iso/")
     machine.succeed("cp ${pkgs.nixos-proxmox-ve-iso}/iso/*.iso /var/lib/vz/template/iso/nixos-proxmox-ve.iso")
-    machine.succeed("qm create 100 --kvm 0 -cdrom local:iso/nixos-proxmox-ve.iso")
+    machine.succeed("qm create 100 --kvm 0 --bios seabios -cdrom local:iso/nixos-proxmox-ve.iso")
     machine.succeed("qm start 100")
+    machine.succeed("qm create 101 --kvm 0 --bios ovmf -cdrom local:iso/nixos-proxmox-ve.iso")
+    machine.succeed("qm start 101")
   '';
 }

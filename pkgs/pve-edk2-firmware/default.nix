@@ -56,10 +56,6 @@ stdenv.mkDerivation rec {
       substituteInPlace ./debian/rules ./**/CMakeLists.txt \
         --replace-warn 'riscv64-linux-gnu-' '${pkgsCross.riscv64.stdenv.cc.targetPrefix}'
       sed -i '/^EDK2_TOOLCHAIN *=/a export $(EDK2_TOOLCHAIN)_BIN=${pkgsCross.gnu64.stdenv.cc.targetPrefix}' ./debian/rules
-
-      # Patch paths in produced .install scripts
-      substituteInPlace ./debian/*.install \
-        --replace-warn '/usr/share/pve-edk2-firmware' "$out/usr/share/pve-edk2-firmware"
     '';
 
   buildPhase = 
@@ -74,16 +70,27 @@ stdenv.mkDerivation rec {
     '';
 
   installPhase = ''
-    # Copy files as mentioned in install scripts
-    for ins in ./debian/*.install; do
+    # Copy files as mentioned in *.install files
+    for f in ./debian/*.install; do
       while IFS= read -r line; do
         read -ra paths <<< "$line"
-        dest="''${paths[-1]}"
+        dest="$out/''${paths[-1]}"
         mkdir -p "$dest"
         for src in "''${paths[@]::''${#paths[@]}-1}"; do
           cp $src "$dest"
         done
-      done < "$ins"
+      done < "$f"
+    done
+
+    # Create symlinks as mentioned in *.links files
+    for f in ./debian/*.links; do
+      while IFS= read -r line; do
+        read -ra paths <<< "$line"
+        dest="$out/''${paths[-1]}"
+        for src in "''${paths[@]::''${#paths[@]}-1}"; do
+          ln -s "$out/$src" "$dest"
+        done
+      done < "$f"
     done
   '';
 

@@ -43,6 +43,7 @@ let
     pve-common = callPackage ./pve-common { };
     pve-container = callPackage ./pve-container { };
     pve-docs = callPackage ./pve-docs { };
+    pve-edk2-firmware = callPackage ./pve-edk2-firmware { };
     pve-firewall = callPackage ./pve-firewall { };
     pve-guest-common = callPackage ./pve-guest-common { };
     pve-ha-manager = callPackage ./pve-ha-manager { };

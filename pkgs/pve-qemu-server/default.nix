@@ -14,6 +14,7 @@
   termreadline,
   socat,
   vncterm,
+  pve-edk2-firmware,
 }:
 
 let
@@ -101,6 +102,7 @@ perl536.pkgs.toPerlModule (
         -e "s|/usr/lib/qemu-server|$out/lib/qemu-server|" \
         -e "s|/usr/share/qemu-server|$out/share/qemu-server|" \
         -e "s|/usr/share/kvm|${pve-qemu}/share/qemu|" \
+        -e "s|/usr/share/pve-edk2-firmware|${pve-edk2-firmware}/usr/share/pve-edk2-firmware|" \
         -Ee "s|(/usr)?/s?bin/kvm|qemu-kvm|" \
         -Ee "s|(/usr)?/s?bin/||" \
         -e "s|socat|${socat}/bin/socat|" \

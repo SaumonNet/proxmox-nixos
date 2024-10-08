@@ -57,7 +57,7 @@ perl536.pkgs.toPerlModule (
     ];
 
     makeFlags = [
-      "BUILDIR=/build"
+      "BUILDIR=$NIX_BUILD_TOP"
       "BUILD_MODE=release"
       "DESTDIR=$(out)"
       "GITVERSION:=${src.rev}"

@@ -30,7 +30,7 @@ perl536.pkgs.toPerlModule (
     postPatch = ''
       sed -i Makefile \
         -e "s/pct.1 pct.conf.5 pct.bash-completion pct.zsh-completion //" \
-        -e "s,/usr/share/lxc,/build/lxc," \
+        -e "s,/usr/share/lxc,$NIX_BUILD_TOP/lxc," \
         -e "/pve-doc-generator/d" \
         -e "/PVE_GENERATING_DOCS/d" \
         -e "/SERVICEDIR/d" \
@@ -45,8 +45,8 @@ perl536.pkgs.toPerlModule (
     dontPatchShebangs = true;
 
     postConfigure = ''
-      cp -r ${lxc}/share/lxc /build
-      chmod -R +w /build/lxc
+      cp -r ${lxc}/share/lxc $NIX_BUILD_TOP/
+      chmod -R +w $NIX_BUILD_TOP/lxc
     '';
 
     makeFlags = [

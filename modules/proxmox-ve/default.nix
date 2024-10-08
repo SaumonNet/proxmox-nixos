@@ -30,6 +30,14 @@ in
     enable = mkEnableOption "Proxmox VE";
 
     package = mkPackageOption pkgs "proxmox-ve" { };
+
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Open port in firewall for proxmox-admin (8006), rpcbind (111) and http(s) (80,443)
+      '';
+    };
   };
 
   config = mkIf cfg.enable (mkMerge [
@@ -75,7 +83,7 @@ in
       environment.systemPackages = [ cfg.package ];
       environment.etc.issue.enable = false;
 
-      networking.firewall.allowedTCPPorts = [
+      networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
         80
         111
         443

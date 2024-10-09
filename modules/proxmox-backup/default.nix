@@ -7,7 +7,7 @@
 
 with lib;
 let
-  cfg = config.services.proxmox-backup;
+  cfg = config.services.proxmox-backup-server;
 in
 
 {
@@ -16,8 +16,8 @@ in
     camillemndn
   ];
 
-  options.services.proxmox-backup = {
-    enable = mkEnableOption (mdDoc ''Proxmox VE'');
+  options.services.proxmox-backup-server = {
+    enable = mkEnableOption (mdDoc ''Proxmox Backup Server'');
     localIP = mkOption {
       description = mdDoc ''Local IP'';
       type = types.str;

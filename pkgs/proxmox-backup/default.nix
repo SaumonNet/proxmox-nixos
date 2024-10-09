@@ -21,7 +21,7 @@ let
 in
 craneLib.buildPackage {
   pname = "proxmox-backup";
-  version = "2024-06-13";
+  version = "2.4.6";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/proxmox-backup.git";

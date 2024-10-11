@@ -23,6 +23,8 @@ def main():
     parser.add_argument('pkg_name', help='Name of the package to update')
     parser.add_argument('--url', help='URL of the Git source', default=None)
     parser.add_argument('--version', help='Specify the version to update to')
+    parser.add_argument('--version-prefix', default=None,
+                        help='Specify the prefix of targeted update version')
     parser.add_argument('--prefix', default='bump version to',
                         help='Prefix for the commit message')
     parser.add_argument('--root', default='.',
@@ -53,8 +55,10 @@ def main():
         version = args.version
     else:
         print('Finding latest version')
+        grep_prefix = f'{args.prefix} {args.version_prefix}' if args.version_prefix else args.prefix
+            
         log_output = run_command(
-            f'git log --grep="{args.prefix}" -n 1 --pretty=format:"%s"')
+            f'git log --grep="{grep_prefix}" -n 1 --pretty=format:"%s"')
         version_match = re.search(f'{re.escape(args.prefix)} (.*)', log_output)
         version = version_match.group(1) if version_match else None
 

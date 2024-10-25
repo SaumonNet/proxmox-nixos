@@ -267,7 +267,7 @@ def eval_config(machine, flake):
         result = subprocess.run(
             ["nix", "eval", "--json"]
             + ([] if flake else ["-f", "default.nix"])
-            + [("#" if flake else"")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox"],
+            + [(".#" if flake else"")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox"],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

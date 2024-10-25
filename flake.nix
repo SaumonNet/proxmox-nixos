@@ -94,16 +94,11 @@
               };
 
             checks =
-              if (system == "x86_64-linux") then
-                (
-                  self.packages.${system}
-                  // (import ./tests {
-                    inherit pkgs;
-                    extraBaseModules = self.nixosModules;
-                  })
-                )
-              else
-                { };
+              self.packages.${system}
+              // (import ./tests {
+                inherit pkgs;
+                extraBaseModules = self.nixosModules;
+              });
           }
         );
 }

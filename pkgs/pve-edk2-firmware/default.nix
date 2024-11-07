@@ -12,11 +12,31 @@ stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
   version = "4.2023.08-4";
 
-  src = fetchgit {
+  src = fetchgit rec {
     url = "git://git.proxmox.com/git/${pname}.git";
     rev = "17443032f78eaf9ae276f8df9d10c64beec2e048";
-    sha256 = "sha256-19frOpnL8xLWIDw58u1zcICU9Qefp936LteyfnSIMCw=";
-    fetchSubmodules = true;
+    sha256 = "sha256-efDcC+kdCXDf64N+kNXDQIpsCiAUP2DyKmXZCpx5MAo=";
+
+    # FIXME: remove manual fetch submodule if submodule url fixed in next release
+    fetchSubmodules = false;
+    leaveDotGit = true;
+
+    postFetch = ''
+      cd $out
+      git remote add origin ${url}
+      git fetch
+      git branch --set-upstream-to=origin/master
+      git reset --hard ${rev}
+
+      sed -i "s#../mirror_edk2#git://git.proxmox.com/git/mirror_edk2.git#g" .gitmodules
+      git submodule sync
+      git submodule update --init --depth 1
+      ls -lah edk2
+      sed -i "s#github.com/Zeex/subhook#github.com/tianocore/edk2-subhook#g" edk2/.gitmodules
+      git submodule update --init --recursive
+      git clean -fxd
+      rm -rf .git/
+    '';
   };
 
   buildInputs = [ ];

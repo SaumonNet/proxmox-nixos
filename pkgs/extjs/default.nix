@@ -6,12 +6,12 @@
 
 stdenv.mkDerivation rec {
   pname = "extjs";
-  version = "7.0.0-4";
+  version = "7.0.0-5";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/extjs.git";
-    rev = "c0c1b0b6335618415ada92f04bd35774e3edb856";
-    hash = "sha256-WCVaXD8gabezcri2agtjfbx+2wt6knRJVBQeOv7OlxI=";
+    rev = "18909118c3d316f0bb48846920b8c94a4efc31f5";
+    hash = "sha256-AaV2DY5DG7tnqDFmfM3yIvJiyQYpR3pX9geH64JG4Ik=";
   };
 
   sourceRoot = "${src.name}/extjs/build";

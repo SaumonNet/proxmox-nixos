@@ -90,6 +90,18 @@ class Proxmox:
             filename=open(iso, "rb"),
         )
 
+        expected_size = os.path.getsize(iso)
+        current_size = 0
+        logging.info(click.style("Waiting for full upload", fg="cyan"))
+        while current_size != expected_size:
+            time.sleep(0.5)
+            volume = (
+                self.api.nodes(node)
+                .storage(storage)
+                .content(f"{storage}:iso/{iso_name}")
+                .get()
+            )
+            current_size = volume["size"]
 
     def delete_iso(self, node, storage, iso):
         """

@@ -21,7 +21,7 @@ lib.mkIf cfg.enable {
         "corosync.service"
         "pve-cluster.service"
       ];
-      path = with pkgs; [ btrfs-progs zfs ];
+      path = with pkgs; [ btrfs-progs zfs bashInteractive cdrkit ];
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/pvedaemon start";
         ExecStop = "${cfg.package}/bin/pvedaemon stop";

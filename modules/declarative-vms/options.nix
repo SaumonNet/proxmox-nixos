@@ -1111,7 +1111,11 @@ in
     spice_enhancements = mkOption {
       type = types.submodule {
         options = {
-          foldersharing = mkEnableOption "Enable or disable folder sharing through SPICE.";
+          foldersharing = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+            description = "Enable or disable folder sharing through SPICE.";
+          };
           videostreaming = mkOption {
             type = types.nullOr (
               types.enum [

@@ -10,6 +10,8 @@ This project is a port of the [Proxmox Hypervisor](https://www.proxmox.com/) on 
 
 Proxmox-NixOS has been tested on real hardware with most basic features of Proxmox (booting VMs, user management, etc), more involved setups (clusters, HA, etc) are still under development and testing.
 
+While we export other architectures for convenience of the user, we only support `x86_64-linux` for now;
+
 ## 🗃️ Cache
 
 Some Proxmox packages have a quite power intensive build process. We make a cache available to download directly the artifacts:

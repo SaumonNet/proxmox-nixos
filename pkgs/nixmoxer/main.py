@@ -309,7 +309,8 @@ def build_iso(machine, flake):
     try:
         subprocess.run(
             ["nix", "--print-build-logs", "build"]
-            + ([] if flake else ["-f", "default.nix", (".#" if flake else "")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox.iso"]),
+            + ([] if flake else ["-f", "default.nix"])
+            + [(".#" if flake else "")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox.iso"],
             check=True,
             stdout=sys.stdout,
             stderr=sys.stderr,

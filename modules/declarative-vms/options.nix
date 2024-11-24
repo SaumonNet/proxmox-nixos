@@ -669,7 +669,11 @@ in
       default = null;
     };
 
-    keephugepages = mkEnableOption "Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.";
+    keephugepages = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = "Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.";
+    };
 
     keyboard = mkOption {
       type = types.nullOr (

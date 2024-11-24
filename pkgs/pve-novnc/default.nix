@@ -1,11 +1,15 @@
 {
+  lib,
   novnc,
   esbuild,
   fetchgit,
 }:
 
 novnc.overrideAttrs (old: rec {
-  src_patches = fetchgit {
+  pname = "pve-novnc";
+  version = "1.4.0-4";
+
+  src = fetchgit {
     url = "git://git.proxmox.com/git/novnc-pve.git";
     rev = "e410ca0eea1d2ab9d3bf93db8e5e1c44cd8229fb";
     hash = "sha256-BQm4hDC7b+YaFipVonzcwVG/4JswkMSFZEpVkCdfrjM=";
@@ -14,13 +18,15 @@ novnc.overrideAttrs (old: rec {
 
   patches =
     let
-      series = builtins.readFile "${src_patches}/debian/patches/series";
+      series = builtins.readFile "${src}/debian/patches/series";
       patchList = builtins.filter (patch: builtins.isString patch && patch != "") (
         builtins.split "\n" series
       );
-      patchPathsList = map (patch: "${src_patches}/debian/patches/${patch}") patchList;
+      patchPathsList = map (patch: "${src}/debian/patches/${patch}") patchList;
     in
     old.patches ++ patchPathsList;
+
+  sourceRoot = "${src.name}/novnc";
 
   buildInputs = [ esbuild ];
 
@@ -33,4 +39,15 @@ novnc.overrideAttrs (old: rec {
       cp app.js $out/share/webapps/novnc/
       mv $out/share/webapps/novnc/{vnc.html,index.html.tpl}
     '';
+
+  passthru.updateScript = [
+    ../update.py
+    pname
+    "--url"
+    src.url
+    "--version-prefix"
+    (lib.versions.majorMinor old.version)
+  ];
+
+  meta.position = builtins.dirOf ./.;
 })

@@ -10,6 +10,7 @@
   pve-ha-manager,
   pve-http-server,
   cdrkit,
+  enableLinstor ? false,
   ceph,
   gnupg,
   graphviz,
@@ -28,6 +29,7 @@
   wget,
   bash,
   zstd,
+  util-linux,
   system-sendmail, rsync, busybox, cstream, lvm2
 }:
 
@@ -38,7 +40,7 @@ let
     PodParser
     TemplateToolkit
     proxmox-acme
-    pve-ha-manager
+    (pve-ha-manager.override { inherit enableLinstor; })
     pve-http-server
     pve-qemu-server
   ];
@@ -52,7 +54,7 @@ perl536.pkgs.toPerlModule (
     version = "8.2.4";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
+      url = "git://git.proxmox.com/git/${pname}.git";
       rev = "faa83925c96413258b9a02c4de89442adeff9215";
       hash = "sha256-onNnxvQ7YrdnrFpl+z7Z+xUyEZsMcU6Qxn/kjYLan+8=";
     };
@@ -129,12 +131,13 @@ perl536.pkgs.toPerlModule (
               cdrkit ## cloud-init
               gzip
               openssh
+              util-linux
               gnupg
               openvswitch
               pve-qemu
               iproute2
               termproxy
-              pve-ha-manager
+              (pve-ha-manager.override { inherit enableLinstor; })
               shadow
               wget
 
@@ -155,7 +158,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "The Proxmox VE Manager API and Web UI repository";
-      homepage = "https://git.proxmox.com/?p=pve-manager.git";
+      homepage = "git://git.proxmox.com/?p=pve-manager.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

@@ -9,12 +9,12 @@
 
 stdenv.mkDerivation rec {
   pname = "proxmox-widget-toolkit";
-  version = "4.2.3";
+  version = "4.3.1";
 
   src = fetchgit {
-    url = "https://git.proxmox.com/git/proxmox-widget-toolkit.git";
-    rev = "1ed4b715bc502fe1e0e8c4110083e9d6a14267ac";
-    hash = "sha256-1T1Y0AOb1372PQrpuWeixJZeSHaKcEFlqXfz+gmUhcs=";
+    url = "git://git.proxmox.com/git/proxmox-widget-toolkit.git";
+    rev = "26869223923a1d922df3a59f5183584853ad8ac5";
+    hash = "sha256-bTStHdVR2DeLQXbU144ckiXz/GdFeK4WvhBvfS1EkYs=";
   };
 
   sourceRoot = "${src.name}/src";
@@ -47,7 +47,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "https://git.proxmox.com/?p=proxmox-widget-toolkit.git";
+    homepage = "git://git.proxmox.com/?p=proxmox-widget-toolkit.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

@@ -17,12 +17,12 @@ in
 perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-container";
-    version = "5.1.11";
+    version = "5.2.2";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
-      rev = "d08a6337632dcbb262d877bd9d880586104d49bb";
-      hash = "sha256-dAo5y/UEvYFtM56x1VOTqKF1G+5T3RfefN1aYSjHZWo=";
+      url = "git://git.proxmox.com/git/${pname}.git";
+      rev = "a39c5b0617e15aabf5259f9743337beb16c2c173";
+      hash = "sha256-lM4QG4ezzUxr4N0aJ3mRYgiq6OouGJwfUcz4OjHugkw=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -30,7 +30,7 @@ perl536.pkgs.toPerlModule (
     postPatch = ''
       sed -i Makefile \
         -e "s/pct.1 pct.conf.5 pct.bash-completion pct.zsh-completion //" \
-        -e "s,/usr/share/lxc,/build/lxc," \
+        -e "s,/usr/share/lxc,$NIX_BUILD_TOP/lxc," \
         -e "/pve-doc-generator/d" \
         -e "/PVE_GENERATING_DOCS/d" \
         -e "/SERVICEDIR/d" \
@@ -45,8 +45,8 @@ perl536.pkgs.toPerlModule (
     dontPatchShebangs = true;
 
     postConfigure = ''
-      cp -r ${lxc}/share/lxc /build
-      chmod -R +w /build/lxc
+      cp -r ${lxc}/share/lxc $NIX_BUILD_TOP/
+      chmod -R +w $NIX_BUILD_TOP/lxc
     '';
 
     makeFlags = [
@@ -76,7 +76,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE container manager & runtime";
-      homepage = "https://git.proxmox.com/?p=pve-container.git";
+      homepage = "git://git.proxmox.com/?p=pve-container.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

@@ -22,7 +22,28 @@ let
       (
         let
           lock = builtins.fromJSON (builtins.readFile ../flake.lock);
-          nixpkgsName = lock.nodes.root.inputs.nixpkgs;
+          nixpkgsName = lock.nodes.root.inputs.nixpkgs-stable;
+        in
+        fetchTarball {
+          url = "https://github.com/NixOS/nixpkgs/archive/${lock.nodes.${nixpkgsName}.locked.rev}.tar.gz";
+          sha256 = lock.nodes.${nixpkgsName}.locked.narHash;
+        }
+      )
+      (
+        if !include-overlays then
+          { overlays = [ ]; }
+        else if include-overlays then
+          { } # Let Nixpkgs include overlays impurely.
+        else
+          { overlays = include-overlays; }
+      );
+
+  pkgs-unstable =
+    import
+      (
+        let
+          lock = builtins.fromJSON (builtins.readFile ../flake.lock);
+          nixpkgsName = lock.nodes.root.inputs.nixpkgs-unstable;
         in
         fetchTarball {
           url = "https://github.com/NixOS/nixpkgs/archive/${lock.nodes.${nixpkgsName}.locked.rev}.tar.gz";
@@ -45,7 +66,7 @@ let
   };
   craneLib = import crane { inherit pkgs; };
 
-  ourpkgs = pkgs.callPackage ../pkgs { inherit craneLib; };
+  ourpkgs = import ../pkgs { inherit pkgs pkgs-unstable craneLib; };
   inherit (pkgs) lib;
 
   # Remove duplicate elements from the list based on some extracted value. O(n^2) complexity.

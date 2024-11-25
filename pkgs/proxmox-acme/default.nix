@@ -19,7 +19,7 @@ perl536.pkgs.toPerlModule (
     version = "1.5.1";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
+      url = "git://git.proxmox.com/git/${pname}.git";
       rev = "bb6df0b8185829b5c1757330c12f977e196ed2b8";
       hash = "sha256-yVgOOE7vAEc9PFeAUuqnctdkWdXLYnDD/gra8YDGhq0=";
     };
@@ -50,7 +50,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "ACME library and helpers for perl-based Proxmox projects";
-      homepage = "https://git.proxmox.com/?p=proxmox-acme.git";
+      homepage = "git://git.proxmox.com/?p=proxmox-acme.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

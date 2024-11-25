@@ -5,6 +5,8 @@
   perl536,
   pve-cluster,
   pve-rados2,
+  enableLinstor ? false,
+  linstor-proxmox,
   ceph,
   coreutils,
   e2fsprogs,
@@ -29,12 +31,15 @@
 }:
 
 let
-  perlDeps = with perl536.pkgs; [
-    Filechdir
-    posixstrptime
-    pve-cluster
-    pve-rados2
-  ];
+  perlDeps =
+    with perl536.pkgs;
+    [
+      Filechdir
+      posixstrptime
+      pve-cluster
+      pve-rados2
+    ]
+    ++ lib.optional enableLinstor linstor-proxmox;
 
   perlEnv = perl536.withPackages (_: perlDeps);
 in
@@ -42,12 +47,12 @@ in
 perl536.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-storage";
-    version = "8.2.3";
+    version = "8.2.9";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/${pname}.git";
-      rev = "13a81873ba22f37ecc0613de3f3ef994b064e3b9";
-      hash = "sha256-5svyUnjqejtuK+skNwg0C8wGKClbh0WSwB/khN9I/c0=";
+      url = "git://git.proxmox.com/git/${pname}.git";
+      rev = "39fd552d14c075a9760fcdbbecd207b8c8028731";
+      hash = "sha256-vNGpDbT6QGjYhl07h58+e5Px7QpEG8xFouxF5Nks7xY=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -68,11 +73,15 @@ perl536.pkgs.toPerlModule (
       "PERLDIR=/${perl536.libPrefix}/${perl536.version}"
     ];
 
-    postInstall = ''
-      sed -i $out/bin/* \
-        -e "s/-T//" \
-        -e "1s|$| -I$out/${perl536.libPrefix}/${perl536.version}|"
-    '';
+    postInstall =
+      ''
+        sed -i $out/bin/* \
+          -e "s/-T//" \
+          -e "1s|$| -I$out/${perl536.libPrefix}/${perl536.version}|"
+      ''
+      + lib.optionalString enableLinstor ''
+        cp -rs ${linstor-proxmox}/lib $out
+      '';
 
     postFixup = ''
       find $out -type f | xargs sed -i \
@@ -114,7 +123,7 @@ perl536.pkgs.toPerlModule (
         -e "s|/usr/sbin/sbdadm||" \
         -e "s|/usr/sbin/smartctl|${smartmontools}/bin/smartctl|" \
         -e "s|/usr/sbin/stmfadm||" \
-        -e "s|/usr/share/perl5|$out/${perl536.libPrefix}/${perl536.version}|" \
+        -e "s|/usr/share/perl5|$out/${perl536.libPrefix}/${perl536.version}|"
     '';
 
     passthru.updateScript = [
@@ -126,7 +135,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE Storage Library";
-      homepage = "https://git.proxmox.com/?p=pve-storage.git";
+      homepage = "git://git.proxmox.com/?p=pve-storage.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

@@ -1,10 +1,12 @@
 {
   pkgs,
+  pkgs-unstable,
   craneLib ? { },
   ...
 }:
 let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
+
   ours = {
     inherit craneLib;
 
@@ -42,6 +44,7 @@ let
     pve-common = callPackage ./pve-common { };
     pve-container = callPackage ./pve-container { };
     pve-docs = callPackage ./pve-docs { };
+    pve-edk2-firmware = callPackage ./pve-edk2-firmware { };
     pve-firewall = callPackage ./pve-firewall { };
     pve-guest-common = callPackage ./pve-guest-common { };
     pve-ha-manager = callPackage ./pve-ha-manager { };
@@ -54,6 +57,15 @@ let
     pve-rs = callPackage ./pve-rs { };
     pve-storage = callPackage ./pve-storage { };
     pve-xtermjs = callPackage ./pve-xtermjs { };
+
+    linstor-api-py = callPackage ./linstor-api-py { };
+    linstor-client = callPackage ./linstor-client { };
+    linstor-proxmox = callPackage ./linstor-proxmox { };
+    linstor-server = pkgs-unstable.callPackage ./linstor-server {
+      protobuf = pkgs-unstable.protobuf_23;
+      jre = pkgs.jdk11_headless;
+    };
+    nixmoxer = callPackage ./nixmoxer { };
   };
 in
 ours

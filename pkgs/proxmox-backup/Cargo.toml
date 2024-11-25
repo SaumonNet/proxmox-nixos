@@ -12,7 +12,7 @@ authors = [
 ]
 edition = "2021"
 license = "AGPL-3"
-repository = "https://git.proxmox.com/?p=proxmox-backup.git"
+repository = "git://git.proxmox.com/?p=proxmox-backup.git"
 
 [package]
 name = "proxmox-backup"

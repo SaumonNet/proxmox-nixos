@@ -23,6 +23,8 @@ def main():
     parser.add_argument('pkg_name', help='Name of the package to update')
     parser.add_argument('--url', help='URL of the Git source', default=None)
     parser.add_argument('--version', help='Specify the version to update to')
+    parser.add_argument('--version-prefix', default=None,
+                        help='Specify the prefix of targeted update version')
     parser.add_argument('--prefix', default='bump version to',
                         help='Prefix for the commit message')
     parser.add_argument('--root', default='.',
@@ -32,7 +34,7 @@ def main():
 
     base_dir = os.getcwd()
     pkg_name = args.pkg_name
-    repo_url = args.url if args.url else f'https://git.proxmox.com/git/{pkg_name}.git'
+    repo_url = args.url if args.url else f'git://git.proxmox.com/git/{pkg_name}.git'
     old_version = run_command(f'nix eval .#{pkg_name}.version').strip('"')
 
     repo_name = os.path.basename(repo_url).replace('.git', '')
@@ -53,8 +55,10 @@ def main():
         version = args.version
     else:
         print('Finding latest version')
+        grep_prefix = f'{args.prefix} {args.version_prefix}' if args.version_prefix else args.prefix
+            
         log_output = run_command(
-            f'git log --grep="{args.prefix}" -n 1 --pretty=format:"%s"')
+            f'git log --grep="{grep_prefix}" -n 1 --pretty=format:"%s"')
         version_match = re.search(f'{re.escape(args.prefix)} (.*)', log_output)
         version = version_match.group(1) if version_match else None
 
@@ -115,16 +119,16 @@ def main():
                         print(f"Patching Cargo dependency '{dep}' to use Git.")
                     if dep == 'perlmod':
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/perlmod.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/perlmod.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                     elif dep == 'proxmox-resource-scheduling':
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/proxmox-resource-scheduling.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox-resource-scheduling.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                     elif dep.startswith('proxmox-'):
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/proxmox.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                     elif dep.startswith('pbs-'):
                         run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git https://git.proxmox.com/git/proxmox-backup.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
+                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox-backup.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
                 print("Finished patching Git dependencies.")
 
             transform_git_deps()

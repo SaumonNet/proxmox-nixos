@@ -7,6 +7,7 @@
   json_c,
   pkg-config,
   proxmox-backup-client,
+  pve-edk2-firmware,
   pve-qemu,
   util-linux,
   uuid,
@@ -53,7 +54,7 @@ perl536.pkgs.toPerlModule (
     version = "8.2.1";
 
     src = fetchgit {
-      url = "https://git.proxmox.com/git/qemu-server.git";
+      url = "git://git.proxmox.com/git/qemu-server.git";
       rev = "54aa98cea5071b5cd325cfaeb21b7aaa4af9bb4d";
       hash = "sha256-KjMkOTYrrXBB2HP9bXVJjDlBi86REe3lc8nEnUjZdls=";
     };
@@ -108,7 +109,7 @@ perl536.pkgs.toPerlModule (
         -e "s|qemu-kvm|${pve-qemu}/bin/qemu-kvm|" \
         -e "s|qemu-system|${pve-qemu}/bin/qemu-system|" \
         -e "s|/var/lib/qemu-server|$out/lib/qemu-server|" \
-
+        -e "s|/usr/share/pve-edk2-firmware|${pve-edk2-firmware}/usr/share/pve-edk2-firmware|" \
         #-e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         #-e "s|/usr/sbin/qm|$out/bin/qm|" \
         #-e "s|/usr/bin/qemu|${pve-qemu}/bin/qemu|" \
@@ -132,7 +133,7 @@ perl536.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE's Virtual Machine Manager";
-      homepage = "https://git.proxmox.com/?p=qemu-server.git";
+      homepage = "git://git.proxmox.com/?p=qemu-server.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

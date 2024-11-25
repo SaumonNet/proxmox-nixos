@@ -20,11 +20,25 @@ in
     ./cluster.nix
     # ./firewall.nix
     # ./ha-manager.nix
+    ./linstor.nix
     ./manager.nix
     ./rrdcached.nix
+    ./vms.nix
   ];
 
-  options.services.proxmox-ve.enable = mkEnableOption (mdDoc ''Proxmox VE'');
+  options.services.proxmox-ve = {
+    enable = mkEnableOption "Proxmox VE";
+
+    package = mkPackageOption pkgs "proxmox-ve" { };
+
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Open port in firewall for proxmox-admin (8006), rpcbind (111) and http(s) (80,443)
+      '';
+    };
+  };
 
   config = mkIf cfg.enable (mkMerge [
     {
@@ -66,10 +80,10 @@ in
       };
       users.groups.www-data = { };
 
-      environment.systemPackages = [ pkgs.proxmox-ve pkgs.pve-qemu pkgs.cifs-utils pkgs.samba];
+      environment.systemPackages = [ cfg.package pkgs.proxmox-ve pkgs.pve-qemu pkgs.cifs-utils pkgs.samba];
       environment.etc.issue.enable = false;
 
-      networking.firewall.allowedTCPPorts = [
+      networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
         80
         111
         443

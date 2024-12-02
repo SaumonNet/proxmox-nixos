@@ -1,10 +1,10 @@
 {
   lib,
   fetchurl,
-  perl536,
+  perl538,
 }:
 
-perl536.pkgs.buildPerlPackage rec {
+perl538.pkgs.buildPerlPackage rec {
   pname = "MIMEBase64";
   version = "3.16";
 

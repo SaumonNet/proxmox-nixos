@@ -2,10 +2,10 @@
   lib,
   stdenv,
   fetchgit,
-  perl536,
+  perl538,
 }:
 
-perl536.pkgs.toPerlModule (
+perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-guest-common";
     version = "5.1.6";
@@ -19,7 +19,7 @@ perl536.pkgs.toPerlModule (
     sourceRoot = "${src.name}/src";
 
     makeFlags = [
-      "PERL5DIR=$(out)/${perl536.libPrefix}/${perl536.version}"
+      "PERL5DIR=$(out)/${perl538.libPrefix}/${perl538.version}"
       "DOCDIR=$(out)/share/doc/${pname}"
     ];
 

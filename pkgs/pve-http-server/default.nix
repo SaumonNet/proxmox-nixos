@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl536,
+  perl538,
   proxmox-widget-toolkit,
   extjs,
   font-awesome_4,
@@ -10,7 +10,7 @@
 }:
 
 let
-  perlDeps = with perl536.pkgs; [ AnyEventHTTP ];
+  perlDeps = with perl538.pkgs; [ AnyEventHTTP ];
   fonts-font-awesome = font-awesome_4.overrideAttrs (
     _: _: {
       installPhase = ''
@@ -23,7 +23,7 @@ let
   );
 in
 
-perl536.pkgs.toPerlModule (
+perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-http-server";
     version = "5.1.2";
@@ -36,7 +36,7 @@ perl536.pkgs.toPerlModule (
 
     sourceRoot = "${src.name}/src";
     propagatedBuildInputs = perlDeps;
-    makeFlags = [ "PERL5DIR=$(out)/${perl536.libPrefix}/${perl536.version}" ];
+    makeFlags = [ "PERL5DIR=$(out)/${perl538.libPrefix}/${perl538.version}" ];
 
     postFixup = ''
       find $out -type f | xargs sed -i \

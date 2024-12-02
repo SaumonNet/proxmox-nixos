@@ -3,7 +3,7 @@
   fetchgit,
   fetchurl,
   proxmox-backup-qemu,
-  perl536,
+  perl538,
   pkg-config,
 }:
 
@@ -44,7 +44,7 @@
 
     nativeBuildInputs = old.nativeBuildInputs ++ [
       proxmox-backup-qemu
-      perl536
+      perl538
       pkg-config
     ];
   })).override

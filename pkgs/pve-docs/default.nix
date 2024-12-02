@@ -2,16 +2,16 @@
   lib,
   stdenv,
   fetchgit,
-  perl536,
+  perl538,
   proxmox-widget-toolkit,
   asciidoc,
   librsvg,
 }:
 
 let
-  perlDeps = with perl536.pkgs; [ JSON ];
+  perlDeps = with perl538.pkgs; [ JSON ];
 
-  perlEnv = perl536.withPackages (_: perlDeps);
+  perlEnv = perl538.withPackages (_: perlDeps);
 in
 
 stdenv.mkDerivation rec {

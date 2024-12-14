@@ -31,6 +31,13 @@ in
 
     package = mkPackageOption pkgs "proxmox-ve" { };
 
+    ipAddress = lib.mkOption {
+      type = lib.types.str;
+      description = ''
+        The IP address used to reach this Proxmox node from outside, added to "/etc/hosts" file.
+      '';
+    };
+
     openFirewall = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -50,6 +57,7 @@ in
       networking.hosts = {
         "127.0.0.2" = lib.mkForce [ ];
         "::1" = lib.mkForce [ ];
+        "${cfg.ipAddress}" = [ config.networking.hostName ];
       };
 
       # create the /etc/network/interfaces file for proxmox

@@ -46,10 +46,16 @@ let
 in
 {
   imports = [ proxmox-nixos.nixosModules.proxmox-ve ];
-  services.proxmox-ve.enable = true;
+
+  services.proxmox-ve = {
+    enable = true;
+    ipAddress = "192.168.0.1";
+  };
+
   nixpkgs.overlays = [
     proxmox-nixos.overlays.x86_64-linux
   ];
+
   # The rest of your configuration...
 }
 ```
@@ -76,7 +82,11 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
           proxmox-nixos.nixosModules.proxmox-ve
 
           ({ pkgs, lib, ... }: {
-            services.proxmox-ve.enable = true;
+            services.proxmox-ve = {
+              enable = true;
+              ipAddress = "192.168.0.1";
+            };
+
             nixpkgs.overlays = [
               proxmox-nixos.overlays.${system}
             ];
@@ -90,7 +100,7 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
 }
 ```
 
-⚠️ Do not override the `nixpkgs-stable` input of the flake, as the only tested and supported version of Proxmox-NixOS is with the upstream stable NixOS release.
+Do not override the `nixpkgs-stable` input of the flake, as the only tested and supported version of Proxmox-NixOS is with the upstream stable NixOS release.
 
 ## 🌐 Networking
 
@@ -200,7 +210,6 @@ $ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
 
 `nixmoxer` will setup the VM on the Proxmox node and attach the specified iso. Instead of specified an iso, setting `autoInstall = true;` will automatically generate an iso that will automatically install the configuration to the VM being bootstrapped.
 
-
 ⚠️ `nixmoxer` shall only be used for the initial bootstraping of a VM, the NixOS VM can be rebuilt with usual tools like `nixos-rebuild`, `colmena`, etc. Changes to the `virtualisation.proxmox` options after the boostraping have no impact.
 
 ### Using the module [`services.proxmox-ve.vms`](modules/proxmox-ve/vms.nix)
@@ -215,6 +224,8 @@ iso and configure your VMs as usual.
 {
   services.proxmox-ve = {
     enable = true;
+    ipAddress = "192.168.0.1";
+
     vms = {
       myvm1 = {
         vmid = 100;
@@ -249,7 +260,6 @@ or in the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#
 
 ⚠️ The current limitation is that if for instance VM `myvm1` has already been initialised,
 subsequent changes to the configuration in `services.proxmox-ve.vms.myvm1` will have no impact.
-
 
 ### Note
 

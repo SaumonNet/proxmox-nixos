@@ -2,7 +2,10 @@
   name = "pve-basic";
 
   nodes.mypve = {
-    services.proxmox-ve.enable = true;
+    services.proxmox-ve = {
+      enable = true;
+      ipAddress = "192.168.0.1";
+    };
   };
 
   testScript = ''

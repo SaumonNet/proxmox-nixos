@@ -18,7 +18,7 @@
     pve2 = {
       services.proxmox-ve = {
         enable = true;
-        ipAddress = "192.168.0.2";
+        ipAddress = "192.168.1.2";
       };
     };
   };
@@ -29,6 +29,7 @@
     pve1.wait_for_unit("pveproxy.service")
     assert "running" in pve1.succeed("pveproxy status")
     assert "Proxmox" in pve1.succeed("curl -k https://localhost:8006")
+
     pve1.succeed("pvecm create mycluster")
     pve1.wait_for_unit("corosync.service")
 

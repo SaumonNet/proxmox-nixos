@@ -6,7 +6,7 @@
       services = {
         proxmox-ve = {
           enable = true;
-          ipAddress = "192.168.0.1";
+          ipAddress = "192.168.1.1";
           linstor.enable = true;
         };
         lvm.enable = true;

@@ -11,6 +11,7 @@
   corosync,
   fuse,
   glib,
+  gzip,
   libfaketime,
   libqb,
   libxcrypt,
@@ -100,6 +101,8 @@ perl538.pkgs.toPerlModule (
               openssl
               bash
               systemd
+              sqlite
+              gzip
               corosync
               libfaketime
             ]

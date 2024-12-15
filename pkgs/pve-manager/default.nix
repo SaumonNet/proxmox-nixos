@@ -121,7 +121,7 @@ perl538.pkgs.toPerlModule (
       # Ceph systemd units in NixOS do not use templates
       find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
 
-      sed -i $out/${perl536.libPrefix}/${perl536.version}/PVE/Ceph/Tools.pm \
+      sed -i $out/${perl538.libPrefix}/${perl538.version}/PVE/Ceph/Tools.pm \
         -e 's|=> "ceph|=> "${ceph}/bin/ceph|' \
         -e "s|=> 'ceph|=> '${ceph}/bin/ceph|" \
         -e "s|ceph-authtool|${ceph}/bin/ceph-authtool|"

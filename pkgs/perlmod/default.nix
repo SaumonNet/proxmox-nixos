@@ -16,6 +16,8 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-9y6Z6IaIHPgbraT7NGUUsEB/PMWybgRt876sUGHUGjg=";
   };
 
+  patches = [ ./remove_RSPL_set_use_safe_putenv.patch ];
+
   cargoLock.lockFile = ./Cargo.lock;
 
   postPatch = ''

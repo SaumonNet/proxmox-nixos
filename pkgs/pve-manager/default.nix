@@ -27,6 +27,10 @@
   sqlite,
   wget,
   util-linux,
+  libfaketime,
+  corosync,
+  openssl,
+  systemd,
 }:
 
 let
@@ -121,15 +125,19 @@ perl538.pkgs.toPerlModule (
           --prefix PATH : ${
             lib.makeBinPath [
               ceph
+              corosync
               gnupg
               gzip
               iproute2
+              libfaketime
               openssh
+              openssl
               openvswitch
               (pve-ha-manager.override { inherit enableLinstor; })
               pve-qemu
               shadow
               sqlite
+              systemd
               termproxy
               util-linux
               wget

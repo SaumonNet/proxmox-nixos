@@ -1045,7 +1045,7 @@ checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 [[package]]
 name = "perlmod"
 version = "0.13.4"
-source = "git+git://git.proxmox.com/git/perlmod.git#f95893f1bc75b3812866fb5f028f0569c0d8255a"
+source = "git+https://github.com/julienmalka/perlmod-rs.git#90041783d7a75f11cc35883d9632927d0e79c77f"
 dependencies = [
  "bitflags 1.3.2",
  "cc",
@@ -1057,7 +1057,7 @@ dependencies = [
 [[package]]
 name = "perlmod-macro"
 version = "0.8.4"
-source = "git+git://git.proxmox.com/git/perlmod.git#f95893f1bc75b3812866fb5f028f0569c0d8255a"
+source = "git+https://github.com/julienmalka/perlmod-rs.git#90041783d7a75f11cc35883d9632927d0e79c77f"
 dependencies = [
  "proc-macro2 1.0.85",
  "quote 1.0.36",

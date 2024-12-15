@@ -118,6 +118,9 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
         -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/"
 
+      # Ceph systemd units in NixOS do not use templates
+      find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
+        
       find $out/bin -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d"
 

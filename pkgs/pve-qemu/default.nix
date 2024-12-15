@@ -51,5 +51,6 @@
   {
     glusterfsSupport = true;
     enableDocs = false;
+    cephSupport = true;
   }
 )

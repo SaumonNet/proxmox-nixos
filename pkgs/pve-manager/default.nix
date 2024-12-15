@@ -24,6 +24,7 @@
   iproute2,
   termproxy,
   shadow,
+  sqlite,
   wget,
   util-linux,
 }:
@@ -120,16 +121,17 @@ perl538.pkgs.toPerlModule (
           --prefix PATH : ${
             lib.makeBinPath [
               ceph
-              gzip
-              openssh
-              util-linux
               gnupg
-              openvswitch
-              pve-qemu
+              gzip
               iproute2
-              termproxy
+              openssh
+              openvswitch
               (pve-ha-manager.override { inherit enableLinstor; })
+              pve-qemu
               shadow
+              sqlite
+              termproxy
+              util-linux
               wget
             ]
           } \

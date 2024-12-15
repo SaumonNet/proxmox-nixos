@@ -13,7 +13,12 @@
 
         environment.systemPackages = [ pkgs.openssl ];
 
-        users.users.root.password = "mypassword";
+        users.users.root = {
+          password = "mypassword";
+          initialPassword = null;
+          hashedPassword = null;
+          hashedPasswordFile = null;
+        };
       };
     pve2 = {
       services.proxmox-ve = {
@@ -36,6 +41,6 @@
     fingerprint = pve1.succeed("openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2")
 
     pve2.wait_for_unit("multi-user.target")
-    pve2.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint} --password mypassword")
+    pve2.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
   '';
 }

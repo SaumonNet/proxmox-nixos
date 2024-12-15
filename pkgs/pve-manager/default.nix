@@ -115,7 +115,8 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
         -Ee "s|(/usr)?/s?bin/||" \
-        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
+        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
+        -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/"
 
       find $out/bin -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d"

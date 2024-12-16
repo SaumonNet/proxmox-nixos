@@ -211,12 +211,10 @@ in
     ];
 
     networking.firewall = lib.mkIf config.services.proxmox-ve.openFirewall {
-      allowedTCPPorts = (
-        lib.optionals cfg.mon.enable [
+      allowedTCPPorts = lib.optionals cfg.mon.enable [
           3300
           6789
-        ]
-      );
+        ];
       allowedTCPPortRanges = lib.optionals (cfg.osd.enable || cfg.msd.enable || cfg.mgr.enable) [
         {
           from = 6800;

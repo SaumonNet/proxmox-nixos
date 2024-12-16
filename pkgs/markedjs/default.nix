@@ -7,16 +7,16 @@
 
 buildNpmPackage rec {
   pname = "markedjs";
-  version = "15.0.1";
+  version = "15.0.4";
 
   src = fetchFromGitHub {
     owner = "markedjs";
     repo = "marked";
     rev = "v${version}";
-    hash = "sha256-e/X/iIJ2Cr2LYoSJa3wkkQOapFjDlLhqBE2AwKh7+Pg=";
+    hash = "sha256-opYsbQLliSEz2nYGHuqM/QeYcqEh7LQtqLzc1ppByHI=";
   };
 
-  npmDepsHash = "sha256-eJYaaJwBCubcHtWEMmnAB7snAZiJVeUS1Pc7XziDqqc=";
+  npmDepsHash = "sha256-e1AnslmDu831L3lD2eS+mGskKJ2s15fCwQkgLtFzP+o=";
 
   passthru.updateScript = nix-update-script { extraArgs = [ "--flake" ]; };
 

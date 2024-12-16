@@ -18,12 +18,17 @@
           hashedPassword = null;
           hashedPasswordFile = null;
         };
+
+        virtualisation.memorySize = 2048;
       };
+
     pve2 = {
       services.proxmox-ve = {
         enable = true;
         ipAddress = "192.168.1.2";
       };
+
+      virtualisation.memorySize = 2048;
     };
   };
 
@@ -40,11 +45,13 @@
     pve1.succeed("pvecm create mycluster")
     pve1.wait_for_unit("corosync.service")
 
-    fingerprint = pve1.succeed("openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2")
-
     pve2.wait_for_unit("multi-user.target")
     time.sleep(10)
+
+    fingerprint = pve1.succeed("openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2")
     pve2.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
-    pve2.succeed("pvecm status")
+
+    assert "Yes" in pve2.succeed("pvecm status | grep Quorate")
+    assert "pve2" in pve1.succeed("pvecm nodes")
   '';
 }

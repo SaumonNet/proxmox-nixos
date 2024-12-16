@@ -1,5 +1,4 @@
 {
-
   name = "pve-basic";
 
   nodes.mypve = {

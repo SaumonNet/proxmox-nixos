@@ -208,7 +208,7 @@ $ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
 _This solution is only available for the admin of a Proxmox Hypervisor on NixOS_.
 
 This configuration will create two VMs on a Proxmox-NixOS Hypervisor. Then you can attach an
-iso and configuration your VMs as usual.
+iso and configure your VMs as usual.
 
 ```nix
 # configuration.nix

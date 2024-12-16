@@ -59,41 +59,9 @@
             craneLib = crane.mkLib pkgs;
           in
           {
-            overlays =
-              final: prev:
-              (import ./pkgs { inherit pkgs pkgs-unstable craneLib; })
-              // {
-                nixos-proxmox-ve-iso =
-                  (lib.nixosSystem {
-                    extraModules = lib.attrValues self.nixosModules;
-                    pkgs = final;
-                    inherit system;
-                    modules = [
-                      "${nixpkgs-stable}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-                      (_: {
-                        services.proxmox-ve.enable = true;
-                        isoImage.isoBaseName = "nixos-proxmox-ve";
-                      })
-                    ];
-                  }).config.system.build.isoImage;
-              };
+            overlays = _: _: (import ./pkgs { inherit pkgs pkgs-unstable craneLib; });
 
-            packages =
-              utils.lib.filterPackages system (import ./pkgs { inherit pkgs pkgs-unstable craneLib; })
-              // {
-                nixos-proxmox-ve-iso =
-                  (lib.nixosSystem {
-                    extraModules = lib.attrValues self.nixosModules;
-                    inherit pkgs system;
-                    modules = [
-                      "${nixpkgs-stable}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-                      (_: {
-                        services.proxmox-ve.enable = true;
-                        isoImage.isoBaseName = "nixos-proxmox-ve";
-                      })
-                    ];
-                  }).config.system.build.isoImage;
-              };
+            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs pkgs-unstable craneLib; });
 
             checks =
               if (system == "x86_64-linux") then

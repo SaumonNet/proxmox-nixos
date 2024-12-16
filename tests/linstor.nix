@@ -1,5 +1,4 @@
 {
-
   name = "pve-linstor";
 
   nodes = {
@@ -16,6 +15,12 @@
         emptyDiskImages = [ 10000 ];
         memorySize = 2048;
       };
+      lvm.enable = true;
+      lvm.dmeventd.enable = true;
+    };
+    virtualisation = {
+      emptyDiskImages = [ 10000 ];
+      memorySize = 2048;
     };
   };
 

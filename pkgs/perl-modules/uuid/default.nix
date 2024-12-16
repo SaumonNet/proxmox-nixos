@@ -1,11 +1,11 @@
 {
   lib,
   fetchurl,
-  perl536,
+  perl538,
   libuuid,
 }:
 
-perl536.pkgs.buildPerlPackage rec {
+perl538.pkgs.buildPerlPackage rec {
   pname = "UUID";
   version = "0.36";
 
@@ -15,7 +15,7 @@ perl536.pkgs.buildPerlPackage rec {
   };
 
   buildInputs = [
-    perl536.pkgs.DevelChecklib
+    perl538.pkgs.DevelChecklib
     libuuid.dev
   ];
 

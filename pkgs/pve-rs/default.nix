@@ -8,11 +8,11 @@
   pkg-config,
   openssl,
   fetchgit,
-  perl536,
+  perl538,
   perlmod,
 }:
 
-perl536.pkgs.toPerlModule (
+perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rs";
     version = "0.8.9";
@@ -47,7 +47,7 @@ perl536.pkgs.toPerlModule (
       rustPlatform.cargoSetupHook
       cargo
       rustc
-      perl536
+      perl538
     ];
 
     buildInputs = [
@@ -61,14 +61,14 @@ perl536.pkgs.toPerlModule (
       "BUILD_MODE=release"
       "DESTDIR=$(out)"
       "GITVERSION:=${src.rev}"
-      "PERL_INSTALLVENDORARCH=/${perl536.libPrefix}/${perl536.version}"
-      "PERL_INSTALLVENDORLIB=/${perl536.libPrefix}/${perl536.version}"
+      "PERL_INSTALLVENDORARCH=/${perl538.libPrefix}/${perl538.version}"
+      "PERL_INSTALLVENDORLIB=/${perl538.libPrefix}/${perl538.version}"
     ];
 
     postInstall = ''
       (
         cd common/pkg
-        PERL_INSTALLVENDORLIB=$out/${perl536.libPrefix}/${perl536.version} make install
+        PERL_INSTALLVENDORLIB=$out/${perl538.libPrefix}/${perl538.version} make install
       )    
     '';
 

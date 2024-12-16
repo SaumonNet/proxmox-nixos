@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl536,
+  perl538,
   glib,
   json_c,
   pkg-config,
@@ -18,7 +18,7 @@
 }:
 
 let
-  perlDeps = with perl536.pkgs; [
+  perlDeps = with perl538.pkgs; [
     CryptOpenSSLRandom
     DataDumper
     DigestSHA
@@ -45,10 +45,10 @@ let
     XMLLibXML
   ];
 
-  perlEnv = perl536.withPackages (_: perlDeps);
+  perlEnv = perl538.withPackages (_: perlDeps);
 in
 
-perl536.pkgs.toPerlModule (
+perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
     version = "8.2.1";
@@ -93,7 +93,7 @@ perl536.pkgs.toPerlModule (
       "SBINDIR=/.bin"
       "USRSHAREDIR=$(out)/share/qemu-server"
       "VARLIBDIR=$(out)/lib/qemu-server"
-      "PERLDIR=/${perl536.libPrefix}/${perl536.version}"
+      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
     ];
 
     postFixup = ''

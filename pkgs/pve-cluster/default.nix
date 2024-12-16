@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl536,
+  perl538,
   pve-access-control,
   pve-apiclient,
   pve-rs,
@@ -25,19 +25,19 @@
 }:
 
 let
-  perlDeps = with perl536.pkgs; [
+  perlDeps = with perl538.pkgs; [
     DigestHMAC
     uuid
-    (rrdtool.override { perl = perl536; })
+    (rrdtool.override { perl = perl538; })
     pve-access-control
     pve-apiclient
     pve-rs
   ];
 
-  perlEnv = perl536.withPackages (_: perlDeps);
+  perlEnv = perl538.withPackages (_: perlDeps);
 in
 
-perl536.pkgs.toPerlModule (
+perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-cluster";
     version = "8.0.10";
@@ -81,8 +81,8 @@ perl536.pkgs.toPerlModule (
 
     makeFlags = [
       "DESTDIR=$(out)"
-      "PERL_VENDORARCH=${perl536.libPrefix}/${perl536.version}"
-      "PVEDIR=$(out)/${perl536.libPrefix}/${perl536.version}/PVE"
+      "PERL_VENDORARCH=${perl538.libPrefix}/${perl538.version}"
+      "PVEDIR=$(out)/${perl538.libPrefix}/${perl538.version}/PVE"
     ];
 
     postInstall = ''
@@ -104,7 +104,7 @@ perl536.pkgs.toPerlModule (
               libfaketime
             ]
           } \
-          --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}
+          --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}
       done      
     '';
 

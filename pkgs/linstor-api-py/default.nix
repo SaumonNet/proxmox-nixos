@@ -20,6 +20,7 @@ python3.pkgs.buildPythonPackage rec {
   nativeBuildInputs = [
     python3.pkgs.setuptools
     python3.pkgs.wheel
+    python3.pkgs.distutils
   ];
 
   pythonImportsCheck = [ "linstor" ];

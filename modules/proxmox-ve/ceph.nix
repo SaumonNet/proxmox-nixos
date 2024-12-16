@@ -210,14 +210,20 @@ in
       }
     ];
 
-    networking.firewall.allowedTCPPorts = lib.mkIf config.services.proxmox-ve.openFirewall [
-      3300
-      6789
-    ];
-    networking.firewall.allowedUDPPorts = lib.mkIf config.services.proxmox-ve.openFirewall [
-      3300
-      6789
-    ];
+    networking.firewall = lib.mkIf config.services.proxmox-ve.openFirewall {
+      allowedTCPPorts = (
+        lib.optionals cfg.mon.enable [
+          3300
+          6789
+        ]
+      );
+      allowedTCPPortRanges = lib.optionals (cfg.osd.enable || cfg.msd.enable || cfg.mgr.enable) [
+        {
+          from = 6800;
+          to = 7300;
+        }
+      ];
+    };
 
     users.users.ceph = {
       uid = config.ids.uids.ceph;

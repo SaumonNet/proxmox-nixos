@@ -92,12 +92,21 @@ in
       environment.systemPackages = [ cfg.package ];
       environment.etc.issue.enable = false;
 
-      networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
-        80
-        111
-        443
-        8006
-      ];
+      networking.firewall = mkIf cfg.openFirewall {
+        allowedTCPPorts = [
+          80
+          111
+          443
+          8006
+        ];
+        allowedUDPPorts = [ 111 ];
+        allowedUDPPortRanges = [
+          {
+            from = 5405;
+            to = 5412;
+          }
+        ];
+      };
     }
   ]);
 }

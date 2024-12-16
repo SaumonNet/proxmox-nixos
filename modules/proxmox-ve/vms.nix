@@ -12,7 +12,7 @@ let
   # Fix toString to return "0" for false
   toString' = x: if isBool x && (!x) then "0" else toString x;
   filterAttrsNonEmpty = filterAttrsRecursive (
-    n: v:
+    _: v:
     v != null
     && (!(isList v) || any (x: x != null) v)
     && (!(isAttrs v) || any (x: x != null) (attrValues v))
@@ -91,7 +91,7 @@ in
         vmid = toString conf.vmid;
       in
       nameValuePair "pve-generate-vm-${vmid}" {
-        description = "Generates PVE VM ${vmid} from configuration.";
+        description = "PVE VM ${vmid} creation from configuration.";
         wants = [ "pveproxy.service" ];
         after = [ "pveproxy.service" ];
         wantedBy = [ "multi-user.target" ];

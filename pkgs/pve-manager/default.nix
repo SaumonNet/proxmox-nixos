@@ -9,6 +9,7 @@
   pve-docs,
   pve-ha-manager,
   pve-http-server,
+  cdrkit,
   enableLinstor ? false,
   ceph,
   gnupg,
@@ -18,6 +19,7 @@
   openvswitch,
   openssh,
   pve-qemu,
+  pve-qemu-server,
   tzdata,
   pve-novnc,
   pve-xtermjs,
@@ -25,7 +27,10 @@
   termproxy,
   shadow,
   wget,
+  bash,
+  zstd,
   util-linux,
+  system-sendmail, rsync, busybox, cstream, lvm2
 }:
 
 let
@@ -37,6 +42,7 @@ let
     proxmox-acme
     (pve-ha-manager.override { inherit enableLinstor; })
     pve-http-server
+    pve-qemu-server
   ];
 
   perlEnv = perl538.withPackages (_: perlDeps);
@@ -110,7 +116,9 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
         -Ee "s|(/usr)?/s?bin/||" \
-        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
+        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
+        -e "s|/usr/share/perl5/.plug|${pve-qemu-server}/${perl536.libPrefix}/${perl536.version}/\$plug|"
+
 
       find $out/bin -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d"
@@ -120,6 +128,7 @@ perl538.pkgs.toPerlModule (
           --prefix PATH : ${
             lib.makeBinPath [
               ceph
+              cdrkit ## cloud-init
               gzip
               openssh
               util-linux
@@ -131,6 +140,9 @@ perl538.pkgs.toPerlModule (
               (pve-ha-manager.override { inherit enableLinstor; })
               shadow
               wget
+
+              ## dependencies of backup and restore
+              bash zstd system-sendmail rsync busybox cstream lvm2
             ]
           } \
           --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}

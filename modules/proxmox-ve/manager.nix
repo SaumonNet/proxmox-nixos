@@ -69,6 +69,7 @@ lib.mkIf cfg.enable {
       wantedBy = [ "multi-user.target" ];
       wants = [
         "pvestatd.service"
+        "qmeventd.service"
         "pveproxy.service"
         "spiceproxy.service"
         "pve-firewall.service"
@@ -77,6 +78,7 @@ lib.mkIf cfg.enable {
       after = [
         "pveproxy.service"
         "pvestatd.service"
+        "qmeventd.service"
         "spiceproxy.service"
         "pve-firewall.service"
         "lxc.service"
@@ -148,6 +150,15 @@ lib.mkIf cfg.enable {
         ExecStop = "${cfg.package}/bin/pvestatd stop";
         ExecReload = "${cfg.package}/bin/pvestatd restart";
         PIDFile = "/run/pvestatd.pid";
+        Type = "forking";
+      };
+    };
+
+    qmeventd = {
+      description = "PVE Qemu Event Daemon";
+      before = [ "pve-ha-lrm.service" "pve-guests.service" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.proxmox-ve}/bin/qmeventd /var/run/qmeventd.sock";
         Type = "forking";
       };
     };

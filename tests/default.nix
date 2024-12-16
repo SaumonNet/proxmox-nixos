@@ -13,6 +13,7 @@ let
 in
 {
   test-pve-basic = runTest ./basic.nix;
+  test-pve-ceph = runTest ./vm.nix;
   test-pve-cluster = runTest ./cluster.nix;
   # Disable this test until drdb gets unbroken in 24.11
   # test-pve-linstor = runTest ./linstor.nix;

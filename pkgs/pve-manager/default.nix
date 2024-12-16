@@ -24,8 +24,13 @@
   iproute2,
   termproxy,
   shadow,
+  sqlite,
   wget,
   util-linux,
+  libfaketime,
+  corosync,
+  openssl,
+  systemd,
 }:
 
 let
@@ -110,7 +115,16 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
         -Ee "s|(/usr)?/s?bin/||" \
-        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" 
+        -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
+        -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/"
+
+      # Ceph systemd units in NixOS do not use templates
+      find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
+
+      sed -i $out/${perl538.libPrefix}/${perl538.version}/PVE/Ceph/Tools.pm \
+        -e 's|=> "ceph|=> "${ceph}/bin/ceph|' \
+        -e "s|=> 'ceph|=> '${ceph}/bin/ceph|" \
+        -e "s|ceph-authtool|${ceph}/bin/ceph-authtool|"
 
       find $out/bin -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d"
@@ -120,16 +134,21 @@ perl538.pkgs.toPerlModule (
           --prefix PATH : ${
             lib.makeBinPath [
               ceph
-              gzip
-              openssh
-              util-linux
+              corosync
               gnupg
-              openvswitch
-              pve-qemu
+              gzip
               iproute2
-              termproxy
+              libfaketime
+              openssh
+              openssl
+              openvswitch
               (pve-ha-manager.override { inherit enableLinstor; })
+              pve-qemu
               shadow
+              sqlite
+              systemd
+              termproxy
+              util-linux
               wget
             ]
           } \

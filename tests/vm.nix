@@ -13,6 +13,7 @@ in
   nodes.mypve = {
     services.proxmox-ve = {
       enable = true;
+      ipAddress = "192.168.1.1";
 
       vms = {
         myvm1 = {

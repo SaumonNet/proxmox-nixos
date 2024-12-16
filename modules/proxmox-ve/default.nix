@@ -17,6 +17,7 @@ in
   ];
 
   imports = [
+    ./ceph.nix
     ./cluster.nix
     # ./firewall.nix
     # ./ha-manager.nix
@@ -30,6 +31,13 @@ in
     enable = mkEnableOption "Proxmox VE";
 
     package = mkPackageOption pkgs "proxmox-ve" { };
+
+    ipAddress = lib.mkOption {
+      type = lib.types.str;
+      description = ''
+        The IP address used to reach this Proxmox node from outside, added to "/etc/hosts" file.
+      '';
+    };
 
     openFirewall = lib.mkOption {
       type = lib.types.bool;
@@ -50,6 +58,7 @@ in
       networking.hosts = {
         "127.0.0.2" = lib.mkForce [ ];
         "::1" = lib.mkForce [ ];
+        "${cfg.ipAddress}" = [ config.networking.hostName ];
       };
 
       # create the /etc/network/interfaces file for proxmox
@@ -83,12 +92,21 @@ in
       environment.systemPackages = [ cfg.package ];
       environment.etc.issue.enable = false;
 
-      networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
-        80
-        111
-        443
-        8006
-      ];
+      networking.firewall = mkIf cfg.openFirewall {
+        allowedTCPPorts = [
+          80
+          111
+          443
+          8006
+        ];
+        allowedUDPPorts = [ 111 ];
+        allowedUDPPortRanges = [
+          {
+            from = 5405;
+            to = 5412;
+          }
+        ];
+      };
     }
   ]);
 }

@@ -15,6 +15,7 @@
   termreadline,
   socat,
   vncterm,
+  swtpm,
 }:
 
 let
@@ -74,7 +75,6 @@ perl538.pkgs.toPerlModule (
 
       # Fix QEMU version check
       sed -i PVE/QemuServer.pm -e "s/\[,\\\s\]//"
-
     '';
 
     buildInputs = [
@@ -110,6 +110,7 @@ perl538.pkgs.toPerlModule (
         -e "s|qemu-system|${pve-qemu}/bin/qemu-system|" \
         -e "s|/var/lib/qemu-server|$out/lib/qemu-server|" \
         -e "s|/usr/share/pve-edk2-firmware|${pve-edk2-firmware}/usr/share/pve-edk2-firmware|" \
+        -e 's|/etc/swtpm_setup.conf|${swtpm}/etc/swtpm_setup.conf|' \
         #-e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         #-e "s|/usr/sbin/qm|$out/bin/qm|" \
         #-e "s|/usr/bin/qemu|${pve-qemu}/bin/qemu|" \

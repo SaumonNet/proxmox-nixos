@@ -21,7 +21,7 @@ lib.mkIf cfg.enable {
         "corosync.service"
         "pve-cluster.service"
       ];
-      path = with pkgs; [ btrfs-progs zfs bashInteractive cdrkit ];
+      path = with pkgs; [ btrfs-progs zfs bashInteractive cdrkit swtpm ];
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/pvedaemon start";
         ExecStop = "${cfg.package}/bin/pvedaemon stop";
@@ -191,6 +191,20 @@ lib.mkIf cfg.enable {
       };
     };
   };
+
+  environment.etc."swtpm_setup.conf".text = ''
+    # Program invoked for creating certificates
+    create_certs_tool= ${pkgs.swtpm}/share/swtpm/swtpm-localca
+    create_certs_tool_config = ${pkgs.writeText "swtpm-localca.conf" ''
+      statedir = /var/lib/swtpm-localca
+      signingkey = /var/lib/swtpm-localca/signkey.pem
+      issuercert = /var/lib/swtpm-localca/issuercert.pem
+      certserial = /var/lib/swtpm-localca/certserial
+    ''}
+    create_certs_tool_options = ${pkgs.swtpm}/etc/swtpm-localca.options
+    # Comma-separated list (no spaces) of PCR banks to activate by default
+    active_pcr_banks = sha256
+  '';
 
   systemd.tmpfiles.rules = [ "d /var/log/pveproxy 0755 www-data www-data -" ];
 

@@ -34,6 +34,7 @@ let
     with perl538.pkgs;
     [
       Filechdir
+      XMLLibXML
       posixstrptime
       pve-cluster
       pve-rados2

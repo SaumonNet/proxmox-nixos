@@ -19,7 +19,6 @@
   openvswitch,
   openssh,
   pve-qemu,
-  pve-qemu-server,
   tzdata,
   pve-novnc,
   pve-xtermjs,
@@ -51,7 +50,6 @@ let
     proxmox-acme
     (pve-ha-manager.override { inherit enableLinstor; })
     pve-http-server
-    pve-qemu-server
   ];
 
   perlEnv = perl538.withPackages (_: perlDeps);
@@ -127,7 +125,7 @@ perl538.pkgs.toPerlModule (
         -Ee "s|(/usr)?/s?bin/||" \
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
         -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/" \
-        -e "s|/usr/share/perl5/.plug|${pve-qemu-server}/${perl538.libPrefix}/${perl538.version}/\$plug|"
+        -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl538.libPrefix}/${perl538.version}/\$plug|"
 
       # Ceph systemd units in NixOS do not use templates
       find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"

@@ -14,17 +14,6 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-a8BtfEOG+5jTqRcTQ0wxXZ5tQlyRyIYoG+qiVMDgluM=";
   };
 
-  buildInputs = [ stdenv.cc ];
-
-  buildPhase = ''
-    make
-  '';
-
-  installPhase = ''
-    mkdir -p $out/bin
-    cp cstream $out/bin
-  '';
-
   meta = {
     description = "A general-purpose stream-handling tool like dd";
     homepage = "https://www.cons.org/cracauer/cstream.html";

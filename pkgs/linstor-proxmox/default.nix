@@ -2,21 +2,21 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  perl536,
+  perl538,
   nix-update-script,
 }:
 
 let
-  perlDeps = with perl536.pkgs; [
+  perlDeps = with perl538.pkgs; [
     JSONXS
     RESTClient
     TypesSerialiser
   ];
 
-  perlEnv = perl536.withPackages (_: perlDeps);
+  perlEnv = perl538.withPackages (_: perlDeps);
 in
 
-perl536.pkgs.toPerlModule (
+perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "linstor-proxmox";
     version = "8.0.4";
@@ -30,7 +30,7 @@ perl536.pkgs.toPerlModule (
 
     makeFlags = [
       "DESTDIR=$(out)"
-      "PERLDIR=/${perl536.libPrefix}/${perl536.version}"
+      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
     ];
 
     buildInputs = [ perlEnv ];

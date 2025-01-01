@@ -2,7 +2,7 @@
   lib,
   rustPlatform,
   fetchgit,
-  perl536,
+  perl538,
   libxcrypt,
 }:
 
@@ -16,6 +16,8 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-9y6Z6IaIHPgbraT7NGUUsEB/PMWybgRt876sUGHUGjg=";
   };
 
+  patches = [ ./remove_safe_putenv.patch ];
+
   cargoLock.lockFile = ./Cargo.lock;
 
   postPatch = ''
@@ -24,7 +26,7 @@ rustPlatform.buildRustPackage rec {
     ln -s ${./Cargo.lock} Cargo.lock
   '';
 
-  nativeBuildInputs = [ perl536 ];
+  nativeBuildInputs = [ perl538 ];
   buildInputs = [ libxcrypt ];
 
   postInstall = ''

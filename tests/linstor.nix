@@ -1,5 +1,4 @@
 {
-
   name = "pve-linstor";
 
   nodes = {
@@ -7,11 +6,16 @@
       services = {
         proxmox-ve = {
           enable = true;
+          ipAddress = "192.168.1.1";
           linstor.enable = true;
         };
-        lvm.enable = true;
-        lvm.dmeventd.enable = true;
+
+        lvm = {
+          enable = true;
+          dmeventd.enable = true;
+        };
       };
+
       virtualisation = {
         emptyDiskImages = [ 10000 ];
         memorySize = 2048;

@@ -3,23 +3,23 @@
   fetchgit,
   fetchurl,
   proxmox-backup-qemu,
-  perl536,
+  perl538,
   pkg-config,
 }:
 
 (
   (qemu.overrideAttrs (old: rec {
-    version = "8.1.5";
+    version = "9.1.2";
 
     src = fetchurl {
       url = "https://download.qemu.org/qemu-${version}.tar.xz";
-      hash = "sha256-l2Ox7+xP1JeWtQgNCINRLXDLY4nq1lxmHMNoalIjKJY=";
+      hash = "sha256-Gf2ddTWlTW4EThhkAqo7OxvfqHw5LsiISFVZLIUQyW8=";
     };
 
     src_patches = fetchgit {
       url = "git://git.proxmox.com/git/pve-qemu.git";
-      rev = "e62423e6156b7bf9afd8b670722c66c93fd2ba45";
-      hash = "sha256-jLFc43HHnOGRXDRyMlmcQ5Fg/Wgc3CbgwSh/TgAPDWQ=";
+      rev = "c4efa30b307fc15df5c00f353494d1aec1702680";
+      hash = "sha256-EjeB1TLaPIhBQH8KpaQ1PDo453LtMumdNfSf5T4yo/I=";
       fetchSubmodules = false;
     };
 
@@ -44,12 +44,13 @@
 
     nativeBuildInputs = old.nativeBuildInputs ++ [
       proxmox-backup-qemu
-      perl536
+      perl538
       pkg-config
     ];
   })).override
   {
     glusterfsSupport = true;
     enableDocs = false;
+    cephSupport = true;
   }
 )

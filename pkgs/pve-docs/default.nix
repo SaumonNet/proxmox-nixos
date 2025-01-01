@@ -2,26 +2,26 @@
   lib,
   stdenv,
   fetchgit,
-  perl536,
+  perl538,
   proxmox-widget-toolkit,
   asciidoc,
   librsvg,
 }:
 
 let
-  perlDeps = with perl536.pkgs; [ JSON ];
+  perlDeps = with perl538.pkgs; [ JSON ];
 
-  perlEnv = perl536.withPackages (_: perlDeps);
+  perlEnv = perl538.withPackages (_: perlDeps);
 in
 
 stdenv.mkDerivation rec {
   pname = "pve-docs";
-  version = "8.2.5";
+  version = "8.3.1";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "3734b4f879125c2b3fe64eebc92a17a1e594c262";
-    hash = "sha256-No3qtUK8ZAuAQUqhS1t5M7dMBP/+og+aNXpRRoBSWmU=";
+    rev = "a89cb75f36a1c3a5c7ba7d9ca113ee5af7a88e17";
+    hash = "sha256-9vgGDgRXKC9cIVhNOf9RLgCMVqf4lC9Ik97/18zLXys=";
   };
 
   postPatch = ''

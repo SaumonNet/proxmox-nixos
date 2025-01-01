@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 
 with lib;
 
@@ -1244,11 +1244,19 @@ in
             type = types.nullOr (
               types.enum [
                 "cirrus"
-                "std"
-                "vmware"
-                "qxl"
-                "virtio"
                 "none"
+                "qxl"
+                "qxl2"
+                "qxl3"
+                "qxl4"
+                "serial2"
+                "serial0"
+                "serial1"
+                "serial3"
+                "std"
+                "virtio"
+                "virtio-gl"
+                "vmware"
               ]
             );
             default = null;

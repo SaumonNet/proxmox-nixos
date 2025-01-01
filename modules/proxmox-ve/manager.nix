@@ -180,7 +180,27 @@ lib.mkIf cfg.enable {
     #   };
     # };
 
-    # spiceproxy = { };
+    spiceproxy = {
+      description = "PVE SPICE Proxy Server";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "pveproxy.service" ];
+      wants = [ "pveproxy.service" ];
+      serviceConfig = {
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/touch /var/lock/spiceproxy.lck"
+          "${pkgs.coreutils}/bin/chown www-data:www-data /var/lock/spiceproxy.lck"
+        ];
+        ExecStart = "${pkgs.proxmox-ve}/bin/spiceproxy start";
+        ExecStop = [
+          "${pkgs.coreutils}/bin/rm -f /var/lock/spiceproxy.lck"
+          "${pkgs.proxmox-ve}/bin/spiceproxy stop"
+        ];
+        ExecReload = "${pkgs.proxmox-ve}/bin/spiceproxy restart";
+        PIDFile = "/run/pveproxy/spiceproxy.pid"; # the code puts it here, not in /run/spiceproxy/
+        Type = "forking";
+        Restart = "on-failure";
+      };
+    };
   };
 
   systemd.tmpfiles.rules = [ "d /var/log/pveproxy 0755 www-data www-data -" ];

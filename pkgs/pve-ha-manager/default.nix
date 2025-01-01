@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  perl536,
+  perl538,
   pve-container,
   pve-firewall,
   pve-guest-common,
@@ -21,18 +21,18 @@ let
     pve-qemu-server
     (pve-storage.override { inherit enableLinstor; })
   ];
-  perlEnv = perl536.withPackages (_: perlDeps);
+  perlEnv = perl538.withPackages (_: perlDeps);
 in
 
-perl536.pkgs.toPerlModule (
+perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-ha-manager";
-    version = "4.0.5";
+    version = "4.0.6";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "800a0c3e485f175d914fb7b59dfcd0cd375998de";
-      hash = "sha256-zY0tB4Uby3uFlPHNy75weYioSln/Bt4wzf+u7ba4nSE=";
+      rev = "34fe8e59eacb9107c76962ed12f6bea69195eb74";
+      hash = "sha256-LDUhe/Qiaak8M38+duNKZ/Ydm0cED4IsJhM+47uKsqI=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -52,7 +52,7 @@ perl536.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=/bin"
-      "PERLDIR=/${perl536.libPrefix}/${perl536.version}"
+      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
     ];
 
     buildInputs = [
@@ -71,7 +71,7 @@ perl536.pkgs.toPerlModule (
       for bin in $out/bin/*; do
         wrapProgram $bin \
           --prefix PATH : ${lib.makeBinPath [ pve-qemu ]} \
-          --prefix PERL5LIB : $out/${perl536.libPrefix}/${perl536.version}
+          --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}
       done      
     '';
 

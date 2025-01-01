@@ -163,12 +163,12 @@ perl538.pkgs.toPerlModule (
 
               ## dependencies of backup and restore
               bash
-              zstd
-              system-sendmail
-              rsync
               busybox
               cstream
               lvm2
+              rsync
+              system-sendmail
+              zstd
             ]
           } \
           --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}

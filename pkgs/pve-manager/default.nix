@@ -35,6 +35,7 @@
   busybox,
   cstream,
   lvm2,
+  lxc,
   libfaketime,
   corosync,
   openssl,
@@ -166,6 +167,7 @@ perl538.pkgs.toPerlModule (
               busybox
               cstream
               lvm2
+              lxc
               rsync
               system-sendmail
               zstd

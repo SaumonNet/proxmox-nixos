@@ -73,7 +73,8 @@ in
         settings.AcceptEnv = "LANG LC_*";
       };
       programs.ssh.extraConfig = ''
-        SendEnv LANG LC_*
+        Host *
+          SendEnv LANG LC_*
       '';
 
       security.pam.services."proxmox-ve-auth" = {

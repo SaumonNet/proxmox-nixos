@@ -153,11 +153,12 @@ class Proxmox:
             bool: True if the VM ID exists, False otherwise.
         """
         vms = self.list_vms_on_cluster()
+        if not vms:
+            return False, None, None
         ids, names, nodes = zip(*vms)
-        if vmid in ids:
-            index = ids.index(vmid)
-            return True, names[index], nodes[index]
-        return False, None, None
+        if vm_name in names:
+            index = names.index(vm_name)
+            return True, ids[index], nodes[index]
 
     def vm_name_exists(self, vm_name):
         """
@@ -170,11 +171,12 @@ class Proxmox:
             bool: True if the VM ID exists, False otherwise.
         """
         vms = self.list_vms_on_cluster()
+        if not vms:
+            return False, None, None
         ids, names, nodes = zip(*vms)
         if vm_name in names:
             index = names.index(vm_name)
             return True, ids[index], nodes[index]
-        return False, None, None
 
     def destroy_vm(self, vmid, node):
         """

@@ -13,6 +13,7 @@
   file,
   glusterfs,
   gptfdisk,
+  gzip,
   libiscsi,
   lvm2,
   nfs-utils,
@@ -112,6 +113,8 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/bin/smbclient|${samba}/bin/smbclient|" \
         -e "s|/usr/bin/ssh|${openssh}/bin/ssh|" \
         -e "s|/usr/bin/targetcli|${targetcli}/bin/targetcli|" \
+        -e "s|/usr/bin/vma|${pve-qemu}/bin/vma|" \
+        -e "s|/usr/bin/zcat|${gzip}/bin/zcat|" \
         -e "s|/usr/libexec/ceph|$out/libexec/ceph|" \
         -re "s|/usr/s?bin/ceph|${ceph}/bin/ceph|" \
         -e "s|/usr/sbin/gluster|${glusterfs}/bin/gluster|" \

@@ -124,6 +124,7 @@ lib.mkIf cfg.enable {
         "pve-guests.service"
         "pve-storage.target"
       ];
+      path = with pkgs; [ btrfs-progs zfs ];
       serviceConfig = {
         ExecStartPre = [
           "${pkgs.coreutils}/bin/touch /var/lib/pve-manager/pve-replication-state.lck"

@@ -30,6 +30,7 @@ let
     termproxy = callPackage ./termproxy { };
     unifont_hex = callPackage ./unifont { };
     vncterm = callPackage ./vncterm { };
+    cstream = callPackage ./cstream { };
 
     proxmox-acme = callPackage ./proxmox-acme { };
     proxmox-backup = callPackage ./proxmox-backup { };

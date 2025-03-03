@@ -9,6 +9,7 @@
   pve-docs,
   pve-ha-manager,
   pve-http-server,
+  cdrkit,
   enableLinstor ? false,
   ceph,
   gnupg,
@@ -26,7 +27,15 @@
   shadow,
   sqlite,
   wget,
+  bash,
+  zstd,
   util-linux,
+  system-sendmail,
+  rsync,
+  busybox,
+  cstream,
+  lvm2,
+  lxc,
   libfaketime,
   corosync,
   openssl,
@@ -116,7 +125,8 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \
         -Ee "s|(/usr)?/s?bin/||" \
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
-        -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/"
+        -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/" \
+        -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl538.libPrefix}/${perl538.version}/\$plug|"
 
       # Ceph systemd units in NixOS do not use templates
       find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
@@ -134,6 +144,7 @@ perl538.pkgs.toPerlModule (
           --prefix PATH : ${
             lib.makeBinPath [
               ceph
+              cdrkit # cloud-init
               corosync
               gnupg
               gzip
@@ -150,6 +161,16 @@ perl538.pkgs.toPerlModule (
               termproxy
               util-linux
               wget
+
+              ## dependencies of backup and restore
+              bash
+              busybox
+              cstream
+              lvm2
+              lxc
+              rsync
+              system-sendmail
+              zstd
             ]
           } \
           --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}

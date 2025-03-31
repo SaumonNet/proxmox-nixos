@@ -11,12 +11,12 @@
 
 stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
-  version = "4.2025.02-1";
+  version = "4.2025.02-2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "cacc8b87677e2cb06a9dfc91968cb977877b39fa";
-    sha256 = "sha256-4blx/bHpP9vlQO2Rz9zLAk1rkl56PAJW978kU20hKzs=";
+    rev = "b00cde11d82743780b6be587d71c6aaa0ea52d03";
+    sha256 = "sha256-vqGjsy/JOYphLoRtkSKP0eNfVlsIXABTlI4vsIiocPw=";
     fetchSubmodules = true;
   };
 

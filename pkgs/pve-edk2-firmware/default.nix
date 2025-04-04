@@ -111,6 +111,6 @@ stdenv.mkDerivation rec {
   meta = {
     description = "edk2 based UEFI firmware modules for virtual machines";
     homepage = "git://git.proxmox.com/git/${pname}.git";
-    maintainers = with lib.maintainers; [ codgician ];
+    maintainers = with lib.maintainers; [ codgician julienmalka ];
   };
  }

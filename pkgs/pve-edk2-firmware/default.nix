@@ -11,13 +11,33 @@
 
 stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
-  version = "4.2025.02-2";
+  version = "4.2025.02-3";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "b00cde11d82743780b6be587d71c6aaa0ea52d03";
-    sha256 = "sha256-vqGjsy/JOYphLoRtkSKP0eNfVlsIXABTlI4vsIiocPw=";
-    fetchSubmodules = true;
+    rev = "d6146dd6dfc084215dfaa59b95bcf6177e988cb5";
+    sha256 = "sha256-6zh9nTdR5+1zZODJ1JBtWkJyo+ioeZoxk7yWtmLBekc=";
+
+    # FIXME: remove manual fetch submodule if 
+    # https://git.proxmox.com/?p=mirror_edk2.git is accessible again
+    fetchSubmodules = false;
+    leaveDotGit = true;
+
+    postFetch = ''
+      pushd $out
+      git reset
+
+      # Switch to official edk2 git repo
+      substituteInPlace ./.gitmodules \
+        --replace-fail 'url = ../mirror_edk2' 'url = https://github.com/tianocore/edk2.git'
+
+      git submodule update --init --recursive -j ''${NIX_BUILD_CORES:-1} --depth 1
+
+      # Remove .git dirs
+      find . -name .git -type f -exec rm -rf {} +
+      rm -rf .git/
+      popd
+    '';
   };
 
   buildInputs = [ ];

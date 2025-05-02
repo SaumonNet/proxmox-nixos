@@ -44,6 +44,7 @@
 
 let
   perlDeps = with perl538.pkgs; [
+    CryptOpenSSLBignum
     FileReadBackwards
     NetDNS
     PodParser

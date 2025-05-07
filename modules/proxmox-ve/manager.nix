@@ -21,7 +21,7 @@ lib.mkIf cfg.enable {
         "corosync.service"
         "pve-cluster.service"
       ];
-      path = with pkgs; [ btrfs-progs zfs bashInteractive cdrkit ];
+      path = with pkgs; [ btrfs-progs zfs bashInteractive cdrkit swtpm ];
       serviceConfig = {
         ExecStart = "${cfg.package}/bin/pvedaemon start";
         ExecStop = "${cfg.package}/bin/pvedaemon stop";
@@ -83,6 +83,7 @@ lib.mkIf cfg.enable {
         "pve-ha-crm.service"
         "pve-ha-lrm.service"
       ];
+      path = with pkgs; [ swtpm ];
       unitConfig = {
         RefuseManualStart = true;
         RefuseManualStop = true;

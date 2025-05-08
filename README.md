@@ -102,6 +102,18 @@ Below is a fragment of a NixOS configuration that enables Proxmox VE.
 
 Do not override the `nixpkgs-stable` input of the flake, as the only tested and supported version of Proxmox-NixOS is with the upstream stable NixOS release.
 
+## 💾 Using with Impermanence
+
+If you're using [impermanence](https://github.com/nix-community/impermanence) for your NixOS system, you'll need to make certain Proxmox directories persistent to maintain your configuration across reboots.
+
+Add the following directories to your persistence configuration:
+
+```nix
+environment.persistence."/persistent".directories = [
+  "/var/lib/pve-cluster"
+];
+```
+
 ## 🌐 Networking
 
 To get internet in your VMs, you need to add a network device to the VM, connected to a bridge. To get this working, follow this 2 steps:
@@ -260,6 +272,7 @@ or in the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#
 
 ⚠️ The current limitation is that if for instance VM `myvm1` has already been initialised,
 subsequent changes to the configuration in `services.proxmox-ve.vms.myvm1` will have no impact.
+
 
 ### Note
 

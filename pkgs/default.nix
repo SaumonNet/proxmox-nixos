@@ -25,6 +25,7 @@ let
 
     extjs = callPackage ./extjs { };
     fonts-font-logos = callPackage ./fonts-font-logos { };
+    sencha-touch = callPackage ./sencha-touch { };
     markedjs = callPackage ./markedjs { };
     perlmod = callPackage ./perlmod { };
     termproxy = callPackage ./termproxy { };

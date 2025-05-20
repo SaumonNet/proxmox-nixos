@@ -53,12 +53,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
-    version = "8.2.1";
+    version = "8.3.12";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/qemu-server.git";
-      rev = "54aa98cea5071b5cd325cfaeb21b7aaa4af9bb4d";
-      hash = "sha256-KjMkOTYrrXBB2HP9bXVJjDlBi86REe3lc8nEnUjZdls=";
+      rev = "a411016f58bed68a84a576df5c998a2ed7dcdaa5";
+      hash = "sha256-IdtiEDUUbzMAWolV8SM0uqWF4/lycfenhPlHrzBBoV4=";
     };
 
     postPatch = ''
@@ -70,7 +70,6 @@ perl538.pkgs.toPerlModule (
         -e "/install -m 0644 qm.1/,+4d" \
         -e "s/qmeventd docs/qmeventd/" \
         -e "/qmeventd.8/d" \
-        -e "/SERVICEDIR/d" \
         -e "/modules-load.conf/d" \
         -e "s,usr/,,g"
 
@@ -99,6 +98,11 @@ perl538.pkgs.toPerlModule (
       "VARLIBDIR=$(out)/lib/qemu-server"
       "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
     ];
+
+    # Create missing SERVICEDIR
+    preInstall = ''
+      mkdir -p $out/lib/systemd/system
+    '';
 
     postFixup = ''
       find $out/lib -type f | xargs sed -i \

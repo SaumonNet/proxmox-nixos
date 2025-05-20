@@ -61,7 +61,7 @@ let
     linstor-client = callPackage ./linstor-client { };
     linstor-proxmox = callPackage ./linstor-proxmox { };
     linstor-server = pkgs-unstable.callPackage ./linstor-server {
-      protobuf = pkgs-unstable.protobuf_23;
+      protobuf = pkgs-unstable.protobuf_24;
       jre = pkgs.jdk11_headless;
     };
     nixmoxer = callPackage ./nixmoxer { };

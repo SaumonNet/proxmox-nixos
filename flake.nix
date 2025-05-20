@@ -1,10 +1,10 @@
 {
   inputs = {
-    nixpkgs-stable.url = "nixpkgs/nixos-24.11";
+    nixpkgs-stable.url = "nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
-    crane.url = "github:ipetkov/crane/v0.17.3";
+    crane.url = "github:ipetkov/crane/v0.20.3";
   };
 
   nixConfig.extra-substituters = "https://cache.saumon.network/proxmox-nixos";

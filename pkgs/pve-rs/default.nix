@@ -10,6 +10,7 @@
   fetchgit,
   perl538,
   perlmod,
+  proxmox-registry,
 }:
 
 perl538.pkgs.toPerlModule (
@@ -38,8 +39,8 @@ perl538.pkgs.toPerlModule (
           -e 's,/usr/lib/perlmod/genpackage.pl,${perlmod}/lib/perlmod/genpackage.pl,'
       done
       cd pve-rs
-      rm .cargo/config Cargo.toml
-      ln -s ${./Cargo.toml} Cargo.toml
+      rm .cargo/config
+      cat ${proxmox-registry}/cargo-patches.toml >> Cargo.toml
       ln -s ${./Cargo.lock} Cargo.lock
     '';
 
@@ -54,6 +55,7 @@ perl538.pkgs.toPerlModule (
       libuuid
       pkg-config
       openssl
+      proxmox-registry
     ];
 
     makeFlags = [

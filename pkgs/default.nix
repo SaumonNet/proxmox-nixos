@@ -32,6 +32,8 @@ let
     vncterm = callPackage ./vncterm { };
     cstream = callPackage ./cstream { };
 
+    proxmox-registry = callPackage ./proxmox-registry { };
+
     proxmox-acme = callPackage ./proxmox-acme { };
     proxmox-backup = callPackage ./proxmox-backup { };
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };

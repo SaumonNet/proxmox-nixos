@@ -1,0 +1,275 @@
+[
+{
+    "package_name": "proxmox-perl-rs",
+    "debian_package_name": "libproxmox-rs-perl", 
+    "git_repository": "git://git.proxmox.com/git/proxmox-perl-rs.git",
+    "path": "."
+  },
+  {
+    "package_name": "proxmox-syslog-api",
+    "debian_package_name": "librust-proxmox-syslog-api-dev", 
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-systemd",
+    "debian_package_name": "librust-proxmox-systemd-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-access-control",
+    "debian_package_name": "librust-proxmox-access-control-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-acme-api",
+    "debian_package_name": "librust-proxmox-acme-api-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-acme",
+    "debian_package_name": "librust-proxmox-acme-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-api-macro",
+    "debian_package_name": "librust-proxmox-api-macro-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-apt-api-types",
+    "debian_package_name": "librust-proxmox-apt-api-types-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-apt",
+    "debian_package_name": "librust-proxmox-apt-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-async",
+    "debian_package_name": "librust-proxmox-async-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-auth-api",
+    "debian_package_name": "librust-proxmox-auth-api-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-borrow",
+    "debian_package_name": "librust-proxmox-borrow-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-client",
+    "debian_package_name": "librust-proxmox-client-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-compression",
+    "debian_package_name": "librust-proxmox-compression-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-config-digest",
+    "debian_package_name": "librust-proxmox-config-digest-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-daemon",
+    "debian_package_name": "librust-proxmox-daemon-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-dns-api",
+    "debian_package_name": "librust-proxmox-dns-api-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-http",
+    "debian_package_name": "librust-proxmox-http-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-http-error",
+    "debian_package_name": "librust-proxmox-http-error-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-human-byte",
+    "debian_package_name": "librust-proxmox-human-byte-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-io",
+    "debian_package_name": "librust-proxmox-io-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-lang",
+    "debian_package_name": "librust-proxmox-lang-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-ldap",
+    "debian_package_name": "librust-proxmox-ldap-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-log",
+    "debian_package_name": "librust-proxmox-log-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-login",
+    "debian_package_name": "librust-proxmox-login-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-metrics",
+    "debian_package_name": "librust-proxmox-metrics-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-network-api",
+    "debian_package_name": "librust-proxmox-network-api-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-notify",
+    "debian_package_name": "librust-proxmox-notify-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-openid",
+    "debian_package_name": "librust-proxmox-openid-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-product-config",
+    "debian_package_name": "librust-proxmox-product-config-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-rest-server",
+    "debian_package_name": "librust-proxmox-rest-server-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-router",
+    "debian_package_name": "librust-proxmox-router-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-rdd-api-types",
+    "debian_package_name": "librust-proxmox-rdd-api-types-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-rdd",
+    "debian_package_name": "librust-proxmox-rdd-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-schema",
+    "debian_package_name": "librust-proxmox-schema-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-section-config",
+    "debian_package_name": "librust-proxmox-section-config-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-sendmail",
+    "debian_package_name": "librust-proxmox-sendmail-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git",
+    "exceptions": {
+	"0.1.0-1": "043fec42f82163a1e6e7012d1032ce67c26cafdc"
+    }
+  },
+  {
+    "package_name": "proxmox-serde",
+    "debian_package_name": "librust-proxmox-serde-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-shared-cache",
+    "debian_package_name": "librust-proxmox-shared-cache-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-shared-memory",
+    "debian_package_name": "librust-proxmox-shared-memory-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-simple-config",
+    "debian_package_name": "librust-proxmox-simple-config-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-sortable-macro",
+    "debian_package_name": "librust-proxmox-sortable-macro-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-subscription",
+    "debian_package_name": "librust-proxmox-subscription-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-sys",
+    "debian_package_name": "librust-proxmox-sys-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-tfa",
+    "debian_package_name": "librust-proxmox-tfa-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-time-api",
+    "debian_package_name": "librust-proxmox-time-api-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-time",
+    "debian_package_name": "librust-proxmox-time-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-uuid",
+    "debian_package_name": "librust-proxmox-uuid-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-worker-task",
+    "debian_package_name": "librust-proxmox-worker-task-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "perlmod",
+    "debian_package_name": "librust-perlmod-dev",
+    "git_repository": "git://git.proxmox.com/git/perlmod.git",
+    "patches": [ "perlmod/remove_safe_putenv.patch" ]
+  },
+  {
+    "package_name": "perlmod-macro",
+    "debian_package_name": "librust-perlmod-macro-dev",
+    "git_repository": "git://git.proxmox.com/git/perlmod.git",
+    "patches": [ "perlmod/remove_safe_putenv.patch" ]
+  },
+  {
+    "package_name": "proxmox-resource-scheduling",
+    "debian_package_name": "librust-proxmox-resource-scheduling-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox-resource-scheduling.git",
+    "path": "."
+  },
+  {
+    "package_name": "proxmox-ve-config",
+    "debian_package_name": "librust-proxmox-ve-config-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox-ve-rs.git"
+  }
+
+]

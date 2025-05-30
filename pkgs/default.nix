@@ -1,15 +1,12 @@
 {
   pkgs,
   pkgs-unstable,
-  craneLib ? { },
   ...
 }:
 let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
 
   ours = {
-    inherit craneLib;
-
     authenpam = callPackage ./perl-modules/authenpam { };
     datadumper = callPackage ./perl-modules/datadumper { };
     digestsha = callPackage ./perl-modules/digest-sha { };
@@ -32,10 +29,9 @@ let
     vncterm = callPackage ./vncterm { };
     cstream = callPackage ./cstream { };
 
-    proxmox-registry = callPackage ./proxmox-registry { };
+    mkRegistry = callPackage ./proxmox-registry { };
 
     proxmox-acme = callPackage ./proxmox-acme { };
-    proxmox-backup = callPackage ./proxmox-backup { };
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
     proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };

@@ -10,18 +10,23 @@
   fetchgit,
   perl538,
   perlmod,
-  proxmox-registry,
+  apt,
+  mkRegistry,
 }:
+let
+  sources = import ./sources.nix;
+  registry = mkRegistry sources;
+in
 
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rs";
-    version = "0.8.9";
+    version = "0.9.1";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/proxmox-perl-rs.git";
-      rev = "cd0e7b8cd2f3e4ece77e0331fb881d87b91a1c18";
-      hash = "sha256-Jxcw3E6J30SFdLj/zpAcT42hGYngh3HKlyNZ4orCnQM=";
+      rev = "82bfbbf6c64b3749e3e982d933b9156e638386b2";
+      hash = "sha256-NetS/dDi5PT1TWZbI0pSqc57C4SSgBzbPmeSpquSuTA=";
     };
 
     cargoDeps = rustPlatform.importCargoLock {
@@ -39,8 +44,8 @@ perl538.pkgs.toPerlModule (
           -e 's,/usr/lib/perlmod/genpackage.pl,${perlmod}/lib/perlmod/genpackage.pl,'
       done
       cd pve-rs
-      rm .cargo/config
-      cat ${proxmox-registry}/cargo-patches.toml >> Cargo.toml
+      rm .cargo/config.toml
+      cat ${registry}/cargo-patches.toml >> Cargo.toml
       ln -s ${./Cargo.lock} Cargo.lock
     '';
 
@@ -49,13 +54,15 @@ perl538.pkgs.toPerlModule (
       cargo
       rustc
       perl538
+      apt
     ];
 
     buildInputs = [
       libuuid
       pkg-config
       openssl
-      proxmox-registry
+      registry
+      apt
     ];
 
     makeFlags = [
@@ -84,6 +91,8 @@ perl538.pkgs.toPerlModule (
       "--root"
       pname
     ];
+
+    passthru.registry = registry;
 
     meta = with lib; {
       description = "Proxmox Rust interface for Perl";

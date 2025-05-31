@@ -34,7 +34,7 @@ let
       owner = "LINBIT";
       repo = "linstor-server";
       rev = "v${finalAttrs.version}";
-      hash = "sha256-2zH4YXrgwID30lou3uITnRK9TGsfQDRkhp9SVoot7VQ=";
+      hash = "sha256-+rtvc6FrBQ9YjLiuJpVy/xzSpXp9AgIRNScRd4BPmYw=";
       fetchSubmodules = true;
       leaveDotGit = true;
     };

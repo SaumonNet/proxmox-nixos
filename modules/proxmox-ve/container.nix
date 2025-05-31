@@ -6,7 +6,31 @@
 }:
 
 lib.mkIf config.services.proxmox-ve.enable {
+  systemd.slices = {
+    "system-pve\\x2dcontainer" = {
+      description = "PVE LXC Container Slice";
+      documentation = ["man:pct"];
+
+      unitConfig = {
+        DefaultDependencies="no";
+      };
+    };
+  };
+
   systemd.services = {
+    lxc-monitord = {
+      description = "LXC Container Monitoring Daemon";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "syslog.service" "network.target"];
+
+      documentation = ["man:lxc"];
+
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.lxc}/libexec/lxc/lxc-monitord --daemon";
+      };
+    };
+
     pve-lxc-syscalld = {
       description = "Proxmox VE LXC Syscall Daemon";
       wantedBy = [ "multi-user.target" ];

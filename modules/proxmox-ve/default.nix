@@ -19,6 +19,7 @@ in
   imports = [
     ./ceph.nix
     ./cluster.nix
+    ./container.nix
     # ./firewall.nix
     # ./ha-manager.nix
     ./linstor.nix

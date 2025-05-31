@@ -13,7 +13,7 @@ lib.mkIf config.services.proxmox-ve.enable {
       before = [ "pve-guests.service" ];
       serviceConfig = {
         Type = "notify";
-        ExecStart = "/usr/lib/x86_64-linux-gnu/pve-lxc-syscalld/pve-lxc-syscalld --system /run/pve/lxc-syscalld.sock";
+        ExecStart = "${pkgs.pve-lxc-syscalld}/bin/pve-lxc-syscalld --system /run/pve/lxc-syscalld.sock";
         RuntimeDirectory = "pve";
         Restart = "on-failure";
       };

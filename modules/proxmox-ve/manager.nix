@@ -23,6 +23,9 @@ lib.mkIf cfg.enable {
       ];
       path = with pkgs; [ e2fsprogs btrfs-progs zfs bashInteractive cdrkit swtpm ];
       serviceConfig = {
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/mkdir -p /run/pve"
+        ];
         ExecStart = "${cfg.package}/bin/pvedaemon start";
         ExecStop = "${cfg.package}/bin/pvedaemon stop";
         ExecReload = "${cfg.package}/bin/pvedaemon restart";

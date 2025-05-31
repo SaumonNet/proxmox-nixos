@@ -31,6 +31,55 @@ lib.mkIf config.services.proxmox-ve.enable {
       };
     };
 
+    lxc-net = {
+      description = "LXC network bridge setup";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network-online.target"];
+      before = ["lxc.service"];
+
+      documentation = ["man:lxc"];
+
+      unitConfig = {
+        ConditionVirtualization = "!lxc";
+      };
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = "yes";
+        ExecStart = "${pkgs.lxc}/libexec/lxc/lxc-net start";
+        ExecStop = "${pkgs.lxc}/libexec/lxc/lxc-net stop";
+      };
+
+      path = [
+        pkgs.iproute2
+        pkgs.iptables
+        pkgs.getent
+        pkgs.dnsmasq
+      ];
+    };
+
+    lxc = {
+      description = "LXC Container Initialization and Autoboot Code";
+      after = [ "network.target" "lxc-net.service" "remote-fs.target" ];
+      wants = [ "lxc-net.service" ];
+      documentation = ["man:lxc-autostart" "man:lxc"];
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = "yes";
+
+        #ExecStartPre = "${pkgs.lxc}/libexec/lxc/lxc-apparmor-load";
+        ExecStart = "${pkgs.lxc}/libexec/lxc/lxc-containers start";
+        ExecStop = "${pkgs.lxc}/libexec/lxc/lxc-containers stop";
+        #ExecReload = "${pkgs.lxc}/libexec/lxc/lxc-apparmor-load";
+        # Environment=BOOTUP=serial
+        # Environment=CONSOLETYPE=serial
+        Delegate = "yes";
+      };
+
+      wantedBy = [ "multi-user.target" ];
+    };
+
     pve-lxc-syscalld = {
       description = "Proxmox VE LXC Syscall Daemon";
       wantedBy = [ "multi-user.target" ];

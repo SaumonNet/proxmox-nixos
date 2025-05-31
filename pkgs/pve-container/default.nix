@@ -27,6 +27,11 @@ perl538.pkgs.toPerlModule (
 
     sourceRoot = "${src.name}/src";
 
+    # See: https://forum.proxmox.com/threads/lxc-container-creation-failing-dsa-ssh-key-generation-error.155813/
+    patches = [
+      ./fix-dsa-keys.patch
+    ];
+
     postPatch = ''
       sed -i Makefile \
         -e "s/pct.1 pct.conf.5 pct.bash-completion pct.zsh-completion //" \

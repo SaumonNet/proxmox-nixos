@@ -51,6 +51,7 @@ perl538.pkgs.toPerlModule (
     # See: https://forum.proxmox.com/threads/lxc-container-creation-failing-dsa-ssh-key-generation-error.155813/
     patches = [
       ./fix-dsa-keys.patch
+      ./fix-lxc-inc.patch
     ];
 
     postPatch = ''

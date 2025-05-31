@@ -4,7 +4,6 @@
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
-    crane.url = "github:ipetkov/crane/v0.17.3";
   };
 
   nixConfig.extra-substituters = "https://cache.saumon.network/proxmox-nixos";
@@ -18,7 +17,6 @@
       nixpkgs-stable,
       nixpkgs-unstable,
       utils,
-      crane,
       ...
     }:
     let
@@ -56,12 +54,11 @@
                 })
               ];
             };
-            craneLib = crane.mkLib pkgs;
           in
           {
-            overlays = _: _: (import ./pkgs { inherit pkgs pkgs-unstable craneLib; });
+            overlays = _: _: (import ./pkgs { inherit pkgs pkgs-unstable; });
 
-            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs pkgs-unstable craneLib; });
+            packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs pkgs-unstable; });
 
             checks =
               if (system == "x86_64-linux") then

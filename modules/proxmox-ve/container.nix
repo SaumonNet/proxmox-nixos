@@ -51,47 +51,47 @@ lib.mkIf config.services.proxmox-ve.enable {
       after = [ "lxc.service" ];
       wants = [ "lxc.service" ];
       unitConfig = {
-        DefaultDependencies = false;
+        DefaultDependencies = "no";
         Documentation = "man:lxc-start man:lxc man:pct";
-        serviceConfig = {
-          Type = "simple";
-          Delegate = true;
-          KillMode = "mixed";
-          TimeoutStopSec = 120;
-          ExecStart = "${pkgs.lxc}/bin/lxc-start -F -n %i -o /dev/stderr -l DEBUG";
-          ExecStop = "${pkgs.pve-container}/share/lxc/pve-container-stop-wrapper %i";
-          # Environment=BOOTUP=serial
-          # Environment=CONSOLETYPE=serial
-          # Prevent container init from putting all its output into the journal
-          StandardOutput = null;
-          StandardError = "file:/run/pve/ct-%i.stderr";
-        };
       };
+      serviceConfig = {
+        Type = "simple";
+        Delegate = "yes";
+        KillMode = "mixed";
+        TimeoutStopSec = "120s";
+        ExecStart = "${pkgs.lxc}/bin/lxc-start -F -n %i -o /dev/stderr -l DEBUG";
+        ExecStop = "${pkgs.pve-container}/share/lxc/pve-container-stop-wrapper %i";
+        # Environment=BOOTUP=serial
+        # Environment=CONSOLETYPE=serial
+        # Prevent container init from putting all its output into the journal
+        StandardOutput = "null";
+        StandardError = "file:/run/pve/ct-%i.stderr";
+      };
+    };
 
-      "pve-container@" = {
-        # based on lxc@.service, but without an install section because
-        # starting and stopping should be initiated by PVE code, not
-        # systemd.
-        description = "PVE LXC Container: %i";
-        after = [ "lxc.service" ];
-        wants = [ "lxc.service" ];
-        unitConfig = {
-          DefaultDependencies = false;
-          Documentation = "man:lxc-start man:lxc man:pct";
-        };
-        serviceConfig = {
-          Type = "simple";
-          Delegate = true;
-          KillMode = "mixed";
-          TimeoutStopSec = 120;
-          ExecStart = "${pkgs.lxc}/bin/lxc-start -F -n %i";
-          ExecStop = "${pkgs.pve-container}/share/lxc/pve-container-stop-wrapper %i";
-          # Environment=BOOTUP=serial
-          # Environment=CONSOLETYPE=serial
-          # Prevent container init from putting all its output into the journal
-          StandardOutput = null;
-          StandardError = "file:/run/pve/ct-%i.stderr";
-        };
+    "pve-container@" = {
+      # based on lxc@.service, but without an install section because
+      # starting and stopping should be initiated by PVE code, not
+      # systemd.
+      description = "PVE LXC Container: %i";
+      after = [ "lxc.service" ];
+      wants = [ "lxc.service" ];
+      unitConfig = {
+        DefaultDependencies = "no";
+        Documentation = "man:lxc-start man:lxc man:pct";
+      };
+      serviceConfig = {
+        Type = "simple";
+        Delegate = "yes";
+        KillMode = "mixed";
+        TimeoutStopSec = "120s";
+        ExecStart = "${pkgs.lxc}/bin/lxc-start -F -n %i";
+        ExecStop = "${pkgs.pve-container}/share/lxc/pve-container-stop-wrapper %i";
+        # Environment=BOOTUP=serial
+        # Environment=CONSOLETYPE=serial
+        # Prevent container init from putting all its output into the journal
+        StandardOutput = "null";
+        StandardError = "file:/run/pve/ct-%i.stderr";
       };
     };
   };

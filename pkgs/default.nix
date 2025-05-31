@@ -31,6 +31,7 @@ let
     unifont_hex = callPackage ./unifont { };
     vncterm = callPackage ./vncterm { };
     cstream = callPackage ./cstream { };
+    lxc = callPackage ./lxc { };
 
     proxmox-acme = callPackage ./proxmox-acme { };
     proxmox-backup = callPackage ./proxmox-backup { };

@@ -1,12 +1,12 @@
 {
   lib,
-  python3,
+  python310,
   fetchFromGitHub,
   linstor-api-py,
   nix-update-script,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python310.pkgs.buildPythonApplication rec {
   pname = "linstor-client";
   version = "1.23.0";
   pyproject = true;
@@ -19,8 +19,8 @@ python3.pkgs.buildPythonApplication rec {
   };
 
   nativeBuildInputs = [
-    python3.pkgs.setuptools
-    python3.pkgs.wheel
+    python310.pkgs.setuptools
+    python310.pkgs.wheel
   ];
 
   propagatedBuildInputs = [ linstor-api-py ];

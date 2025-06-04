@@ -74,7 +74,7 @@ perl538.pkgs.toPerlModule (
         -e "s,usr/,,g"
 
       # Fix QEMU version check
-      sed -i PVE/QemuServer.pm -e "s/\[,\\\s\]//"
+      sed -i PVE/QemuServer/Helpers.pm -e "s/\[,\\\s\]//"
 
       # Fix libGL and libEGL detection
       sed -i PVE/QemuServer.pm -e "s|/usr/lib/x86_64-linux-gnu/lib|${libglvnd}/lib/lib|"

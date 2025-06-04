@@ -66,7 +66,7 @@ perl538.pkgs.toPerlModule (
         -e "/GITVERSION/d" \
         -e "/default.mk/d" \
         -e "/pve-doc-generator/d" \
-        -e "/install -m 0644 -D qm.bash-completion/,+4d" \
+        -e "/install -m 0644 -D qm.bash-completion/,+3d" \
         -e "/install -m 0644 qm.1/,+4d" \
         -e "s/qmeventd docs/qmeventd/" \
         -e "/qmeventd.8/d" \

@@ -16,7 +16,7 @@
   usbutils,
   mimebase32,
   mimebase64,
-  substituteAll,
+  replaceVars,
 }:
 
 let
@@ -82,15 +82,13 @@ perl538.pkgs.toPerlModule (
     sourceRoot = "${src.name}/src";
 
     patches = [
-      (substituteAll {
-        src = ./0001-ss_fix_path.patch;
+      (replaceVars ./0001-ss_fix_path.patch {
         sspath = "${iproute2}/bin/";
       })
 
       ./0002-mknod-mknodat.patch
 
-      (substituteAll {
-        src = ./0003-pci-id-path.patch;
+      (replaceVars ./0003-pci-id-path.patch {
         pciutils = "${pciutils}";
       })
     ];

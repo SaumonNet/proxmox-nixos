@@ -1,37 +1,48 @@
 {
+  lib,
   qemu,
   fetchgit,
-  fetchurl,
   proxmox-backup-qemu,
   perl538,
   pkg-config,
+  meson,
+  cacert
 }:
 
 (
   (qemu.overrideAttrs (old: rec {
-    version = "9.1.2";
+    pname = "pve-qemu";
+    version = "9.2.0-5";
 
-    src = fetchurl {
-      url = "https://download.qemu.org/qemu-${version}.tar.xz";
-      hash = "sha256-Gf2ddTWlTW4EThhkAqo7OxvfqHw5LsiISFVZLIUQyW8=";
-    };
-
-    src_patches = fetchgit {
+    src = fetchgit {
       url = "git://git.proxmox.com/git/pve-qemu.git";
-      rev = "c4efa30b307fc15df5c00f353494d1aec1702680";
-      hash = "sha256-EjeB1TLaPIhBQH8KpaQ1PDo453LtMumdNfSf5T4yo/I=";
-      fetchSubmodules = false;
+      rev = "e0969989ac8ba252891a1a178b71e068c8ed4995";
+      hash = "sha256-wIrvaSjatyQq3a897ScljxmivUIM80rvc0F0y2tIZWo=";
+      fetchSubmodules = true;
+      
+      # Download subprojects managed by meson
+      postFetch = ''
+        cd "$out/qemu"
+        export NIX_SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
+        for prj in subprojects/*.wrap; do
+          ${lib.getExe meson} subprojects download "$(basename "$prj" .wrap)"
+        done
+        find subprojects -type d -name .git -prune -execdir rm -r {} +
+        rm -rf subprojects/packagecache/tmp*
+      '';
     };
 
     patches =
       let
-        series = builtins.readFile "${src_patches}/debian/patches/series";
+        series = builtins.readFile "${src}/debian/patches/series";
         patchList = builtins.filter (patch: builtins.isString patch && patch != "") (
           builtins.split "\n" series
         );
-        patchPathsList = map (patch: "${src_patches}/debian/patches/${patch}") patchList;
+        patchPathsList = map (patch: "${src}/debian/patches/${patch}") patchList;
       in
       old.patches ++ patchPathsList;
+
+    sourceRoot = "${src.name}/qemu";
 
     buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
     propagatedBuildInputs = [ proxmox-backup-qemu ];
@@ -46,6 +57,15 @@
       proxmox-backup-qemu
       perl538
       pkg-config
+    ];
+
+    passthru.updateScript = [
+      ../update.py
+      pname
+      "--url"
+      src.url
+      "--version-prefix"
+      (lib.versions.majorMinor old.version)
     ];
   })).override
   {

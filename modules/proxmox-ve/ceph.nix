@@ -88,6 +88,9 @@ let
       description = "Ceph target allowing to start/stop all ceph-${daemonType} services at once";
       partOf = [ "ceph.target" ];
       wantedBy = [ "ceph.target" ];
+      wants = lib.mkIf (daemonType == "osd") (
+        map (daemonId: "ceph-volume@${daemonId}.service") cfg.osd.daemons
+      );
       before = [ "ceph.target" ];
       unitConfig.StopWhenUnneeded = true;
     };
@@ -212,9 +215,9 @@ in
 
     networking.firewall = lib.mkIf config.services.proxmox-ve.openFirewall {
       allowedTCPPorts = lib.optionals cfg.mon.enable [
-          3300
-          6789
-        ];
+        3300
+        6789
+      ];
       allowedTCPPortRanges = lib.optionals (cfg.osd.enable || cfg.msd.enable || cfg.mgr.enable) [
         {
           from = 6800;
@@ -240,6 +243,20 @@ in
           lib.optional cfg.mon.enable (makeServices "mon" cfg.mon.daemons)
           ++ lib.optional cfg.mds.enable (makeServices "mds" cfg.mds.daemons)
           ++ lib.optional cfg.osd.enable (makeServices "osd" cfg.osd.daemons)
+          ++ lib.optional cfg.osd.enable {
+            "ceph-volume@" = {
+              description = "Ceph Volume activation: %i";
+              after = [ "local-fs.target" ];
+              wants = [ "local-fs.target" ];
+              environment.CEPH_VOLUME_TIMEOUT = "10000";
+              serviceConfig = {
+                Type = "oneshot";
+                KillMode = "none";
+                ExecStart = "${pkgs.ceph}/bin/ceph-volume-systemd %i";
+                TimeoutSec = 0;
+              };
+            };
+          }
           ++ lib.optional cfg.rgw.enable (makeServices "rgw" cfg.rgw.daemons)
           ++ lib.optional cfg.mgr.enable (makeServices "mgr" cfg.mgr.daemons);
       in

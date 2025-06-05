@@ -208,7 +208,7 @@ Then configure the access to the Proxmox API:
 
 ```sh
 # nixmoxer.conf
-host=192.168.0.3
+host=192.168.0.3:8006
 user=root
 password=<password>
 verify_ssl=0
@@ -272,7 +272,6 @@ or in the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#
 
 ⚠️ The current limitation is that if for instance VM `myvm1` has already been initialised,
 subsequent changes to the configuration in `services.proxmox-ve.vms.myvm1` will have no impact.
-
 
 ### Note
 

@@ -77,7 +77,7 @@ class Proxmox:
             logging.error(click.style(
                 f'The specified iso already exists on {node}/local.', fg='red'))
             logging.info(click.style(
-                'Do you wish to destroy it? Type "destroy" to do so:', fg='yellow'))
+                'Do you wish to destroy it?', fg='yellow'))
             verify_before_destructive_action("yes")
             self.delete_iso(node, storage, iso_name)
 
@@ -92,7 +92,7 @@ class Proxmox:
 
         expected_size = os.path.getsize(iso)
         current_size = 0
-        logging.info(click.style("Waiting for full upload", fg="cyan"))
+        logging.info(click.style("Waiting for full upload...", fg="cyan"))
         while current_size != expected_size:
             time.sleep(0.5)
             volume = (
@@ -121,9 +121,9 @@ class Proxmox:
 
         if not self.iso_exists(node, storage, iso_name):
             logging.error(click.style(
-                f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}"', fg='red'))
+                f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}".', fg='red'))
             raise ValueError(
-                f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}"')
+                f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}".')
 
         self.api.nodes(node).storage(storage).content(f"iso/{iso_name}").delete(
             node=node,
@@ -139,7 +139,7 @@ class Proxmox:
             int: The next available VM ID.
         """
         vms = self.list_vms_on_cluster()
-        ids, _ = zip(*vms)
+        ids, _, _ = zip(*vms)
         return max(ids) + 1
 
     def vmid_exists(self, vmid):
@@ -199,7 +199,7 @@ class Proxmox:
 
         if status == "running":
             logging.error(click.style(
-                "The VM did not stop in time...", fg='red'))
+                "The VM did not stop in time.", fg='red'))
             sys.exit(1)
 
         logging.info(click.style(
@@ -226,10 +226,10 @@ class Proxmox:
 
         if "vmid" not in api_params.keys():
             logging.info(click.style(
-                'No VM ID set. Finding the smallest free VM ID... ', fg='cyan'))
+                'No VM ID set. Finding the smallest free VM ID...', fg='cyan'))
             api_params["vmid"] = int(self.find_free_vmid())
             logging.info(click.style(
-                f'Set VM ID to "{api_params["vmid"]}"', fg='green'))
+                f'Set VM ID to "{api_params["vmid"]}."', fg='green'))
 
         vmid_exists, name, vm_node = self.vmid_exists(
             int(api_params["vmid"]))
@@ -320,7 +320,7 @@ def build_iso(machine, flake):
             'Iso built successfully.', fg='green'))
 
     except subprocess.CalledProcessError as e:
-        logging.error(click.style('ISO building failed', fg='red'))
+        logging.error(click.style('ISO building failed.', fg='red'))
         logging.error(click.style(e.stderr, fg='red'))
         sys.exit(1)
 
@@ -403,19 +403,19 @@ def parse_configuration():
     # Validate required keys
     if "host" not in config.keys():
         logging.error(click.style(
-            f'Missing authentication configuration for Proxmox. Please set "host" in {local_config_file_path}', fg='red'))
+            f'Missing authentication configuration for Proxmox. Please set "host" in {local_config_file_path}.', fg='red'))
         raise KeyError('Missing "host" configuration')
 
     if "user" not in config.keys():
         logging.error(click.style(
-            f'Missing authentication configuration for Proxmox. Please set "user" in {local_config_file_path}', fg='red'))
-        raise KeyError('Missing "user" configuration')
+            f'Missing authentication configuration for Proxmox. Please set "user" in {local_config_file_path}.', fg='red'))
+        raise KeyError('Missing "user" configuration.')
 
     if "password" not in config.keys() and ("token_name" not in config.keys() or "token_value" not in config.keys()):
         logging.error(click.style(
-            'Missing authentication configuration for Proxmox. Please set either "password" or both "token_name" and "token_value"', fg='red'))
+            'Missing authentication configuration for Proxmox. Please set either "password" or both "token_name" and "token_value".', fg='red'))
         raise KeyError(
-            'Missing "password" or "token_name" and "token_value" configuration')
+            'Missing "password" or "token_name" and "token_value" configuration.')
 
     logging.info(click.style("Configuration parsed successfully.", fg='green'))
     return config

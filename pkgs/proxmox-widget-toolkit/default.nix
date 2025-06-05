@@ -36,6 +36,7 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     cp api-viewer/APIViewer.js $out/share/javascript/proxmox-widget-toolkit
+    sed -Ezi "s/(function\(orig_cmd\) \{)/\1\n\torig_cmd\(\);\n\treturn;/g" $out/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
   '';
 
   passthru.updateScript = [

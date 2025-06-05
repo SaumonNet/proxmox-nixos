@@ -7,11 +7,11 @@
 
 perl538.pkgs.buildPerlPackage rec {
   pname = "UUID";
-  version = "0.36";
+  version = "0.37";
 
   src = fetchurl {
     url = "mirror://cpan/authors/id/J/JR/JRM/UUID-${version}.tar.gz";
-    hash = "sha256-wYLprYVJgakIA64lOA0hl8pvkjUZ4dUkvIUgXq9JvwY=";
+    hash = "sha256-AvWv4rQ4bgm2yzo5taECt054mj4pcimUogqOMoXFYcc=";
   };
 
   buildInputs = [

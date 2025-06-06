@@ -60,12 +60,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "8.2.4";
+    version = "8.2.10";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "faa83925c96413258b9a02c4de89442adeff9215";
-      hash = "sha256-onNnxvQ7YrdnrFpl+z7Z+xUyEZsMcU6Qxn/kjYLan+8=";
+      rev = "536023790079895fdac20da75a767be5f3c38295";
+      hash = "sha256-BtBm2x0OEGvF1Sl/iA9di8Ip8TjyavZ/aTLhNHQiKbU=";
     };
 
     patches = [
@@ -121,6 +121,7 @@ perl538.pkgs.toPerlModule (
         -e "/ENV{'PATH'}/d" \
         -e "s|/usr/share/javascript|${pve-http-server}/share/javascript|" \
         -e "s|/usr/share/fonts-font-awesome|${pve-http-server}/share/fonts-font-awesome|" \
+        -e "s|/usr/share/fonts-font-logos|${pve-http-server}/share/fonts-font-logos|" \
         -e "s|/usr/share/pve-manager|$out/share/pve-manager|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \

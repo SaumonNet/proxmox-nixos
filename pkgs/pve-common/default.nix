@@ -71,12 +71,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-common";
-    version = "8.2.9";
+    version = "8.3.1";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "5d5b3abe6da80c5eea5233bd1486246acc9e12ab";
-      hash = "sha256-ODFyNWUnVr8Yo3hZZAIFRlpkMutN9Hx+6uDqFncA7pg=";
+      rev = "85d46b41030f538e1e42b570187b0aea3f3f6afd";
+      hash = "sha256-kSx0mSP5Htcid2a/bNPNFCsy4jURc/NDHHILWXpQIlk=";
     };
 
     sourceRoot = "${src.name}/src";

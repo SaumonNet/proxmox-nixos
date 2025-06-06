@@ -34,6 +34,7 @@ let
 
     proxmox-acme = callPackage ./proxmox-acme { };
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
+    proxmox-i18n = callPackage ./proxmox-i18n { };
     proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
 

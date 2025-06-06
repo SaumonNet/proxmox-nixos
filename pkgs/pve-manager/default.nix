@@ -6,6 +6,7 @@
   perl538,
   proxmox-widget-toolkit,
   proxmox-acme,
+  proxmox-i18n,
   pve-docs,
   pve-ha-manager,
   pve-http-server,
@@ -60,12 +61,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "8.2.4";
+    version = "8.3.5";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "faa83925c96413258b9a02c4de89442adeff9215";
-      hash = "sha256-onNnxvQ7YrdnrFpl+z7Z+xUyEZsMcU6Qxn/kjYLan+8=";
+      rev = "dac3aa88bac3f3004bc793eaaf8b27b820043605";
+      hash = "sha256-GaAeEwDyxFtLz5+zLD0FPadRZftVHNNDJhZCJSFCl78=";
     };
 
     patches = [
@@ -121,6 +122,8 @@ perl538.pkgs.toPerlModule (
         -e "/ENV{'PATH'}/d" \
         -e "s|/usr/share/javascript|${pve-http-server}/share/javascript|" \
         -e "s|/usr/share/fonts-font-awesome|${pve-http-server}/share/fonts-font-awesome|" \
+        -e "s|/usr/share/fonts-font-logos|${pve-http-server}/share/fonts-font-logos|" \
+        -e "s|/usr/share/pve-i18n|${proxmox-i18n}/share/pve-i18n|" \
         -e "s|/usr/share/pve-manager|$out/share/pve-manager|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -e "s|/usr/share/pve-xtermjs|${pve-xtermjs}/share/pve-xtermjs|" \

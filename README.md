@@ -17,7 +17,7 @@ While we export other architectures for convenience of the user, we only support
 Some Proxmox packages have a quite power intensive build process. We make a cache available to download directly the artifacts:
 
 - address: `https://cache.saumon.network/proxmox-nixos`
-- public key: `proxmox-nixos:nveXDuVVhFDRFx8Dn19f1WDEaNRJjPrF2CPD2D+m1ys=`
+- public key: `proxmox-nixos:D9RYSWpQQC/msZUWphOY2I5RLH5Dd6yQcaHIuug7dWM=`
 
 ## 🚀 Quick start
 

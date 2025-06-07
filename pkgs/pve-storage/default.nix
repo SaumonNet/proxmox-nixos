@@ -48,12 +48,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-storage";
-    version = "8.3.2";
+    version = "8.3.6";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "edb18d638697c08a52343ad8664a92e618bb7841";
-      hash = "sha256-nNsa8F8b7HNA/p39GaY5PNxXhlvr0/g1/69cUdUSjag=";
+      rev = "0c6234f0bc9772320786ca7ce5f45018630557de";
+      hash = "sha256-+bDlHddVaC+/xg/S06ZZzdIOumkXTK+c6e2k398OYqs=";
     };
 
     sourceRoot = "${src.name}/src";

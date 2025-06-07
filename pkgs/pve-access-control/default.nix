@@ -19,12 +19,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-access-control";
-    version = "8.2.0";
+    version = "9.0.0";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "de84a7894b61de8fce49539a853c3dd7d5154028";
-      hash = "sha256-jnq/VDRRN5l+D94FDGUdwEcmT8v7ZPVru3RvuWGHeP0=";
+      rev = "ca27a7666a006b5b72592ae1e592cac3a019405e";
+      hash = "sha256-bvPkcOmDgKiKD4OUWenYqFPqMNcX/6RtOm3aFHK9Xes=";
     };
 
     sourceRoot = "${src.name}/src";

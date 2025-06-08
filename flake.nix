@@ -7,7 +7,7 @@
   };
 
   nixConfig.extra-substituters = "https://cache.saumon.network/proxmox-nixos";
-  nixConfig.extra-trusted-public-keys = "proxmox-nixos:nveXDuVVhFDRFx8Dn19f1WDEaNRJjPrF2CPD2D+m1ys=";
+  nixConfig.extra-trusted-public-keys = "proxmox-nixos:D9RYSWpQQC/msZUWphOY2I5RLH5Dd6yQcaHIuug7dWM=";
 
   description = "Proxmox on NixOS";
 

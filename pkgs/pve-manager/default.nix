@@ -13,12 +13,14 @@
   cdrkit,
   enableLinstor ? false,
   ceph,
+  gnutar,
   gnupg,
   graphviz,
   gzip,
   nodePackages,
   openvswitch,
   openssh,
+  xz,
   pve-qemu,
   tzdata,
   pve-novnc,
@@ -33,7 +35,7 @@
   util-linux,
   system-sendmail,
   rsync,
-  busybox,
+  coreutils,
   cstream,
   lvm2,
   lxc,
@@ -151,6 +153,7 @@ perl538.pkgs.toPerlModule (
               cdrkit # cloud-init
               corosync
               gnupg
+              gnutar
               gzip
               iproute2
               libfaketime
@@ -165,10 +168,11 @@ perl538.pkgs.toPerlModule (
               termproxy
               util-linux
               wget
+              xz
 
               ## dependencies of backup and restore
               bash
-              busybox
+              coreutils
               cstream
               lvm2
               lxc

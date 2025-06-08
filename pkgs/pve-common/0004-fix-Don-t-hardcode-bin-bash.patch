@@ -1,0 +1,34 @@
+From 45755abf967fef94ed683985d24cfc395e5e7f24 Mon Sep 17 00:00:00 2001
+From: Thomas Ieong <th.ieong@free.fr>
+Date: Wed, 28 May 2025 21:15:33 +0200
+Subject: [PATCH] fix: Don't hardcode /bin/bash
+
+---
+ src/PVE/Tools.pm | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/PVE/Tools.pm b/src/PVE/Tools.pm
+index 8901f92..f29ed84 100644
+--- a/PVE/Tools.pm
++++ b/PVE/Tools.pm
+@@ -425,7 +425,7 @@ sub run_command {
+ 		$cmdstr .= $pipe .  join(' ', map { ref($_) ? $$_ : shellquote($_) } @$command);
+ 		$pipe = ' | ';
+ 	    }
+-	    $cmd = [ '/bin/bash', '-c', "$cmdstr" ];
++	    $cmd = [ '@bashpath@/bin/bash', '-c', "$cmdstr" ];
+ 	} else {
+ 	    $cmdstr = cmd2string($cmd);
+ 	}
+@@ -433,7 +433,7 @@ sub run_command {
+ 	$cmdstr = $cmd;
+ 	if ($cmd =~ m/\|/) {
+ 	    # see 'man bash' for option pipefail
+-	    $cmd = [ '/bin/bash', '-c', "set -o pipefail && $cmd" ];
++	    $cmd = [ '@bashpath@/bin/bash', '-c', "set -o pipefail && $cmd" ];
+ 	} else {
+ 	    $cmd = [ $cmd ];
+ 	}
+-- 
+2.49.0
+

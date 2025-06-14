@@ -22,12 +22,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-firewall";
-    version = "5.0.7";
+    version = "5.1.1";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "4339ef1526fd482f800438fbdeec2f6b50133be2";
-      hash = "sha256-bAbObcdrxTY6VVwpP3fH8+7TBudlViQHNTVPjZdm8c8=";
+      rev = "acf164bbedea0b12e7ca96ace196d682fa6cb079";
+      hash = "sha256-/phvXi9mh+mGnnFznan9lqZjbHzN6BdOLy0OmuByU4c=";
     };
 
     sourceRoot = "${src.name}/src";

@@ -83,7 +83,7 @@ lib.mkIf cfg.enable {
         "pve-ha-crm.service"
         "pve-ha-lrm.service"
       ];
-      path = with pkgs; [ swtpm ];
+      path = with pkgs; [ bashInteractive cdrkit swtpm ];
       unitConfig = {
         RefuseManualStart = true;
         RefuseManualStop = true;

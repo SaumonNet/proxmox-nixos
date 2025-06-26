@@ -153,6 +153,8 @@ class Proxmox:
             bool: True if the VM ID exists, False otherwise.
         """
         vms = self.list_vms_on_cluster()
+        if (len(vms) == 0):
+            return False, None, None
         ids, names, nodes = zip(*vms)
         if vmid in ids:
             index = ids.index(vmid)
@@ -170,6 +172,8 @@ class Proxmox:
             bool: True if the VM ID exists, False otherwise.
         """
         vms = self.list_vms_on_cluster()
+        if (len(vms) == 0):
+            return False, None, None
         ids, names, nodes = zip(*vms)
         if vm_name in names:
             index = names.index(vm_name)

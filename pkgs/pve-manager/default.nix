@@ -30,6 +30,7 @@
   sqlite,
   wget,
   bash,
+  sequoia-sq,
   zstd,
   util-linux,
   system-sendmail,
@@ -73,6 +74,7 @@ perl538.pkgs.toPerlModule (
     patches = [
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
+      ./0003-fix-aplinfo-gpg.patch
     ];
 
     postPatch = ''
@@ -83,18 +85,22 @@ perl538.pkgs.toPerlModule (
         -e '/pkg-info/d' \
         -e '/log/d' \
         -e '/architecture/d' \
-        -e 's/aplinfo PVE bin www services configs network-hooks test/PVE bin www configs test/'
+        -e 's/aplinfo PVE bin www services configs network-hooks test/aplinfo PVE bin www configs test/'
       sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+7d'
       patchShebangs configs/country.pl
       sed -i configs/country.pl -e "s|/usr|${tzdata}|"
       #cp PVE/pvecfg.pm{.in,}
       sed -i www/manager6/Makefile -e "/ESLINT/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
+      sed -i PVE/APLInfo.pm \
+        -e 's|/usr/share/doc/pve-manager/trustedkeys.gpg|${placeholder "out"}/usr/share/doc/pve-manager/trustedkeys.gpg|'
     '';
 
     buildInputs = [
       perlEnv
       nodePackages.eslint
       graphviz
+      sequoia-sq
+      gnupg
       makeWrapper
     ];
     propagatedBuildInputs = perlDeps;

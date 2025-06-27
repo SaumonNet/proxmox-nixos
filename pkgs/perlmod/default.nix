@@ -12,8 +12,8 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/perlmod.git";
-    rev = "88d7d3b742057c57a78fa68fd461b4d4bb8a0fce";
-    hash = "sha256-9y6Z6IaIHPgbraT7NGUUsEB/PMWybgRt876sUGHUGjg=";
+    rev = "1544fc13d7196152409467db416f1791ed121fc3";
+    hash = "sha256-/HsItWYgSMkqaXHsvsRR3seuHkzWJfBnAR2DDwcvpw4=";
   };
 
   patches = [ ./remove_safe_putenv.patch ];
@@ -21,7 +21,7 @@ rustPlatform.buildRustPackage rec {
   cargoLock.lockFile = ./Cargo.lock;
 
   postPatch = ''
-    rm .cargo/config
+    rm .cargo/config.toml
     patchShebangs perlmod-bin/genpackage.pl
     ln -s ${./Cargo.lock} Cargo.lock
   '';

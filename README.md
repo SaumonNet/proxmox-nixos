@@ -17,7 +17,7 @@ While we export other architectures for convenience of the user, we only support
 Some Proxmox packages have a quite power intensive build process. We make a cache available to download directly the artifacts:
 
 - address: `https://cache.saumon.network/proxmox-nixos`
-- public key: `proxmox-nixos:nveXDuVVhFDRFx8Dn19f1WDEaNRJjPrF2CPD2D+m1ys=`
+- public key: `proxmox-nixos:D9RYSWpQQC/msZUWphOY2I5RLH5Dd6yQcaHIuug7dWM=`
 
 ## 🚀 Quick start
 
@@ -118,7 +118,7 @@ environment.persistence."/persistent".directories = [
 
 To get internet in your VMs, you need to add a network device to the VM, connected to a bridge. To get this working, follow this 2 steps:
 
-1. Create the bridge in `System->Network->Create->Linux Bridge`. This operation has no effect on your system and is just a quirk for Proxmox to know the existence of your bridge.
+1. Set the list of bridges in `services.proxmox-ve.bridges` option. This is the list of bridges that will be visible in Proxmox web interface. Note that this option doesn't affect your OS level network config in any way.
 2. Configure your networking through NixOS configuration so that the bridge you created in the Proxmox web interface actually exists!
 
 ### Example NixOS networking configurations
@@ -128,6 +128,10 @@ Any kind of advanced networking configuration is possible through the usual NixO
 #### With `systemd-networkd`
 
 ```nix
+# Make vmbr0 bridge visible in Proxmox web interface
+services.proxmox-ve.bridges = [ "vmbr0" ];
+
+# Actually set up the vmbr0 bridge
 systemd.network.networks."10-lan" = {
     matchConfig.Name = [ "ens18" ];
     networkConfig = {
@@ -155,6 +159,10 @@ systemd.network.networks."10-lan-bridge" = {
 ### With scripted networking
 
 ```nix
+# Make vmbr0 bridge visible in Proxmox web interface
+services.proxmox-ve.bridges = [ "vmbr0" ];
+
+# Actually set up the vmbr0 bridge
 networking.bridges.vmbr0.interfaces = [ "ens18" ];
 networking.interfaces.vmbr0.useDHCP = lib.mkDefault true;
 ```
@@ -208,7 +216,7 @@ Then configure the access to the Proxmox API:
 
 ```sh
 # nixmoxer.conf
-host=192.168.0.3
+host=192.168.0.3:8006
 user=root
 password=<password>
 verify_ssl=0
@@ -272,7 +280,6 @@ or in the official [documentation](https://pve.proxmox.com/pve-docs/api-viewer/#
 
 ⚠️ The current limitation is that if for instance VM `myvm1` has already been initialised,
 subsequent changes to the configuration in `services.proxmox-ve.vms.myvm1` will have no impact.
-
 
 ### Note
 

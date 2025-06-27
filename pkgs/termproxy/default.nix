@@ -2,16 +2,21 @@
   lib,
   fetchgit,
   rustPlatform,
+  mkRegistry,
 }:
 
+let
+  sources = import ./sources.nix;
+  registry = mkRegistry sources;
+in
 rustPlatform.buildRustPackage rec {
   pname = "termproxy";
-  version = "1.0.1";
+  version = "1.1.0";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/pve-xtermjs.git";
-    rev = "e2e62fc67368ad25a35c6d009f9d85ac5ef97233";
-    hash = "sha256-Inx3LnAelDwvRoLHqMG91lUuQUI/CvNVIZ/EfmeIFUM=";
+    rev = "9bf8b31e8daac4fa9f464bff9e864a7b10179609";
+    hash = "sha256-OmL57wuLQGqfm1089hy2q40gHyti2PHzkizfWYRXQaU=";
   };
 
   cargoLock = {
@@ -20,15 +25,19 @@ rustPlatform.buildRustPackage rec {
   };
 
   prePatch = ''
-    rm .cargo/config
+    rm .cargo/config.toml
     cd termproxy
-    cp ${./Cargo.toml} Cargo.toml
+    cat ${registry}/cargo-patches.toml >> Cargo.toml
     cp ${./Cargo.lock} Cargo.lock
   '';
+
+  buildInputs = [ registry ];
 
   postInstall = ''
     mv $out/bin/{proxmox-,}termproxy
   '';
+
+  passthru.registry = registry;
 
   passthru.updateScript = [
     ../update.py

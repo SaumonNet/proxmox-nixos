@@ -1,77 +1,52 @@
 {
-  lib,
   fetchgit,
-  craneLib,
   pkg-config,
   clang,
   zstd,
   apt,
   sg3_utils,
   libclang,
-  proxmox-backup,
   openssl,
   libxcrypt,
   acl,
   linux-pam,
   libuuid,
+  rustPlatform,
+  git,
+  mkRegistry,
 }:
-
 let
-
-  isProxmoxRS = p: lib.hasPrefix "git+https://github.com/proxmox/proxmox-rs.git" p.source;
+  sources = import ./sources.nix;
+  registry = mkRegistry sources;
 in
-craneLib.buildPackage rec {
+rustPlatform.buildRustPackage rec {
   pname = "proxmox-backup-qemu";
-  version = "1.3.2";
+  version = "1.5.1";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "afc3670334a5c911a14725bc9df2a96ac8066781";
-    hash = "sha256-9d73I+JL47MHLhvEnLSbO4xcYVu187oN9YKkTzwUlSk=";
-    fetchSubmodules = false;
+    rev = "c3cbcae289d04b4454a70fc59dc58a19d5edb681";
+    hash = "sha256-qynY7bt+lOzpg4YxeUnRk7/xoSbtk+tWGbuNMmAdzHY=";
+    fetchSubmodules = true;
   };
+
+  patches = [ ./backup-toml.patch ];
+  patchFlags = [
+    "-p1"
+    "-d"
+    "submodules/proxmox-backup/"
+  ];
+
+  cargoLock.lockFile = ./Cargo.lock;
 
   postPatch = ''
-    ls
     rm -rf .cargo
-    cp ${./Cargo.lock} Cargo.lock
-    cp ${./Cargo.toml} Cargo.toml
-    cp -r ${proxmox-backup.src} proxmox-backup
-    chmod -R 744 proxmox-backup
-    cp ${../proxmox-backup/Cargo.toml} proxmox-backup/Cargo.toml
-    cp ${../proxmox-backup/Cargo.lock} proxmox-backup/Cargo.lock
-    ls
+    cat ${registry}/cargo-patches.toml >> Cargo.toml
+    ln -s ${./Cargo.lock} Cargo.lock
   '';
 
-  REPOID = "lol";
-
-  cargoVendorDir = craneLib.vendorCargoDeps {
-    cargoLock = ./Cargo.lock;
-    overrideVendorGitCheckout =
-      ps: drv:
-      if (lib.any isProxmoxRS ps) then
-        (drv.overrideAttrs (_old: {
-          postPatch = ''
-            rm .cargo/config 
-          '';
-        }))
-      else
-        drv;
-  };
-
-  cargoArtifacts = craneLib.buildDepsOnly {
-    inherit
-      src
-      cargoVendorDir
-      postPatch
-      REPOID
-      nativeBuildInputs
-      LIBCLANG_PATH
-      ;
-    dummySrc = src;
-  };
-
   nativeBuildInputs = [
+    acl
     pkg-config
     clang
     zstd
@@ -83,18 +58,26 @@ craneLib.buildPackage rec {
     libxcrypt
     acl
     linux-pam
-    libuuid
+    git
   ];
 
   buildInputs = [
+    acl
+    libxcrypt
+    libuuid
     zstd
     clang
     zstd.dev
+    registry
+    git
+    openssl
   ];
+
+  passthru.registry = registry;
 
   postInstall = ''
     cp proxmox-backup-qemu.h $out/lib
-    cp target/release/libproxmox_backup_qemu.so $out/lib/libproxmox_backup_qemu.so.0
+    cp target/*/release/libproxmox_backup_qemu.so $out/lib/libproxmox_backup_qemu.so.0
   '';
 
   LIBCLANG_PATH = "${libclang.lib}/lib";

@@ -16,7 +16,7 @@
   usbutils,
   mimebase32,
   mimebase64,
-  substituteAll,
+  replaceVars,
 }:
 
 let
@@ -71,26 +71,24 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-common";
-    version = "8.2.1";
+    version = "8.3.1";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "1a6005ad2377b6586e084b3840ac622752b666b8";
-      hash = "sha256-fMgkeaOoaJDk9yf3O4uZSTs0p7H4uUYyy1Ii3J02uNw=";
+      rev = "85d46b41030f538e1e42b570187b0aea3f3f6afd";
+      hash = "sha256-kSx0mSP5Htcid2a/bNPNFCsy4jURc/NDHHILWXpQIlk=";
     };
 
     sourceRoot = "${src.name}/src";
 
     patches = [
-      (substituteAll {
-        src = ./0001-ss_fix_path.patch;
+      (replaceVars ./0001-ss_fix_path.patch {
         sspath = "${iproute2}/bin/";
       })
 
       ./0002-mknod-mknodat.patch
 
-      (substituteAll {
-        src = ./0003-pci-id-path.patch;
+      (replaceVars ./0003-pci-id-path.patch {
         pciutils = "${pciutils}";
       })
 

@@ -1,15 +1,12 @@
 {
   pkgs,
   pkgs-unstable,
-  craneLib ? { },
   ...
 }:
 let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
 
   ours = {
-    inherit craneLib;
-
     authenpam = callPackage ./perl-modules/authenpam { };
     datadumper = callPackage ./perl-modules/datadumper { };
     digestsha = callPackage ./perl-modules/digest-sha { };
@@ -25,6 +22,7 @@ let
 
     extjs = callPackage ./extjs { };
     fonts-font-logos = callPackage ./fonts-font-logos { };
+    sencha-touch = callPackage ./sencha-touch { };
     markedjs = callPackage ./markedjs { };
     perlmod = callPackage ./perlmod { };
     termproxy = callPackage ./termproxy { };
@@ -33,9 +31,11 @@ let
     cstream = callPackage ./cstream { };
     lxc = callPackage ./lxc { };
 
+    mkRegistry = callPackage ./proxmox-registry { };
+
     proxmox-acme = callPackage ./proxmox-acme { };
-    proxmox-backup = callPackage ./proxmox-backup { };
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
+    proxmox-i18n = callPackage ./proxmox-i18n { };
     proxmox-ve = callPackage ./proxmox-ve { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
 
@@ -64,7 +64,7 @@ let
     linstor-client = callPackage ./linstor-client { };
     linstor-proxmox = callPackage ./linstor-proxmox { };
     linstor-server = pkgs-unstable.callPackage ./linstor-server {
-      protobuf = pkgs-unstable.protobuf_23;
+      protobuf = pkgs-unstable.protobuf_24;
       jre = pkgs.jdk11_headless;
     };
     nixmoxer = callPackage ./nixmoxer { };

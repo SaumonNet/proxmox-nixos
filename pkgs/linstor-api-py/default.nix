@@ -1,10 +1,10 @@
 {
   lib,
-  python3,
+  python310,
   fetchFromGitHub,
 }:
 
-python3.pkgs.buildPythonPackage rec {
+python310.pkgs.buildPythonPackage rec {
   pname = "linstor-api-py";
   version = "1.23.0";
   pyproject = true;
@@ -18,9 +18,9 @@ python3.pkgs.buildPythonPackage rec {
   };
 
   nativeBuildInputs = [
-    python3.pkgs.setuptools
-    python3.pkgs.wheel
-    python3.pkgs.distutils
+    python310.pkgs.setuptools
+    python310.pkgs.wheel
+    python310.pkgs.distutils
   ];
 
   pythonImportsCheck = [ "linstor" ];

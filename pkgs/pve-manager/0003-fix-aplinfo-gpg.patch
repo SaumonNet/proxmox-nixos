@@ -11,7 +11,7 @@ diff --git a/aplinfo/Makefile b/aplinfo/Makefile
 index 56af6dfc..2b7f09b2 100644
 --- a/aplinfo/Makefile
 +++ b/aplinfo/Makefile
-@@ -21,9 +21,9 @@ update:
+@@ -21,8 +21,9 @@ update:
  	mv aplinfo.dat.tmp aplinfo.dat
  
  trustedkeys.gpg: $(TRUSTED_KEYS)

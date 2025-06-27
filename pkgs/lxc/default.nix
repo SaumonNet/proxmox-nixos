@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  makeWrapper,
 
   bashInteractive,
   dbus,
@@ -14,6 +15,9 @@
   ninja,
   nixosTests,
   openssl,
+  shadow,
+  apparmor-parser,
+  bash,
   pkg-config,
   coreutils,
   systemd,
@@ -49,6 +53,7 @@ stdenv.mkDerivation (finalAttrs: {
     libselinux
     openssl
     systemd
+    makeWrapper
   ];
 
   patches = [
@@ -64,8 +69,8 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dinstall-init-files=true"
     "-Dinstall-state-dirs=false"
     "-Dspecfile=false"
-    "-Dtools-multicall=true"
-    "-Dtools=false"
+    "-Dtools-multicall=false"
+    "-Dtools=true"
     "-Dusernet-config-path=/etc/lxc/lxc-usernet"
     "-Ddistrosysconfdir=${placeholder "out"}/etc/lxc"
     "-Dsystemd-unitdir=${placeholder "out"}/lib/systemd/system"
@@ -86,6 +91,13 @@ stdenv.mkDerivation (finalAttrs: {
     sed -i $out/libexec/lxc/lxc-containers \
       -e "s|touch|${coreutils}/bin/touch|" \
       -e "s|rm|${coreutils}/bin/rm|"
+  '';
+
+  postFixup = ''
+      for bin in $out/bin/*; do
+        wrapProgram $bin \
+          --prefix PATH : ${lib.makeBinPath [ bash apparmor-parser "/run/wrappers" ]}
+      done
   '';
 
   enableParallelBuilding = true;

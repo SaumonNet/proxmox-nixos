@@ -11,12 +11,12 @@
 
 stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
-  version = "4.2025.02-3";
+  version = "4.2025.02-4";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "d6146dd6dfc084215dfaa59b95bcf6177e988cb5";
-    sha256 = "sha256-6zh9nTdR5+1zZODJ1JBtWkJyo+ioeZoxk7yWtmLBekc=";
+    rev = "221a2615288791f6673ae4d58d2669230071f4af";
+    sha256 = "sha256-YmgS7gmT5ZYlfPi+HBc+4SgKVx8pcAriUDNtbZYvwQs=";
 
     # FIXME: remove manual fetch submodule if 
     # https://git.proxmox.com/?p=mirror_edk2.git is accessible again

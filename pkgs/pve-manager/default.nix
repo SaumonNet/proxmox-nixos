@@ -16,7 +16,7 @@
   gnupg,
   graphviz,
   gzip,
-  nodePackages,
+  biome,
   openvswitch,
   openssh,
   pve-qemu,
@@ -61,12 +61,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "8.3.5";
+    version = "8.4.7";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "dac3aa88bac3f3004bc793eaaf8b27b820043605";
-      hash = "sha256-GaAeEwDyxFtLz5+zLD0FPadRZftVHNNDJhZCJSFCl78=";
+      rev = "1c3f920570951127c02095cf0bc5c9547e5efdee";
+      hash = "sha256-LZUQflXE66Q4PKukwa+hPrf0n36PQu3dXqc+Fnl0eMs=";
     };
 
     patches = [
@@ -87,12 +87,13 @@ perl538.pkgs.toPerlModule (
       patchShebangs configs/country.pl
       sed -i configs/country.pl -e "s|/usr|${tzdata}|"
       #cp PVE/pvecfg.pm{.in,}
-      sed -i www/manager6/Makefile -e "/ESLINT/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
+      sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
+
     '';
 
     buildInputs = [
       perlEnv
-      nodePackages.eslint
+      biome
       graphviz
       makeWrapper
     ];

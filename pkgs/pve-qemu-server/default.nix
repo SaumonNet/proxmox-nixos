@@ -5,7 +5,9 @@
   perl538,
   glib,
   json_c,
-  pkg-config,
+  pkgconf,
+  libsysprof-capture,
+  pcre2,
   proxmox-backup-client,
   pve-edk2-firmware,
   pve-qemu,
@@ -53,16 +55,18 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
-    version = "8.3.8";
+    version = "8.4.1";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/qemu-server.git";
-      rev = "78a0c43e7c6b844d1c4f7ce037ce32c9ed6857cd";
-      hash = "sha256-YktRlURya0pPg5mu+LVlJcBDhDW5Kd7tduZv0hgGyJo=";
+      rev = "fae0dfd7f67845b717c119de349cdf8ac75339c8";
+      hash = "sha256-fCjPK2Acm5eM7gNt89wr0/5abOniw9W+6Rwd5n45LBM=";
     };
 
+    sourceRoot = "${src.name}/src";
+
     postPatch = ''
-      sed -i {qmeventd/,}Makefile \
+      sed -i {qmeventd/,bin/}Makefile \
         -e "/GITVERSION/d" \
         -e "/default.mk/d" \
         -e "/pve-doc-generator/d" \
@@ -83,25 +87,34 @@ perl538.pkgs.toPerlModule (
     buildInputs = [
       glib
       json_c
-      pkg-config
+      pkgconf
       perlEnv
+      libsysprof-capture
+      pcre2
     ];
     propagatedBuildInputs = perlDeps;
     dontPatchShebangs = true;
 
-    makeFlags = [
-      "PKGSOURCES=qm qmrestore qmextract"
-      "DESTDIR=$(out)"
-      "PREFIX="
-      "SBINDIR=/.bin"
-      "USRSHAREDIR=$(out)/share/qemu-server"
-      "VARLIBDIR=$(out)/lib/qemu-server"
-      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
-    ];
+    dontBuild = true;
 
     # Create missing SERVICEDIR
     preInstall = ''
       mkdir -p $out/lib/systemd/system
+    '';
+
+    installPhase = ''
+      runHook preInstall
+
+      make install \
+        PKGSOURCES="qm qmrestore qmextract" \
+        DESTDIR=$out \
+        PREFIX= \
+        SBINDIR=/.bin \
+        USRSHAREDIR=$out/share/qemu-server \
+        VARLIBDIR=$out/lib/qemu-server \
+        PERLDIR=/${perl538.libPrefix}/${perl538.version}
+
+      runHook postInstall
     '';
 
     postFixup = ''

@@ -14,6 +14,7 @@ let
     iosocketip = callPackage ./perl-modules/iosocketip { };
     mimebase32 = callPackage ./perl-modules/mimebase32 { };
     mimebase64 = callPackage ./perl-modules/mimebase64 { };
+    net-subnet = callPackage ./perl-modules/net-subnet { };
     posixstrptime = callPackage ./perl-modules/posixstrptime { };
     socket = callPackage ./perl-modules/socket { };
     termreadline = callPackage ./perl-modules/termreadline { };

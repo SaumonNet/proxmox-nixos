@@ -10,6 +10,7 @@
   pcre2,
   proxmox-backup-client,
   pve-edk2-firmware,
+  pve-firewall,
   pve-qemu,
   util-linux,
   uuid,
@@ -37,6 +38,7 @@ let
     MIMEBase64
     NetSSLeay
     PathTools
+    pve-firewall
     ScalarListUtils
     Socket
     Storable
@@ -111,16 +113,16 @@ perl538.pkgs.toPerlModule (
         PREFIX= \
         SBINDIR=/.bin \
         USRSHAREDIR=$out/share/qemu-server \
-        VARLIBDIR=$out/lib/qemu-server \
         PERLDIR=/${perl538.libPrefix}/${perl538.version}
 
       runHook postInstall
     '';
 
     postFixup = ''
-      find $out/lib -type f | xargs sed -i \
+      find $out/lib $out/libexec -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d" \
         -e "s|/usr/lib/qemu-server|$out/lib/qemu-server|" \
+        -e "s|/usr/libexec/qemu-server|$out/libexec/qemu-server|" \
         -e "s|/usr/share/qemu-server|$out/share/qemu-server|" \
         -e "s|/usr/share/kvm|${pve-qemu}/share/qemu|" \
         -Ee "s|(/usr)?/s?bin/kvm|qemu-kvm|" \
@@ -140,10 +142,9 @@ perl538.pkgs.toPerlModule (
         #-e "s|/usr/bin/termproxy||" \
         #-e "s|/usr/bin/vma||" \
         #-e "s|/usr/bin/pbs-restore||" \
-        patchShebangs $out/lib/qemu-server/pve-bridge
-        patchShebangs $out/lib/qemu-server/pve-bridgedown
-        patchShebangs $out/lib/qemu-server/pve-bridge-hotplug
-        patchShebangs $out/lib/qemu-server/qmextract
+
+      patchShebangs $out/lib/
+      patchShebangs $out/libexec/
     '';
 
     passthru.updateScript = [

@@ -98,7 +98,6 @@ perl538.pkgs.toPerlModule (
       coreutils
       diffutils
       iproute2
-      openvswitch
       proxmox-backup-client
       systemd
       usbutils
@@ -134,6 +133,7 @@ perl538.pkgs.toPerlModule (
     postFixup = ''
       find $out/lib -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d" \
+        -e "s|ovs-vsctl|${openvswitch}/bin/ovs-vsctl|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -Ee "s|(/usr)?/s?bin/||"
     '';

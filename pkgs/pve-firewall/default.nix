@@ -4,7 +4,10 @@
   fetchgit,
   makeWrapper,
   perl538,
+  pve-access-control,
   pve-cluster,
+  pve-network,
+  pve-rs,
   glib,
   ipset,
   iptables,
@@ -15,19 +18,24 @@
 }:
 
 let
-  perlDeps = [ pve-cluster ];
+  perlDeps = [ 
+    pve-access-control
+    pve-cluster 
+    pve-network
+    pve-rs
+  ];
   perlEnv = perl538.withPackages (_: perlDeps);
 in
 
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-firewall";
-    version = "5.0.7";
+    version = "5.1.2";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "4339ef1526fd482f800438fbdeec2f6b50133be2";
-      hash = "sha256-bAbObcdrxTY6VVwpP3fH8+7TBudlViQHNTVPjZdm8c8=";
+      rev = "9b7fdbb369b2767e71272525b37fa6dd74a15330";
+      hash = "sha256-lwoemYrZXkKD7+43IwOLu5Dgn1N0Zg/e1siXYBRA6Co=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -49,6 +57,8 @@ perl538.pkgs.toPerlModule (
       perlEnv
       makeWrapper
     ];
+
+    propagatedBuildInputs = perlDeps;
 
     makeFlags = [
       "DESTDIR=$(out)"

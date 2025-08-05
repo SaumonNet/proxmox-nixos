@@ -29,6 +29,7 @@ let
     unifont_hex = callPackage ./unifont { };
     vncterm = callPackage ./vncterm { };
     cstream = callPackage ./cstream { };
+    lxc = callPackage ./lxc { };
 
     mkRegistry = callPackage ./proxmox-registry { };
 
@@ -57,6 +58,7 @@ let
     pve-rs = callPackage ./pve-rs { };
     pve-storage = callPackage ./pve-storage { };
     pve-xtermjs = callPackage ./pve-xtermjs { };
+    pve-lxc-syscalld = callPackage ./pve-lxc-syscalld { };
 
     linstor-api-py = callPackage ./linstor-api-py { };
     linstor-client = callPackage ./linstor-client { };

@@ -1,0 +1,31 @@
+From 616879d6a63aac54d882ba2ddc4634124fae3414 Mon Sep 17 00:00:00 2001
+From: Thomas Ieong <th.ieong@free.fr>
+Date: Sat, 31 May 2025 00:01:10 +0200
+Subject: [PATCH] add stuff
+
+---
+ src/PVE/LXC.pm | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/PVE/LXC.pm b/src/PVE/LXC.pm
+index 2b9f0cf..15d9935 100644
+--- a/PVE/LXC.pm
++++ b/PVE/LXC.pm
+@@ -670,8 +670,13 @@ sub update_lxc_config {
+ 
+     my $cfgpath = '/usr/share/lxc/config';
+     my $inc = "$cfgpath/$ostype.common.conf";
+-    $inc ="$cfgpath/common.conf" if !-f $inc;
++    $inc ="$cfgpath/common.conf.d/01-pve.conf" if !-f $inc;
+     $raw .= "lxc.include = $inc\n";
++    # Include lxcfs, need to have virtualisation.lxcfs enabled
++    $raw .= "lxc.include = @lxcfspath@/share/lxc/config/common.conf.d/00-lxcfs.conf\n";
++    # Include common.conf
++    $raw .= "lxc.include = @lxcpath@/share/lxc/config/common.conf\n";
++
+     if ($unprivileged) {
+ 	$inc = "$cfgpath/$ostype.userns.conf";
+ 	$inc = "$cfgpath/userns.conf" if !-f $inc;
+-- 
+2.49.0
+

@@ -20,6 +20,7 @@ in
     ./ceph.nix
     ./bridges.nix
     ./cluster.nix
+    ./container.nix
     # ./firewall.nix
     # ./ha-manager.nix
     ./linstor.nix

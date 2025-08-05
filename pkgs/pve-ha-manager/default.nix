@@ -64,6 +64,9 @@ perl538.pkgs.toPerlModule (
     postInstall = ''
       cp ${pve-container}/.bin/pct $out/bin
       cp ${pve-qemu-server}/.bin/* $out/bin
+      sed -i $out/bin/pct \
+        -e "s/-T//" \
+        -e "1s|$| -I$out/${perl538.libPrefix}/${perl538.version}|"
       rm $out/bin/pve-ha-simulator
     '';
 

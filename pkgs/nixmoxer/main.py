@@ -139,6 +139,8 @@ class Proxmox:
             int: The next available VM ID.
         """
         vms = self.list_vms_on_cluster()
+        if not vms:
+            return 100
         ids, _, _ = zip(*vms)
         return max(ids) + 1
 

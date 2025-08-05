@@ -1340,7 +1340,7 @@ version = "1.4.0"
 
 [[package]]
 name = "proxmox-log"
-version = "0.2.7"
+version = "0.2.8"
 dependencies = [
  "anyhow",
  "nix",
@@ -1355,7 +1355,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-notify"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
@@ -1383,7 +1383,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-openid"
-version = "0.10.3"
+version = "0.10.4"
 dependencies = [
  "anyhow",
  "http",
@@ -1492,7 +1492,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-sys"
-version = "0.6.5"
+version = "0.6.6"
 dependencies = [
  "anyhow",
  "libc",
@@ -1573,7 +1573,7 @@ dependencies = [
 
 [[package]]
 name = "pve-rs"
-version = "0.9.1"
+version = "0.9.4"
 dependencies = [
  "anyhow",
  "base32",
@@ -1581,7 +1581,6 @@ dependencies = [
  "hex",
  "http",
  "libc",
- "log",
  "nix",
  "openssl",
  "perlmod",

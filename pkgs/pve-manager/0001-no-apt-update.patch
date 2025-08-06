@@ -1,38 +1,38 @@
 diff --git a/www/manager6/node/Config.js b/www/manager6/node/Config.js
-index d27592ce..34c52a5d 100644
+index f6cd8749..335c12f4 100644
 --- a/www/manager6/node/Config.js
 +++ b/www/manager6/node/Config.js
-@@ -253,33 +253,6 @@ Ext.define('PVE.node.Config', {
- 	    });
+@@ -256,33 +256,6 @@ Ext.define('PVE.node.Config', {
+             });
  
- 	    if (caps.nodes['Sys.Modify']) {
--		me.items.push({
--		    xtype: 'proxmoxNodeAPT',
--		    title: gettext('Updates'),
--		    iconCls: 'fa fa-refresh',
--		    expandedOnInit: true,
--		    disabled: !caps.nodes['Sys.Console'],
--		    // do we want to link to system updates instead?
--		    itemId: 'apt',
--		    upgradeBtn: {
--			xtype: 'pveConsoleButton',
--			disabled: Proxmox.UserName !== 'root@pam',
--			text: gettext('Upgrade'),
--			consoleType: 'upgrade',
--			nodename: nodename,
--		    },
--		    nodename: nodename,
--		});
+             if (caps.nodes['Sys.Modify']) {
+-                me.items.push({
+-                    xtype: 'proxmoxNodeAPT',
+-                    title: gettext('Updates'),
+-                    iconCls: 'fa fa-refresh',
+-                    expandedOnInit: true,
+-                    disabled: !caps.nodes['Sys.Console'],
+-                    // do we want to link to system updates instead?
+-                    itemId: 'apt',
+-                    upgradeBtn: {
+-                        xtype: 'pveConsoleButton',
+-                        disabled: Proxmox.UserName !== 'root@pam',
+-                        text: gettext('Upgrade'),
+-                        consoleType: 'upgrade',
+-                        nodename: nodename,
+-                    },
+-                    nodename: nodename,
+-                });
 -
--		me.items.push({
--		    xtype: 'proxmoxNodeAPTRepositories',
--		    title: gettext('Repositories'),
--		    iconCls: 'fa fa-files-o',
--		    itemId: 'aptrepositories',
--		    nodename: nodename,
--		    onlineHelp: 'sysadmin_package_repositories',
--		    groups: ['apt'],
--		});
- 	    }
- 	}
+-                me.items.push({
+-                    xtype: 'proxmoxNodeAPTRepositories',
+-                    title: gettext('Repositories'),
+-                    iconCls: 'fa fa-files-o',
+-                    itemId: 'aptrepositories',
+-                    nodename: nodename,
+-                    onlineHelp: 'sysadmin_package_repositories',
+-                    groups: ['apt'],
+-                });
+             }
+         }
  

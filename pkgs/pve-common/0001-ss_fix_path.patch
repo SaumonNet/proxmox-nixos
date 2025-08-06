@@ -1,8 +1,8 @@
-diff --git a/PVE/Tools.pm b/src/PVE/Tools.pm
-index 9ffac12..639b178 100644
+diff --git a/PVE/Tools.pm b/PVE/Tools.pm
+index 948ef5e..6a18754 100644
 --- a/PVE/Tools.pm
 +++ b/PVE/Tools.pm
-@@ -851,7 +851,7 @@ sub wait_for_vnc_port {
+@@ -920,7 +920,7 @@ sub wait_for_vnc_port {
      my $starttime = [gettimeofday];
      my $elapsed;
  

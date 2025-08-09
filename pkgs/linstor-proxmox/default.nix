@@ -19,13 +19,13 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "linstor-proxmox";
-    version = "8.1.1";
+    version = "8.1.3";
 
     src = fetchFromGitHub {
       owner = "LINBIT";
       repo = "linstor-proxmox";
       rev = "v${version}";
-      hash = "sha256-O50dqs6XPiU58mr65h+Juj9hxalUL6UcgTcXnyCEwBY=";
+      hash = "sha256-edD77DlsYozs2sgLykZkFOYTLnkbG9dGgt/Q/94Jwnw=";
     };
 
     makeFlags = [

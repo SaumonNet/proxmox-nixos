@@ -63,12 +63,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "8.4.7";
+    version = "8.4.10";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "1c3f920570951127c02095cf0bc5c9547e5efdee";
-      hash = "sha256-LZUQflXE66Q4PKukwa+hPrf0n36PQu3dXqc+Fnl0eMs=";
+      rev = "293f4abc4b22fa081656c2cd52e71217f221d82d";
+      hash = "sha256-8ViRW1q5AG0j1ZOmkyyolA4Q2d/bbKB9SZX/2iVDvuU=";
     };
 
     patches = [
@@ -85,12 +85,11 @@ perl538.pkgs.toPerlModule (
         -e '/log/d' \
         -e '/architecture/d' \
         -e 's/aplinfo PVE bin www services configs network-hooks test/PVE bin www configs test/'
-      sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+7d'
+      sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+9d'
       patchShebangs configs/country.pl
       sed -i configs/country.pl -e "s|/usr|${tzdata}|"
       #cp PVE/pvecfg.pm{.in,}
       sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
-
     '';
 
     buildInputs = [
@@ -115,7 +114,7 @@ perl538.pkgs.toPerlModule (
     ];
 
     postInstall = ''
-      rm -r $out/var $out/bin/pve{upgrade,update,version,7to8}
+      rm -r $out/var $out/bin/pve{upgrade,update,version,7to8,8to9}
       sed -i $out/{bin/*,share/pve-manager/helpers/pve-startall-delay} -e "s/-T//"
     '';
 

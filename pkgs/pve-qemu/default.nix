@@ -9,15 +9,19 @@
   cacert
 }:
 
+let 
+  perlDeps = with perl538.pkgs; [ JSON ];
+  perlEnv = perl538.withPackages (_: perlDeps);
+in 
 (
   (qemu.overrideAttrs (old: rec {
     pname = "pve-qemu";
-    version = "9.2.0-5";
+    version = "9.2.0-7";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/pve-qemu.git";
-      rev = "e0969989ac8ba252891a1a178b71e068c8ed4995";
-      hash = "sha256-wIrvaSjatyQq3a897ScljxmivUIM80rvc0F0y2tIZWo=";
+      rev = "245689b9ae4120994de29b71595ea58abac06f3c";
+      hash = "sha256-JTcTUVC8vmv7yrtpE7deCN7zkZmiCC1Z0lLXackuY/8=";
       fetchSubmodules = true;
       
       # Download subprojects managed by meson
@@ -55,7 +59,7 @@
 
     nativeBuildInputs = old.nativeBuildInputs ++ [
       proxmox-backup-qemu
-      perl538
+      perlEnv
       pkg-config
     ];
 
@@ -67,6 +71,15 @@
       "--version-prefix"
       (lib.versions.majorMinor old.version)
     ];
+
+    # Generate cpu flag files and machine versions json
+    # This is done in /debian/rules of pve-qemu, and needed by pve-qemu-server
+    postInstall = old.postInstall + ''
+      $out/bin/qemu-system-x86_64 -cpu help \
+        | ${perlEnv}/bin/perl ${src}/debian/parse-cpu-flags.pl > $out/share/qemu/recognized-CPUID-flags-x86_64
+      $out/bin/qemu-system-x86_64 -machine help \
+        | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
+    '';
   })).override
   {
     glusterfsSupport = true;

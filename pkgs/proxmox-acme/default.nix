@@ -6,6 +6,7 @@
   acme-sh,
   bash,
   curl,
+  bind,
   pve-update-script,
 }:
 
@@ -49,6 +50,8 @@ perl5.pkgs.toPerlModule (
 
     postFixup = ''
       find $out -type f | xargs sed -i -e "s|/usr/share/proxmox-acme|$out/share/proxmox-acme|"
+      substituteInPlace $out/share/proxmox-acme/dnsapi/dns_nsupdate.sh \
+        --replace-fail "    nsupdate" "    ${lib.getExe' bind.dnsutils "nsupdate"}"
     '';
 
     passthru.updateScript = pve-update-script {

@@ -5,7 +5,7 @@
   perl538,
   acme-sh,
   bash,
-  curl,  
+  curl,
 }:
 
 let

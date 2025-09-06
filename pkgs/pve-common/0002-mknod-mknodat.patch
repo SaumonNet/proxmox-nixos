@@ -16,11 +16,11 @@ index 0325f53..b05d0ff 100644
 --- a/PVE/Tools.pm
 +++ b/PVE/Tools.pm
 @@ -1787,7 +1787,7 @@ sub mkdirat($$$) {
- 
+
  sub mknod($$$) {
      my ($filename, $mode, $dev) = @_;
 -    return syscall(PVE::Syscall::mknod, $filename, int($mode), int($dev)) == 0;
 +    return syscall(PVE::Syscall::mknodat, $filename, int($mode), int($dev)) == 0;
  }
- 
+
  sub fchownat($$$$$) {

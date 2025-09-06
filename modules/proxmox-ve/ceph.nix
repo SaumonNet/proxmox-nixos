@@ -32,7 +32,8 @@ let
         "network-online.target"
         "time-sync.target"
         "pve-cluster.service"
-      ] ++ lib.optional (daemonType == "osd") "ceph-mon.target";
+      ]
+      ++ lib.optional (daemonType == "osd") "ceph-mon.target";
       wants = [
         "network-online.target"
         "time-sync.target"
@@ -58,29 +59,28 @@ let
           5;
       startLimitIntervalSec = 60 * 30; # 30 mins
 
-      serviceConfig =
-        {
-          LimitNOFILE = 1048576;
-          LimitNPROC = 1048576;
-          Environment = "CLUSTER=${clusterName}";
-          ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
-          PrivateDevices = "yes";
-          PrivateTmp = "true";
-          ProtectHome = "true";
-          ProtectSystem = "full";
-          Restart = "on-failure";
-          ExecStart = ''
-            ${ceph.out}/bin/${if daemonType == "rgw" then "radosgw" else "ceph-${daemonType}"} \
-                                -f --cluster ${clusterName} --id ${daemonId} --setuser ceph --setgroup ceph'';
-        }
-        // lib.optionalAttrs (daemonType == "osd") {
-          ExecStartPre = "${ceph.lib}/libexec/ceph/ceph-osd-prestart.sh --id ${daemonId} --cluster ${clusterName}";
-          RestartSec = "20s";
-          PrivateDevices = "no"; # osd needs disk access
-        }
-        // lib.optionalAttrs (daemonType == "mon") {
-          RestartSec = "10";
-        };
+      serviceConfig = {
+        LimitNOFILE = 1048576;
+        LimitNPROC = 1048576;
+        Environment = "CLUSTER=${clusterName}";
+        ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
+        PrivateDevices = "yes";
+        PrivateTmp = "true";
+        ProtectHome = "true";
+        ProtectSystem = "full";
+        Restart = "on-failure";
+        ExecStart = ''
+          ${ceph.out}/bin/${if daemonType == "rgw" then "radosgw" else "ceph-${daemonType}"} \
+                              -f --cluster ${clusterName} --id ${daemonId} --setuser ceph --setgroup ceph'';
+      }
+      // lib.optionalAttrs (daemonType == "osd") {
+        ExecStartPre = "${ceph.lib}/libexec/ceph/ceph-osd-prestart.sh --id ${daemonId} --cluster ${clusterName}";
+        RestartSec = "20s";
+        PrivateDevices = "no"; # osd needs disk access
+      }
+      // lib.optionalAttrs (daemonType == "mon") {
+        RestartSec = "10";
+      };
     };
 
   makeTarget = daemonType: {
@@ -212,9 +212,9 @@ in
 
     networking.firewall = lib.mkIf config.services.proxmox-ve.openFirewall {
       allowedTCPPorts = lib.optionals cfg.mon.enable [
-          3300
-          6789
-        ];
+        3300
+        6789
+      ];
       allowedTCPPortRanges = lib.optionals (cfg.osd.enable || cfg.msd.enable || cfg.mgr.enable) [
         {
           from = 6800;
@@ -247,21 +247,20 @@ in
 
     systemd.targets =
       let
-        targets =
-          [
-            {
-              ceph = {
-                description = "Ceph target allowing to start/stop all ceph service instances at once";
-                wantedBy = [ "multi-user.target" ];
-                unitConfig.StopWhenUnneeded = true;
-              };
-            }
-          ]
-          ++ lib.optional cfg.mon.enable (makeTarget "mon")
-          ++ lib.optional cfg.mds.enable (makeTarget "mds")
-          ++ lib.optional cfg.osd.enable (makeTarget "osd")
-          ++ lib.optional cfg.rgw.enable (makeTarget "rgw")
-          ++ lib.optional cfg.mgr.enable (makeTarget "mgr");
+        targets = [
+          {
+            ceph = {
+              description = "Ceph target allowing to start/stop all ceph service instances at once";
+              wantedBy = [ "multi-user.target" ];
+              unitConfig.StopWhenUnneeded = true;
+            };
+          }
+        ]
+        ++ lib.optional cfg.mon.enable (makeTarget "mon")
+        ++ lib.optional cfg.mds.enable (makeTarget "mds")
+        ++ lib.optional cfg.osd.enable (makeTarget "osd")
+        ++ lib.optional cfg.rgw.enable (makeTarget "rgw")
+        ++ lib.optional cfg.mgr.enable (makeTarget "mgr");
       in
       lib.mkMerge targets;
 

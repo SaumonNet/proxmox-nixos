@@ -33,7 +33,8 @@ buildEnv rec {
     vncterm
     wget
     util-linux
-  ] ++ lib.optionals enableLinstor [ linstor-client ];
+  ]
+  ++ lib.optionals enableLinstor [ linstor-client ];
 
   meta = with lib; {
     description = "A complete, open-source server management platform for enterprise virtualization";

@@ -56,7 +56,7 @@ def main():
     else:
         print('Finding latest version')
         grep_prefix = f'{args.prefix} {args.version_prefix}' if args.version_prefix else args.prefix
-            
+
         log_output = run_command(
             f'git log --grep="{grep_prefix}" -n 1 --pretty=format:"%s"')
         version_match = re.search(f'{re.escape(args.prefix)} (.*)', log_output)

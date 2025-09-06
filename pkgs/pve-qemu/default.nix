@@ -6,7 +6,7 @@
   perl538,
   pkg-config,
   meson,
-  cacert
+  cacert,
 }:
 
 (
@@ -19,7 +19,7 @@
       rev = "e0969989ac8ba252891a1a178b71e068c8ed4995";
       hash = "sha256-wIrvaSjatyQq3a897ScljxmivUIM80rvc0F0y2tIZWo=";
       fetchSubmodules = true;
-      
+
       # Download subprojects managed by meson
       postFetch = ''
         cd "$out/qemu"
@@ -47,11 +47,10 @@
     buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
     propagatedBuildInputs = [ proxmox-backup-qemu ];
 
-    preBuild =
-      ''
-        cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
-      ''
-      + old.preBuild;
+    preBuild = ''
+      cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
+    ''
+    + old.preBuild;
 
     nativeBuildInputs = old.nativeBuildInputs ++ [
       proxmox-backup-qemu

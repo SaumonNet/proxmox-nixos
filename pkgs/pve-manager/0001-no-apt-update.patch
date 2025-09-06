@@ -4,7 +4,7 @@ index d27592ce..34c52a5d 100644
 +++ b/www/manager6/node/Config.js
 @@ -253,33 +253,6 @@ Ext.define('PVE.node.Config', {
  	    });
- 
+
  	    if (caps.nodes['Sys.Modify']) {
 -		me.items.push({
 -		    xtype: 'proxmoxNodeAPT',
@@ -35,4 +35,4 @@ index d27592ce..34c52a5d 100644
 -		});
  	    }
  	}
- 
+

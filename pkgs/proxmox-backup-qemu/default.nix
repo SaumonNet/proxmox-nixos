@@ -74,6 +74,12 @@ rustPlatform.buildRustPackage rec {
   ];
 
   passthru.registry = registry;
+  passthru.updateScript = [
+    ../update.py
+    pname
+    "--url"
+    src.url
+  ];
 
   postInstall = ''
     cp proxmox-backup-qemu.h $out/lib

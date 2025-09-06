@@ -5,7 +5,7 @@ index 0ac200c7..7b64bab9 100644
 @@ -156,13 +156,6 @@ Ext.define('PVE.node.StatusView', {
  	    nodetab: "aptrepositories",
  	});
- 
+
 -	me.items.push({
 -	    xtype: 'pmxNodeInfoRepoStatus',
 -	    itemId: 'repositoryStatus',
@@ -23,9 +23,9 @@ index c2dca0df..d2cac94e 100644
 @@ -207,8 +207,6 @@ Ext.define('PVE.node.Summary', {
  	    },
  	});
- 
+
 -	me.updateRepositoryStatus();
 -
  	me.callParent();
- 
+
  	let sp = Ext.state.Manager.getProvider();

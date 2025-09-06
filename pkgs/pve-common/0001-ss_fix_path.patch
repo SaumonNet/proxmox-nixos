@@ -5,9 +5,9 @@ index 9ffac12..639b178 100644
 @@ -851,7 +851,7 @@ sub wait_for_vnc_port {
      my $starttime = [gettimeofday];
      my $elapsed;
- 
+
 -    my $cmd = ['/bin/ss', '-Htln', "sport = :$port"];
 +    my $cmd = ['@sspath@/bin/ss', '-Htln', "sport = :$port"];
      push @$cmd, $family == AF_INET6 ? '-6' : '-4' if defined($family);
- 
+
      my $found;

@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
     rev = "80a4665aa333807539a491cce7feef3f62ffe8aa";
     hash = "sha256-CGH6ceUJVHdljKMDofPWVXHSNA0XOiUVLmZL6Gjkm60=";
   };
- 
+
   postPatch = ''
     # Remove dpkg pkg-info.mk targets
     substituteInPlace ./Makefile \

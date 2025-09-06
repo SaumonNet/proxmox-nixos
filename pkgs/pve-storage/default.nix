@@ -135,7 +135,7 @@ perl538.pkgs.toPerlModule (
     ];
 
     meta = with lib; {
-      description = "Proxmox VE Storage Library";
+      description = "Proxmox VE Storage Libraryy";
       homepage = "git://git.proxmox.com/?p=pve-storage.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [

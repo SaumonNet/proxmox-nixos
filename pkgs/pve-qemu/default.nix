@@ -6,7 +6,7 @@
   perl538,
   pkg-config,
   meson,
-  cacert
+  cacert,
 }:
 
 (
@@ -19,7 +19,7 @@
       rev = "e0969989ac8ba252891a1a178b71e068c8ed4995";
       hash = "sha256-wIrvaSjatyQq3a897ScljxmivUIM80rvc0F0y2tIZWo=";
       fetchSubmodules = true;
-      
+
       # Download subprojects managed by meson
       postFetch = ''
         cd "$out/qemu"

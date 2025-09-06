@@ -10,4 +10,3 @@ nix-shell tasks/update.nix --arg predicate '_: pkg: builtins.match ".*proxmox.*"
 # Only Perl packages:
 nix-shell tasks/update.nix --arg predicate '_: pkg: builtins.match ".*cpan.*" pkg.src.url == []'
 ```
-

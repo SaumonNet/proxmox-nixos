@@ -1,12 +1,12 @@
 {
   lib,
   python3,
-  pkgs, 
+  pkgs,
   pkgsCross,
-  stdenv, 
+  stdenv,
   fetchgit,
   writeShellScriptBin,
-  ... 
+  ...
 }:
 
 stdenv.mkDerivation rec {
@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
     rev = "d6146dd6dfc084215dfaa59b95bcf6177e988cb5";
     sha256 = "sha256-6zh9nTdR5+1zZODJ1JBtWkJyo+ioeZoxk7yWtmLBekc=";
 
-    # FIXME: remove manual fetch submodule if 
+    # FIXME: remove manual fetch submodule if
     # https://git.proxmox.com/?p=mirror_edk2.git is accessible again
     fetchSubmodules = false;
     leaveDotGit = true;
@@ -42,34 +42,39 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ ];
 
-  hardeningDisable = [ 
-    "format" 
-    "fortify" 
-    "trivialautovarinit" 
+  hardeningDisable = [
+    "format"
+    "fortify"
+    "trivialautovarinit"
   ];
 
-  nativeBuildInputs = with pkgs; [
-    dpkg
-    fakeroot 
-    qemu
-    bc 
-    dosfstools 
-    acpica-tools 
-    mtools 
-    nasm 
-    libuuid
-    qemu-utils 
-    libisoburn 
-    python3
-    # Mock debhelper
-    (writeShellScriptBin "dh" "true") 
-  ] ++ (lib.optional (stdenv.hostPlatform.system != "aarch64-linux") pkgsCross.aarch64-multiplatform.stdenv.cc)
+  nativeBuildInputs =
+    with pkgs;
+    [
+      dpkg
+      fakeroot
+      qemu
+      bc
+      dosfstools
+      acpica-tools
+      mtools
+      nasm
+      libuuid
+      qemu-utils
+      libisoburn
+      python3
+      # Mock debhelper
+      (writeShellScriptBin "dh" "true")
+    ]
+    ++ (lib.optional (
+      stdenv.hostPlatform.system != "aarch64-linux"
+    ) pkgsCross.aarch64-multiplatform.stdenv.cc)
     ++ (lib.optional (stdenv.hostPlatform.system != "x86_64-linux") pkgsCross.gnu64.stdenv.cc)
     ++ (lib.optional (stdenv.hostPlatform.system != "riscv64-linux") pkgsCross.riscv64.stdenv.cc);
 
   depsBuildBuild = [ stdenv.cc ];
 
-  postPatch = 
+  postPatch =
     let
       pythonPath = python3.pkgs.makePythonPath (with python3.pkgs; [ pexpect ]);
     in
@@ -131,6 +136,9 @@ stdenv.mkDerivation rec {
   meta = {
     description = "edk2 based UEFI firmware modules for virtual machines";
     homepage = "git://git.proxmox.com/git/${pname}.git";
-    maintainers = with lib.maintainers; [ codgician julienmalka ];
+    maintainers = with lib.maintainers; [
+      codgician
+      julienmalka
+    ];
   };
- }
+}

@@ -4,6 +4,11 @@
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
+
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
   };
 
   nixConfig.extra-substituters = "https://cache.saumon.network/proxmox-nixos";
@@ -16,6 +21,7 @@
       self,
       nixpkgs-stable,
       nixpkgs-unstable,
+      pre-commit-hooks,
       utils,
       ...
     }:
@@ -54,23 +60,41 @@
                 })
               ];
             };
+            pre-commit-check = pre-commit-hooks.lib.${system}.run {
+              src = ./.;
+              hooks = {
+                deadnix.enable = true;
+                nixfmt-rfc-style.enable = true;
+              };
+            };
           in
           {
             overlays = _: _: (import ./pkgs { inherit pkgs pkgs-unstable; });
 
             packages = utils.lib.filterPackages system (import ./pkgs { inherit pkgs pkgs-unstable; });
 
+            devShells.default = pkgs.mkShell {
+              packages = with pkgs; [
+                nixfmt-rfc-style
+              ];
+            };
+
             checks =
-              if (system == "x86_64-linux") then
-                (
-                  self.packages.${system}
-                  // (import ./tests {
-                    inherit pkgs;
-                    extraBaseModules = self.nixosModules;
-                  })
-                )
-              else
-                { };
+              {
+                pre-commit-check = pre-commit-check;
+              }
+              // (
+                if system == "x86_64-linux" then
+                  (
+                    self.packages.${system}
+                    // (import ./tests {
+                      inherit pkgs;
+                      extraBaseModules = self.nixosModules;
+                    })
+                  )
+                else
+                  { }
+              );
           }
         );
 }

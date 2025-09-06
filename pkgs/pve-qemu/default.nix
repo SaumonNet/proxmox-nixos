@@ -47,10 +47,11 @@
     buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
     propagatedBuildInputs = [ proxmox-backup-qemu ];
 
-    preBuild = ''
-      cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
-    ''
-    + old.preBuild;
+    preBuild =
+      ''
+        cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
+      ''
+      + old.preBuild;
 
     nativeBuildInputs = old.nativeBuildInputs ++ [
       proxmox-backup-qemu

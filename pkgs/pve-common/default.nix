@@ -102,8 +102,7 @@ perl538.pkgs.toPerlModule (
       proxmox-backup-client
       systemd
       usbutils
-    ]
-    ++ perlDeps;
+    ] ++ perlDeps;
 
     makeFlags = [
       "PREFIX=$(out)"

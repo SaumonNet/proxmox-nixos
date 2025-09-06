@@ -224,8 +224,8 @@ verify_ssl=0
 
 Now you can bootstrap `myvm` using `nixmoxer`:
 
-```console
-$ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
+```sh
+nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
 ```
 
 `nixmoxer` will setup the VM on the Proxmox node and attach the specified iso. Instead of specified an iso, setting `autoInstall = true;` will automatically generate an iso that will automatically install the configuration to the VM being bootstrapped.

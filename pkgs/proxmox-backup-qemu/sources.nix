@@ -561,9 +561,9 @@
   {
     name = "librust-proxmox-sys-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "212249e009a2f6b4312528110aa23f70f4b09f99";
+    rev = "86a517d0875acec90ca1aae71e0a795930308d6d";
 
-    sha256 = "0wjivnia72vf035b9lifqyx959v0r5zfxz5fgi1i2xilyb9ld1dx";
+    sha256 = "sha256-Q22+j24oONx9GfoyRErT0sL702FEJrTbmk8Uc/2C9oU=";
     crates = [
       {
         name = "proxmox-sys";

@@ -57,12 +57,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
-    version = "8.4.1";
+    version = "8.4.2";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/qemu-server.git";
-      rev = "fae0dfd7f67845b717c119de349cdf8ac75339c8";
-      hash = "sha256-fCjPK2Acm5eM7gNt89wr0/5abOniw9W+6Rwd5n45LBM=";
+      rev = "14abf7b3589605d744e7ff03d21c5f5fc8a13cbe";
+      hash = "sha256-tQBKrsFRVPIAtbRKOu2+m2Ez9iHdNeq7XEsaQLleEUQ=";
     };
 
     sourceRoot = "${src.name}/src";

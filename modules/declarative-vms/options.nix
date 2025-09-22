@@ -430,16 +430,19 @@ in
             cputype = mkOption {
               type = types.str;
               example = "host";
+              default = "host";
               description = "Specify the CPU type to emulate.";
             };
             flags = mkOption {
-              type = types.str;
+              type = types.nullOr types.str;
+              default = null;
               example = "+vmx;-svm";
               description = "CPU flags to enable or disable.";
             };
             hidden = mkEnableOption "Whether to hide the CPU from the guest.";
             hv-vendor-id = mkOption {
-              type = types.str;
+              type = types.nullOr types.str;
+              default = null;
               example = "MyHypervisor";
               description = "Hypervisor vendor ID string.";
             };
@@ -450,7 +453,8 @@ in
               description = "Number of physical address bits to use (between 8 and 64) or 'host' to use host settings.";
             };
             reported-model = mkOption {
-              type = types.str;
+              type = types.nullOr types.str;
+              default = null;
               example = "IvyBridge";
               description = "Reported CPU model string.";
             };

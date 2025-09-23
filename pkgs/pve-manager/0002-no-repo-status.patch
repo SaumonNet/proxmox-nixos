@@ -1,31 +1,31 @@
 diff --git a/www/manager6/node/StatusView.js b/www/manager6/node/StatusView.js
-index 0ac200c7..7b64bab9 100644
+index e05ec4df..c52f1d20 100644
 --- a/www/manager6/node/StatusView.js
 +++ b/www/manager6/node/StatusView.js
 @@ -156,13 +156,6 @@ Ext.define('PVE.node.StatusView', {
- 	    nodetab: "aptrepositories",
- 	});
+             nodetab: 'aptrepositories',
+         });
  
--	me.items.push({
--	    xtype: 'pmxNodeInfoRepoStatus',
--	    itemId: 'repositoryStatus',
--	    product: 'Proxmox VE',
--	    repoLink: `#${repoLink}`,
--	});
+-        me.items.push({
+-            xtype: 'pmxNodeInfoRepoStatus',
+-            itemId: 'repositoryStatus',
+-            product: 'Proxmox VE',
+-            repoLink: `#${repoLink}`,
+-        });
 -
- 	me.callParent();
+         me.callParent();
      },
  });
 diff --git a/www/manager6/node/Summary.js b/www/manager6/node/Summary.js
-index c2dca0df..d2cac94e 100644
+index 9a3f84a4..a1e7424e 100644
 --- a/www/manager6/node/Summary.js
 +++ b/www/manager6/node/Summary.js
-@@ -207,8 +207,6 @@ Ext.define('PVE.node.Summary', {
- 	    },
- 	});
+@@ -245,8 +245,6 @@ Ext.define('PVE.node.Summary', {
+             },
+         });
  
--	me.updateRepositoryStatus();
+-        me.updateRepositoryStatus();
 -
- 	me.callParent();
+         me.callParent();
  
- 	let sp = Ext.state.Manager.getProvider();
+         let sp = Ext.state.Manager.getProvider();

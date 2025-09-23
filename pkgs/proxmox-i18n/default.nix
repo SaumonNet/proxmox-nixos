@@ -17,12 +17,12 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "proxmox-i18n";
-  version = "3.2.4";
+  version = "3.4.5";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "80a4665aa333807539a491cce7feef3f62ffe8aa";
-    hash = "sha256-CGH6ceUJVHdljKMDofPWVXHSNA0XOiUVLmZL6Gjkm60=";
+    rev = "24e0aeb18ee90b73a7c98f6d4479ba7e0899ebc7";
+    hash = "sha256-oAl3Fs9JW3JFNb2HJAxpPjLcRxU5WKaEiZVtbcKabpU=";
   };
  
   postPatch = ''

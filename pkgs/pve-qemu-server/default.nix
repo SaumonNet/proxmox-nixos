@@ -5,9 +5,12 @@
   perl538,
   glib,
   json_c,
-  pkg-config,
+  pkgconf,
+  libsysprof-capture,
+  pcre2,
   proxmox-backup-client,
   pve-edk2-firmware,
+  pve-firewall,
   pve-qemu,
   util-linux,
   uuid,
@@ -35,6 +38,7 @@ let
     MIMEBase64
     NetSSLeay
     PathTools
+    pve-firewall
     ScalarListUtils
     Socket
     Storable
@@ -53,16 +57,18 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
-    version = "8.3.8";
+    version = "8.4.2";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/qemu-server.git";
-      rev = "78a0c43e7c6b844d1c4f7ce037ce32c9ed6857cd";
-      hash = "sha256-YktRlURya0pPg5mu+LVlJcBDhDW5Kd7tduZv0hgGyJo=";
+      rev = "14abf7b3589605d744e7ff03d21c5f5fc8a13cbe";
+      hash = "sha256-tQBKrsFRVPIAtbRKOu2+m2Ez9iHdNeq7XEsaQLleEUQ=";
     };
 
+    sourceRoot = "${src.name}/src";
+
     postPatch = ''
-      sed -i {qmeventd/,}Makefile \
+      sed -i {qmeventd/,bin/}Makefile \
         -e "/GITVERSION/d" \
         -e "/default.mk/d" \
         -e "/pve-doc-generator/d" \
@@ -83,31 +89,40 @@ perl538.pkgs.toPerlModule (
     buildInputs = [
       glib
       json_c
-      pkg-config
+      pkgconf
       perlEnv
+      libsysprof-capture
+      pcre2
     ];
     propagatedBuildInputs = perlDeps;
     dontPatchShebangs = true;
 
-    makeFlags = [
-      "PKGSOURCES=qm qmrestore qmextract"
-      "DESTDIR=$(out)"
-      "PREFIX="
-      "SBINDIR=/.bin"
-      "USRSHAREDIR=$(out)/share/qemu-server"
-      "VARLIBDIR=$(out)/lib/qemu-server"
-      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
-    ];
+    dontBuild = true;
 
     # Create missing SERVICEDIR
     preInstall = ''
       mkdir -p $out/lib/systemd/system
     '';
 
+    installPhase = ''
+      runHook preInstall
+
+      make install \
+        PKGSOURCES="qm qmrestore qmextract" \
+        DESTDIR=$out \
+        PREFIX= \
+        SBINDIR=/.bin \
+        USRSHAREDIR=$out/share/qemu-server \
+        PERLDIR=/${perl538.libPrefix}/${perl538.version}
+
+      runHook postInstall
+    '';
+
     postFixup = ''
-      find $out/lib -type f | xargs sed -i \
+      find $out/lib $out/libexec -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d" \
         -e "s|/usr/lib/qemu-server|$out/lib/qemu-server|" \
+        -e "s|/usr/libexec/qemu-server|$out/libexec/qemu-server|" \
         -e "s|/usr/share/qemu-server|$out/share/qemu-server|" \
         -e "s|/usr/share/kvm|${pve-qemu}/share/qemu|" \
         -Ee "s|(/usr)?/s?bin/kvm|qemu-kvm|" \
@@ -127,10 +142,9 @@ perl538.pkgs.toPerlModule (
         #-e "s|/usr/bin/termproxy||" \
         #-e "s|/usr/bin/vma||" \
         #-e "s|/usr/bin/pbs-restore||" \
-        patchShebangs $out/lib/qemu-server/pve-bridge
-        patchShebangs $out/lib/qemu-server/pve-bridgedown
-        patchShebangs $out/lib/qemu-server/pve-bridge-hotplug
-        patchShebangs $out/lib/qemu-server/qmextract
+
+      patchShebangs $out/lib/
+      patchShebangs $out/libexec/
     '';
 
     passthru.updateScript = [

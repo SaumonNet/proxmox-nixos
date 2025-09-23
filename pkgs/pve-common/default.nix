@@ -71,12 +71,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-common";
-    version = "8.3.1";
+    version = "8.3.4";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "85d46b41030f538e1e42b570187b0aea3f3f6afd";
-      hash = "sha256-kSx0mSP5Htcid2a/bNPNFCsy4jURc/NDHHILWXpQIlk=";
+      rev = "a8f8a80f0c5d5a11e596d50203ca1693faa994d0";
+      hash = "sha256-aq7zk0tgLDqyk72tIb2NE2dxP1eSt3WAPS3+Yk7w7Es=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -98,7 +98,6 @@ perl538.pkgs.toPerlModule (
       coreutils
       diffutils
       iproute2
-      openvswitch
       proxmox-backup-client
       systemd
       usbutils
@@ -134,6 +133,7 @@ perl538.pkgs.toPerlModule (
     postFixup = ''
       find $out/lib -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d" \
+        -e "s|ovs-vsctl|${openvswitch}/bin/ovs-vsctl|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -Ee "s|(/usr)?/s?bin/||"
     '';

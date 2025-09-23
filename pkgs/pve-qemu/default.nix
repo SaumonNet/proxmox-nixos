@@ -18,7 +18,7 @@ in
     pname = "pve-qemu";
     version = "9.2.0-7";
 
-    src = fetchgit {
+    src = (fetchgit {
       url = "git://git.proxmox.com/git/pve-qemu.git";
       rev = "245689b9ae4120994de29b71595ea58abac06f3c";
       hash = "sha256-JTcTUVC8vmv7yrtpE7deCN7zkZmiCC1Z0lLXackuY/8=";
@@ -34,7 +34,15 @@ in
         find subprojects -type d -name .git -prune -execdir rm -r {} +
         rm -rf subprojects/packagecache/tmp*
       '';
-    };
+    }).overrideAttrs (_: {
+      GIT_CONFIG_COUNT = 2;
+      
+      GIT_CONFIG_KEY_0 = "url.https://github.com/qemu/u-boot-sam460ex.git.insteadOf";
+      GIT_CONFIG_VALUE_0 = "https://gitlab.com/qemu-project/u-boot-sam460ex.git";
+      
+      GIT_CONFIG_KEY_1 = "url.https://github.com/u-boot/u-boot.git.insteadOf";
+      GIT_CONFIG_VALUE_1 = "https://gitlab.com/qemu-project/u-boot.git";
+    });
 
     patches =
       let

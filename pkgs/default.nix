@@ -14,6 +14,7 @@ let
     iosocketip = callPackage ./perl-modules/iosocketip { };
     mimebase32 = callPackage ./perl-modules/mimebase32 { };
     mimebase64 = callPackage ./perl-modules/mimebase64 { };
+    net-subnet = callPackage ./perl-modules/net-subnet { };
     posixstrptime = callPackage ./perl-modules/posixstrptime { };
     socket = callPackage ./perl-modules/socket { };
     termreadline = callPackage ./perl-modules/termreadline { };
@@ -50,6 +51,8 @@ let
     pve-ha-manager = callPackage ./pve-ha-manager { };
     pve-http-server = callPackage ./pve-http-server { };
     pve-manager = callPackage ./pve-manager { };
+    pve-network = callPackage ./pve-network { };
+    pve-network-api = callPackage ./pve-network-api { };
     pve-novnc = callPackage ./pve-novnc { };
     pve-qemu = callPackage ./pve-qemu { };
     pve-qemu-server = callPackage ./pve-qemu-server { };

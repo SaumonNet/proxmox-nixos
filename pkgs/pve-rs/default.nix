@@ -21,12 +21,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rs";
-    version = "0.9.1";
+    version = "0.9.4";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/proxmox-perl-rs.git";
-      rev = "82bfbbf6c64b3749e3e982d933b9156e638386b2";
-      hash = "sha256-NetS/dDi5PT1TWZbI0pSqc57C4SSgBzbPmeSpquSuTA=";
+      rev = "22a6b226309923ddf6ca1982e813f5a273e0d427";
+      hash = "sha256-YxioQTLVYMSvkZx4pYTjnFto9PhFMODS5ZwLa1Wa/JA=";
     };
 
     cargoDeps = rustPlatform.importCargoLock {

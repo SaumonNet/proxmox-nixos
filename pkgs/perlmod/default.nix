@@ -8,12 +8,12 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "perlmod";
-  version = "0.2.0-3";
+  version = "0.2.1-1";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/perlmod.git";
-    rev = "1544fc13d7196152409467db416f1791ed121fc3";
-    hash = "sha256-/HsItWYgSMkqaXHsvsRR3seuHkzWJfBnAR2DDwcvpw4=";
+    rev = "2c5f34aee080675173ce54b557c8785f24b885ab";
+    hash = "sha256-6SoYGQP5ExYiitfO879hDksk9tWLo1W6f98jqQmUznY=";
   };
 
   patches = [ ./remove_safe_putenv.patch ];

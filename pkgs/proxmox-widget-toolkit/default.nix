@@ -9,19 +9,19 @@
 
 stdenv.mkDerivation rec {
   pname = "proxmox-widget-toolkit";
-  version = "4.3.3";
+  version = "4.3.13";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/proxmox-widget-toolkit.git";
-    rev = "a5fb3afcf9f9865baf379f8840d411e30f07625d";
-    hash = "sha256-wJe8TW5mP6g+JdmAoe4GZ6Wj3grkzgOAJhEYf2N7Gis=";
+    rev = "492daaf42584813748c6fcb0d1526b87d8550b60";
+    hash = "sha256-MZq3nDSsd6OMMeNIv6RXohsF36fPxVLopGqw0V5AAA8=";
   };
 
   sourceRoot = "${src.name}/src";
 
   postPatch = ''
     sed -i defines.mk -e "s,/usr,,"
-    sed -i Makefile -e "/BUILD_VERSION=/d" -e "/ESLINT/d"
+    sed -i Makefile -e "/BUILD_VERSION=/d" -e "/BIOME/d"
   '';
 
   buildInputs = [

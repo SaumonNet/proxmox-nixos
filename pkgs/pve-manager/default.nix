@@ -10,13 +10,14 @@
   pve-docs,
   pve-ha-manager,
   pve-http-server,
+  pve-network-api,
   cdrkit,
   enableLinstor ? false,
   ceph,
   gnupg,
   graphviz,
   gzip,
-  nodePackages,
+  biome,
   openvswitch,
   openssh,
   pve-qemu,
@@ -53,6 +54,7 @@ let
     proxmox-acme
     (pve-ha-manager.override { inherit enableLinstor; })
     pve-http-server
+    pve-network-api
   ];
 
   perlEnv = perl538.withPackages (_: perlDeps);
@@ -61,12 +63,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "8.3.5";
+    version = "8.4.13";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "dac3aa88bac3f3004bc793eaaf8b27b820043605";
-      hash = "sha256-GaAeEwDyxFtLz5+zLD0FPadRZftVHNNDJhZCJSFCl78=";
+      rev = "5b08ebc2823dd9cbdacddb8768ff159625468414";
+      hash = "sha256-ViJV9oVnEPCa2K6nlpusfu+t6DWY6+a/N5xyJr4rfiI=";
     };
 
     patches = [
@@ -83,16 +85,16 @@ perl538.pkgs.toPerlModule (
         -e '/log/d' \
         -e '/architecture/d' \
         -e 's/aplinfo PVE bin www services configs network-hooks test/PVE bin www configs test/'
-      sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+7d'
+      sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+9d'
       patchShebangs configs/country.pl
       sed -i configs/country.pl -e "s|/usr|${tzdata}|"
       #cp PVE/pvecfg.pm{.in,}
-      sed -i www/manager6/Makefile -e "/ESLINT/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
+      sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
     '';
 
     buildInputs = [
       perlEnv
-      nodePackages.eslint
+      biome
       graphviz
       makeWrapper
     ];
@@ -112,7 +114,7 @@ perl538.pkgs.toPerlModule (
     ];
 
     postInstall = ''
-      rm -r $out/var $out/bin/pve{upgrade,update,version,7to8}
+      rm -r $out/var $out/bin/pve{upgrade,update,version,7to8,8to9}
       sed -i $out/{bin/*,share/pve-manager/helpers/pve-startall-delay} -e "s/-T//"
     '';
 

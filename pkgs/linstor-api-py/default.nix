@@ -6,14 +6,14 @@
 
 python310.pkgs.buildPythonPackage rec {
   pname = "linstor-api-py";
-  version = "1.23.0";
+  version = "1.26.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "LINBIT";
     repo = "linstor-api-py";
     rev = "v${version}";
-    hash = "sha256-+nv1Lp14X7a5BVHYGWFEESO95MsTa6NLPJSRJvIJc3w=";
+    hash = "sha256-AQMK838P+l0BKaCSOO/+FxNVN3PZsC05n5zgut86RZs=";
     fetchSubmodules = true;
   };
 

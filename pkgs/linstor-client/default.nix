@@ -8,14 +8,14 @@
 
 python310.pkgs.buildPythonApplication rec {
   pname = "linstor-client";
-  version = "1.23.0";
+  version = "1.26.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "LINBIT";
     repo = "linstor-client";
     rev = "v${version}";
-    hash = "sha256-DxYtqJr8ZOlwQdX4s4UF1BnzQsJQaYQOYOupbN3kD5k=";
+    hash = "sha256-QEP3YLmBwvNvUcU/OLPgkb2O9tguOngYVj0HRhIGd0A=";
   };
 
   nativeBuildInputs = [

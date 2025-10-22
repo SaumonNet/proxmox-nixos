@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i python3 -p git common-updater-scripts cargo toml-cli jq
+#!nix-shell -i python3 -p python3 git common-updater-scripts cargo toml-cli jq
 
 import argparse
 import os
@@ -150,7 +150,7 @@ def main():
 
     os.chdir(base_dir)
     print(f'Updating {pkg_name} with hash: {rev}')
-    run_command(f'update-source-version {pkg_name} {version} --rev={rev}')
+    run_command(f'update-source-version {pkg_name} {version} --rev={rev} --file=pkgs/{pkg_name}/default.nix')
 
 
 if __name__ == '__main__':

@@ -39,7 +39,7 @@ perl538.pkgs.toPerlModule (
       hash = "sha256-bJp432j3wC4cRgti9YE+cNFxFcHp6HR0f7yZzFWBqHQ=";
     };
 
-    sourceRoot = "${src.name}/src/PVE/Network";
+    sourceRoot = "${src.name}/src/PVE";
 
     buildInputs = [
       pkg-config

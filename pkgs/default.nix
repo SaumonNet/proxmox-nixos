@@ -52,7 +52,6 @@ let
     pve-http-server = callPackage ./pve-http-server { };
     pve-manager = callPackage ./pve-manager { };
     pve-network = callPackage ./pve-network { };
-    pve-network-api = callPackage ./pve-network-api { };
     pve-novnc = callPackage ./pve-novnc { };
     pve-qemu = callPackage ./pve-qemu { };
     pve-qemu-server = callPackage ./pve-qemu-server { };

@@ -10,7 +10,7 @@
   pve-docs,
   pve-ha-manager,
   pve-http-server,
-  pve-network-api,
+  pve-network,
   cdrkit,
   enableLinstor ? false,
   ceph,
@@ -54,7 +54,7 @@ let
     proxmox-acme
     (pve-ha-manager.override { inherit enableLinstor; })
     pve-http-server
-    pve-network-api
+    pve-network
   ];
 
   perlEnv = perl538.withPackages (_: perlDeps);

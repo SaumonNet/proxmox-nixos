@@ -15,7 +15,7 @@ perl538.pkgs.buildPerlPackage rec {
 
   passthru.updateScript = [
     ../update.pl
-    "NetSubnet"
+    "Net::Subnet"
   ];
 
   meta = with lib; {

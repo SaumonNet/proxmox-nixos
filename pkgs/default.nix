@@ -9,12 +9,12 @@ let
   ours = {
     authenpam = callPackage ./perl-modules/authenpam { };
     datadumper = callPackage ./perl-modules/datadumper { };
-    digestsha = callPackage ./perl-modules/digest-sha { };
-    findbin = callPackage ./perl-modules/find-bin { };
+    digestsha = callPackage ./perl-modules/digestsha { };
+    findbin = callPackage ./perl-modules/findbin { };
     iosocketip = callPackage ./perl-modules/iosocketip { };
     mimebase32 = callPackage ./perl-modules/mimebase32 { };
     mimebase64 = callPackage ./perl-modules/mimebase64 { };
-    net-subnet = callPackage ./perl-modules/net-subnet { };
+    netsubnet = callPackage ./perl-modules/netsubnet { };
     posixstrptime = callPackage ./perl-modules/posixstrptime { };
     socket = callPackage ./perl-modules/socket { };
     termreadline = callPackage ./perl-modules/termreadline { };

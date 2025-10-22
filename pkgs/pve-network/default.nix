@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  net-subnet,
+  netsubnet,
   perl538,
   pve-access-control,
   pve-common,
@@ -14,11 +14,11 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [ 
+  perlDeps = with perl538.pkgs; [
     IOSocketSSL
     NetAddrIP
     NetIP
-    net-subnet
+    netsubnet
     uuid
     pve-access-control
     pve-common

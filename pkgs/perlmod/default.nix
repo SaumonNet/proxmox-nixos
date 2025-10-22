@@ -37,8 +37,6 @@ rustPlatform.buildRustPackage rec {
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
     "--prefix"
     "bump perlmod-bin to"
     "--root"

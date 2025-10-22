@@ -75,8 +75,8 @@ in
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "pve-qemu-kvm"
     ];
 
     # Generate cpu flag files and machine versions json

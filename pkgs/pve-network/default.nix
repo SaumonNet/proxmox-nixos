@@ -57,8 +57,8 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "libpve-network-perl"
     ];
 
     meta = with lib; {

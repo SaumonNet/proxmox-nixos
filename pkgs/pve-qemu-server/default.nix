@@ -150,8 +150,8 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "qemu-server"
     ];
 
     meta = with lib; {

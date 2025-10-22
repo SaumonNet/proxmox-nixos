@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
     rev = "24e0aeb18ee90b73a7c98f6d4479ba7e0899ebc7";
     hash = "sha256-oAl3Fs9JW3JFNb2HJAxpPjLcRxU5WKaEiZVtbcKabpU=";
   };
- 
+
   postPatch = ''
     # Remove dpkg pkg-info.mk targets
     substituteInPlace ./Makefile \
@@ -43,15 +43,19 @@ stdenv.mkDerivation rec {
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
+    "--deb-name"
+    "pve-i18n"
+    "--use-git-log"
   ];
 
   meta = with lib; {
     description = "";
     homepage = "git://git.proxmox.com/?p=proxmox-i18n.git";
     license = [ ];
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
     platforms = platforms.all;
   };
 }

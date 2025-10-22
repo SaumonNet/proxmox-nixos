@@ -27,12 +27,6 @@ stdenv.mkDerivation rec {
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
-    "--prefix"
-    "xtermjs: bump version to"
-    "--root"
-    "xterm.js"
   ];
 
   meta = with lib; {

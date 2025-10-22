@@ -25,8 +25,7 @@ stdenv.mkDerivation rec {
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
+    "--use-git-log"
   ];
 
   meta = with lib; {

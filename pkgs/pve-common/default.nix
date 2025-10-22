@@ -101,7 +101,8 @@ perl538.pkgs.toPerlModule (
       proxmox-backup-client
       systemd
       usbutils
-    ] ++ perlDeps;
+    ]
+    ++ perlDeps;
 
     makeFlags = [
       "PREFIX=$(out)"
@@ -141,8 +142,8 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "libpve-common-perl"
     ];
 
     meta = with lib; {

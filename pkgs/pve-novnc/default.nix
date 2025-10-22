@@ -30,23 +30,20 @@ novnc.overrideAttrs (old: rec {
 
   buildInputs = [ esbuild ];
 
-  installPhase =
-    ''
-      esbuild --bundle app/ui.js > app.js
-    ''
-    + old.installPhase
-    + ''
-      cp app.js $out/share/webapps/novnc/
-      mv $out/share/webapps/novnc/{vnc.html,index.html.tpl}
-    '';
+  installPhase = ''
+    esbuild --bundle app/ui.js > app.js
+  ''
+  + old.installPhase
+  + ''
+    cp app.js $out/share/webapps/novnc/
+    mv $out/share/webapps/novnc/{vnc.html,index.html.tpl}
+  '';
 
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
-    "--version-prefix"
-    (lib.versions.majorMinor old.version)
+    "--deb-name"
+    "novnc-pve"
   ];
 
   meta.position = builtins.dirOf ./.;

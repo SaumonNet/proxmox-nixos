@@ -70,8 +70,6 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
     ];
 
     meta = with lib; {

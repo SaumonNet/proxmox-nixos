@@ -59,8 +59,6 @@ stdenv.mkDerivation rec {
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
   ];
 
   meta = with lib; {

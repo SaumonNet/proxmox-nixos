@@ -2,6 +2,7 @@
   lib,
   python310,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 python310.pkgs.buildPythonPackage rec {
@@ -24,6 +25,8 @@ python310.pkgs.buildPythonPackage rec {
   ];
 
   pythonImportsCheck = [ "linstor" ];
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--flake" ]; };
 
   meta = with lib; {
     description = "LINSTOR Python API";

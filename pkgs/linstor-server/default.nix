@@ -23,6 +23,7 @@
   thin-provisioning-tools,
   util-linux,
   zfs,
+  writeScript,
 }:
 
 let
@@ -116,7 +117,14 @@ let
           ]
         }
     '';
-  });
 
+    passthru.updateScript = writeScript "update-linstor-server" ''
+      #!/usr/bin/env nix-shell
+      #!nix-shell -i bash -p nix-update
+
+      nix-update linstor-server --flake # update version and hash
+      bash $(nix build --no-link --print-out-paths .#packages.x86_64-linux.linstor-server.mitmCache.updateScript)
+    '';
+  });
 in
 self

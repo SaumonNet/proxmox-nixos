@@ -1,8 +1,8 @@
 {
-  lib,
   novnc,
   esbuild,
   fetchgit,
+  fetchurl,
 }:
 
 novnc.overrideAttrs (old: rec {
@@ -31,7 +31,7 @@ novnc.overrideAttrs (old: rec {
   buildInputs = [ esbuild ];
 
   installPhase = ''
-    esbuild --bundle app/ui.js > app.js
+    esbuild --bundle --format=esm app/ui.js > app.js
   ''
   + old.installPhase
   + ''

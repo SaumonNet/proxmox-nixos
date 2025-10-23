@@ -87,6 +87,8 @@ in
       $out/bin/qemu-system-x86_64 -machine help \
         | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
     '';
+
+    meta.position = builtins.dirOf ./.;
   })).override
   {
     glusterfsSupport = true;

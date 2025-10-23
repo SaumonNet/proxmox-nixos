@@ -194,9 +194,7 @@ def main():
     os.chdir(base_dir)
 
     print(f"Updating {pkg_name} with hash: {rev} and version: {version}")
-    run_command(
-        f"update-source-version {pkg_name} {version} --rev={rev} --file=pkgs/{pkg_name}/default.nix"
-    )
+    run_command(f"update-source-version {pkg_name} {version} --rev={rev}")
 
     print("Done.")
 

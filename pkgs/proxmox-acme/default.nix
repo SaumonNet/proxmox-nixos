@@ -32,7 +32,7 @@ perl538.pkgs.toPerlModule (
     postPatch = ''
       # Remove --reset-env so basic coreutils tools could be found
       substituteInPlace PVE/ACME/DNSChallenge.pm \
-        --replace-fail ', "--reset-env"' "" \
+        --replace-fail "--reset-env" "" \
         --replace-fail '/bin/bash' '${lib.getExe bash}'
       substituteInPlace proxmox-acme \
         --replace-fail '_CURL="curl' '_CURL="${lib.getExe curl}' 

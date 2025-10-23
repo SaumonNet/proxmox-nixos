@@ -87,8 +87,6 @@ perl538.pkgs.toPerlModule (
         -e '/architecture/d' \
         -e 's/aplinfo PVE bin www services configs network-hooks test/PVE bin www configs test/'
       sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+9d'
-      patchShebangs configs/country.pl
-      sed -i configs/country.pl -e "s|/usr|${tzdata}|"
       #cp PVE/pvecfg.pm{.in,}
       sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
     '';
@@ -115,7 +113,7 @@ perl538.pkgs.toPerlModule (
     ];
 
     postInstall = ''
-      rm -r $out/var $out/bin/pve{upgrade,update,version,7to8,8to9}
+      rm -r $out/var $out/bin/pve{upgrade,update,version,8to9}
       sed -i $out/{bin/*,share/pve-manager/helpers/pve-startall-delay} -e "s/-T//"
     '';
 

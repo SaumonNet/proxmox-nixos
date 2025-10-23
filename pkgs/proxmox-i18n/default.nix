@@ -3,6 +3,7 @@
   stdenv,
   fetchgit,
   perl538,
+  gettext,
   pve-update-script,
 }:
 
@@ -39,7 +40,10 @@ stdenv.mkDerivation rec {
     "DESTDIR=$(out)"
   ];
 
-  nativeBuildInputs = [ perlEnv ];
+  nativeBuildInputs = [
+    perlEnv
+    gettext
+  ];
 
   passthru.updateScript = pve-update-script {
     extraArgs = [

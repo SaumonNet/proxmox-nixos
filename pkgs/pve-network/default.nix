@@ -32,12 +32,12 @@ in
 perl538.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-network";
-    version = "0.11.2";
+    version = "1.1.8";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "8f4f5d2074989cf814d2f2312360239377c495f5";
-      hash = "sha256-bJp432j3wC4cRgti9YE+cNFxFcHp6HR0f7yZzFWBqHQ=";
+      rev = "3938fa1c6e88cc9d8eebcd8ba1919a5417e109e0";
+      hash = "sha256-A5PZTudip6mGqi0TcHAX7+bh0htGjzqza6NLNvhjPp4=";
     };
 
     sourceRoot = "${src.name}/src/PVE";

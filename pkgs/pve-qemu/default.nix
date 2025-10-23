@@ -17,13 +17,13 @@ in
 (
   (qemu.overrideAttrs (old: rec {
     pname = "pve-qemu";
-    version = "9.2.0-7";
+    version = "10.0.2-4";
 
     src =
       (fetchgit {
         url = "git://git.proxmox.com/git/pve-qemu.git";
-        rev = "245689b9ae4120994de29b71595ea58abac06f3c";
-        hash = "sha256-JTcTUVC8vmv7yrtpE7deCN7zkZmiCC1Z0lLXackuY/8=";
+        rev = "839b53bab89fddb7a7fb3a1d722e05df932cce4e";
+        hash = "sha256-pu0Mp4F1ppmD1R0O31c8tm0jTlfsxuxYFN03+YPrtBc=";
         fetchSubmodules = true;
 
         # Download subprojects managed by meson

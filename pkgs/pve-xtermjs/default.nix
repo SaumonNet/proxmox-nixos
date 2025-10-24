@@ -6,12 +6,12 @@
 
 stdenv.mkDerivation rec {
   pname = "pve-xtermjs";
-  version = "5.3.0-3";
+  version = "5.5.0-2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/pve-xtermjs.git";
-    rev = "9e209b042bad4f3cf524654c1484ec8061a9edfb";
-    hash = "sha256-Ifnv0sYC9nNHuHPpXwTn+2vKSFHpnFn1Gwc59s5kzOE=";
+    rev = "a29b36079fbaf18586615e26bb615992d1007c7e";
+    hash = "sha256-89K93D8uD1pAynM1M3ixbbZS3p7Sxga9OA/HgpVBeHY=";
   };
 
   dontBuild = true;
@@ -27,12 +27,6 @@ stdenv.mkDerivation rec {
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
-    "--prefix"
-    "xtermjs: bump version to"
-    "--root"
-    "xterm.js"
   ];
 
   meta = with lib; {

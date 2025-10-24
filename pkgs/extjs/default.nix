@@ -30,8 +30,9 @@ stdenv.mkDerivation rec {
   passthru.updateScript = [
     ../update.py
     pname
-    "--url"
-    src.url
+    "--deb-name"
+    "libjs-extjs"
+    "--use-git-log"
   ];
 
   meta = with lib; {

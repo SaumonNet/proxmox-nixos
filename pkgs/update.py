@@ -1,157 +1,203 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i python3 -p git common-updater-scripts cargo toml-cli jq
+#!nix-shell -i python3 -p python3 git common-updater-scripts dpkg
 
 import argparse
 import os
 import subprocess
-import shutil
+import tempfile
+import urllib.request
+import gzip
+import sys
 import re
 
+# Defaults targeting Proxmox public repo / trixie pve-no-subscription
+DIST = "bookworm"
+COMP = "pve-no-subscription"
+BASE_URL = "http://download.proxmox.com/debian/pve"
+PACKAGES_GZ_URL = f"{BASE_URL}/dists/{DIST}/{COMP}/binary-amd64/Packages.gz"
 
-def run_command(command):
-    result = subprocess.run(command, shell=True,
-                            text=True, capture_output=True)
-    if result.returncode != 0:
-        error_message = f"Command '{command}' failed with error: {result.stderr.strip()}"
-        raise RuntimeError(error_message)
+
+def run_command(command, check=True):
+    """Run a shell command and return stdout (raises on non-zero by default)."""
+    result = subprocess.run(command, shell=True, text=True, capture_output=True)
+    if check and result.returncode != 0:
+        raise RuntimeError(f"Command '{command}' failed: {result.stderr.strip()}")
     return result.stdout.strip()
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Update a package to a new version.')
-    parser.add_argument('pkg_name', help='Name of the package to update')
-    parser.add_argument('--url', help='URL of the Git source', default=None)
-    parser.add_argument('--version', help='Specify the version to update to')
-    parser.add_argument('--version-prefix', default=None,
-                        help='Specify the prefix of targeted update version')
-    parser.add_argument('--prefix', default='bump version to',
-                        help='Prefix for the commit message')
-    parser.add_argument('--root', default='.',
-                        help='Root directory of the source')
+def parse_packages_gz(url):
+    """Stream and parse Packages.gz from the given URL. Yields dicts."""
+    with urllib.request.urlopen(url) as resp:
+        with gzip.open(resp, "rt", encoding="utf-8") as f:
+            entry = {}
+            for line in f:
+                line = line.rstrip("\n")
+                if not line:
+                    if entry:
+                        yield entry
+                        entry = {}
+                    continue
+                if ":" in line:
+                    k, v = line.split(":", 1)
+                    entry[k.strip()] = v.strip()
+            if entry:
+                yield entry
 
-    args = parser.parse_args()
+
+def latest_pkg_info(package):
+    """Return (version, filename) of the latest available package using dpkg compare-versions."""
+    candidates = [
+        p for p in parse_packages_gz(PACKAGES_GZ_URL) if p.get("Package") == package
+    ]
+    if not candidates:
+        raise RuntimeError(f"Package '{package}' not found in {PACKAGES_GZ_URL}")
+
+    latest = candidates[0]
+    for c in candidates[1:]:
+        # dpkg --compare-versions latest lt c  -> exit 0 if latest < c
+        rc = subprocess.run(
+            ["dpkg", "--compare-versions", latest["Version"], "lt", c["Version"]],
+            check=False,
+        ).returncode
+        if rc == 0:
+            latest = c
+    return latest["Version"], latest["Filename"]
+
+
+def normalize_debian_version(version):
+    """
+    Strip everything after '~' (pre-release) for dpkg/git log comparison.
+    Example: '4.2025.02-4~bpo12+1' -> '4.2025.02-4'
+    """
+    if "~" in version:
+        version = version.split("~", 1)[0]
+    return version
+
+
+def extract_source_from_deb(deb_url):
+    """Download .deb from deb_url, extract and return the contents of any SOURCE file found."""
+    with tempfile.TemporaryDirectory() as td:
+        deb_path = os.path.join(td, "pkg.deb")
+        urllib.request.urlretrieve(deb_url, deb_path)
+        subprocess.run(["dpkg-deb", "-x", deb_path, td], check=True)
+        for root, _, files in os.walk(td):
+            if "SOURCE" in files:
+                with open(os.path.join(root, "SOURCE"), "r", encoding="utf-8") as fh:
+                    return fh.read().strip()
+    return None
+
+
+def find_commit_in_source(source_text):
+    """Return the first plausible commit hash from SOURCE contents."""
+    if not source_text:
+        return None
+    m = re.search(r"\b[0-9a-f]{7,40}\b", source_text)
+    return m.group(0) if m else None
+
+
+def main():
+    p = argparse.ArgumentParser(
+        description="Update a nix package to the Proxmox repo revision"
+    )
+    p.add_argument(
+        "pkg_name",
+        help="Name of the nix package and proxmox git repo (e.g. pve-manager)",
+    )
+    p.add_argument(
+        "--deb-name",
+        help="Actual package name in the Proxmox repository (if different from nix package)",
+    )
+    p.add_argument(
+        "--use-git-log",
+        action="store_true",
+        help="Instead of extracting SOURCE from .deb, grep the git history for the version",
+    )
+    p.add_argument(
+        "--git-log-prefix",
+        help="Optional prefix to use when grepping git commit messages for the version",
+        default="bump version to ",
+    )
+    args = p.parse_args()
 
     base_dir = os.getcwd()
     pkg_name = args.pkg_name
-    repo_url = args.url if args.url else f'git://git.proxmox.com/git/{pkg_name}.git'
-    old_version = run_command(f'nix eval .#{pkg_name}.version').strip('"')
+    deb_name = args.deb_name if args.deb_name else pkg_name
 
-    repo_name = os.path.basename(repo_url).replace('.git', '')
+    # get latest package version + filename from Proxmox Packages.gz
+    print("Fetching package metadata...")
+    version, filename = latest_pkg_info(deb_name)
+    version = normalize_debian_version(version)
+    deb_url = f"{BASE_URL}/{filename}"
+    print(f"Latest available: {deb_name} {version}")
+    print(f"Deb URL: {deb_url}")
 
-    temp_dir = '/tmp'
-    os.chdir(temp_dir)
+    # read old version from nix expr
+    try:
+        old_version = (
+            run_command(f"nix eval .#{pkg_name}.version", check=True).strip().strip('"')
+        )
+    except Exception as e:
+        print(f"Warning: failed to eval old version: {e}")
+        old_version = None
 
-    if not os.path.isdir(repo_name):
-        print(f'Cloning the {pkg_name} repository...')
-        run_command(f'git clone {repo_url}')
-    else:
-        print('Repository already cloned.')
-
-    os.chdir(repo_name)
-    run_command('git fetch origin && git reset --hard @{u} && git clean -fd')
-
-    if args.version:
-        version = args.version
-    else:
-        print('Finding latest version')
-        grep_prefix = f'{args.prefix} {args.version_prefix}' if args.version_prefix else args.prefix
-            
-        log_output = run_command(
-            f'git log --grep="{grep_prefix}" -n 1 --pretty=format:"%s"')
-        version_match = re.search(f'{re.escape(args.prefix)} (.*)', log_output)
-        version = version_match.group(1) if version_match else None
-
-    if not version:
-        print('No version found in the commit messages.')
+    # if same version, nothing to do
+    if old_version and old_version == version:
+        print("New version same as old version, nothing to do.")
         return
 
-    rev = run_command(
-        f'git log --grep="{args.prefix} {version}" -n 1 --pretty=format:"%H"')
-    if len(rev) == 0:
-        print("Error: Version was not found in the Git repository.")
-        return
+    if args.use_git_log:
+        # Clone or update the repository
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_url = run_command(f"nix eval .#{pkg_name}.src.url").strip().strip('"')
+            repo_name = os.path.basename(repo_url).replace(".git", "")
+            repo_path = os.path.join(tmpdir, repo_name)
+            print(f"Cloning {repo_url} in {tmpdir}...")
+            run_command(f"git clone {repo_url} {repo_path}")
 
-    if old_version == version:
-        print('New version same as old version, nothing to do.')
-    else:
-        os.chdir(temp_dir)
-        os.chdir(repo_name)
-        print(f'Resetting to {rev}')
-        run_command(f'git reset --hard {rev}')
+            os.chdir(repo_path)
+            # Search the git history for a commit message matching the version
+            grep_prefix = args.git_log_prefix if args.git_log_prefix else ""
+            # Build the grep pattern: optionally include a prefix before the version
+            pattern = f"{grep_prefix}{version}" if grep_prefix else version
 
-        # Remove debian registry
-        for root, _, files in os.walk('.'):
-            for file in files:
-                if file == 'config' and '.cargo' in root:
-                    os.remove(os.path.join(root, file))
-
-        os.chdir(args.root)
-
-        cargo_toml_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(
-            '.') for f in filenames if f == 'Cargo.toml']
-
-        if len(cargo_toml_files) > 1:
-            print('Error: There should be at most 1 Cargo.toml file.')
-            return
-
-        if len(cargo_toml_files) == 1:
-            cargo_toml = cargo_toml_files[0]
-            cargo_dir = os.path.dirname(cargo_toml)
-            print(f'Found a Cargo.toml file in directory: {cargo_dir}')
-
-            os.chdir(cargo_dir)
-
-            def transform_git_deps():
-                deps = run_command(
-                    'toml get Cargo.toml dependencies | jq -r "keys[]"').splitlines()
-                with open('Cargo.toml', 'r') as f:
-                    lines = f.readlines()
-
-                with open('Cargo.toml', 'w') as f:
-                    for line in lines:
-                        if not line.strip():
-                            continue
-                        f.write(line)
-
-                for dep in deps:
-                    if dep.startswith('proxmox-') or dep.startswith('pbs-'):
-                        print(f"Patching Cargo dependency '{dep}' to use Git.")
-                    if dep == 'perlmod':
-                        run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/perlmod.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
-                    elif dep == 'proxmox-resource-scheduling':
-                        run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox-resource-scheduling.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
-                    elif dep.startswith('proxmox-'):
-                        run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
-                    elif dep.startswith('pbs-'):
-                        run_command(
-                            f'toml set Cargo.toml dependencies.{dep}.git git://git.proxmox.com/git/proxmox-backup.git > Cargo.toml.tmp && mv Cargo.toml.tmp Cargo.toml')
-                print("Finished patching Git dependencies.")
-
-            transform_git_deps()
-            run_command('cargo generate-lockfile')
-            shutil.copy('Cargo.toml', os.path.join(
-                base_dir, f'pkgs/{pkg_name}/'))
-
-            cargo_lock_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(
-                temp_dir) for f in filenames if f == 'Cargo.lock']
-            if len(cargo_lock_files) != 1:
+            print(f"Searching git history for version '{pattern}'...")
+            try:
+                rev = run_command(
+                    f"git log --grep='{pattern}' -n 1 --pretty=format:'%H'"
+                )
+            except RuntimeError:
                 print(
-                    f'Error: Found {len(cargo_lock_files)} Cargo.lock file(s).')
-                return
+                    f"ERROR: Could not find a commit matching version '{pattern}' in git history."
+                )
+                sys.exit(1)
+            if not rev:
+                print(
+                    f"ERROR: Could not find a commit matching version '{pattern}' in git history."
+                )
+                sys.exit(1)
+    else:
+        # extract SOURCE and commit
+        print("Downloading package and extracting SOURCE...")
+        source_text = extract_source_from_deb(deb_url)
+        if not source_text:
+            print("ERROR: SOURCE file not found inside the .deb")
+            sys.exit(1)
 
-            cargo_lock = cargo_lock_files[0]
-            print(f'Found one Cargo.lock file: {cargo_lock}')
-            shutil.copy(cargo_lock, os.path.join(
-                base_dir, f'pkgs/{pkg_name}/'))
+        rev = find_commit_in_source(source_text)
+        if not rev:
+            print("ERROR: could not find a commit hash in SOURCE file")
+            sys.exit(1)
 
+    print(f"Resolved commit: {rev}")
+
+    # go to provided root and run update-source-version
     os.chdir(base_dir)
-    print(f'Updating {pkg_name} with hash: {rev}')
-    run_command(f'update-source-version {pkg_name} {version} --rev={rev}')
+
+    print(f"Updating {pkg_name} with hash: {rev} and version: {version}")
+    run_command(f"update-source-version {pkg_name} {version} --rev={rev}")
+
+    print("Done.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

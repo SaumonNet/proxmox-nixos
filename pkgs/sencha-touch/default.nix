@@ -29,13 +29,6 @@ stdenv.mkDerivation rec {
     cp -r resources/themes/images/default/* $out/share/javascript/sencha-touch/resources/themes/images
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--url"
-    src.url
-  ];
-
   meta = with lib; {
     description = "";
     homepage = "git://git.proxmox.com/?p=sencha-touch.git";

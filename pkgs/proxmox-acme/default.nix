@@ -5,7 +5,7 @@
   perl538,
   acme-sh,
   bash,
-  curl,  
+  curl,
 }:
 
 let
@@ -53,8 +53,9 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "libproxmox-acme-perl"
+      "--use-git-log"
     ];
 
     meta = with lib; {

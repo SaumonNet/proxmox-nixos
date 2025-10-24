@@ -74,15 +74,14 @@ perl538.pkgs.toPerlModule (
       "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
     ];
 
-    postInstall =
-      ''
-        sed -i $out/bin/* \
-          -e "s/-T//" \
-          -e "1s|$| -I$out/${perl538.libPrefix}/${perl538.version}|"
-      ''
-      + lib.optionalString enableLinstor ''
-        cp -rs ${linstor-proxmox}/lib $out
-      '';
+    postInstall = ''
+      sed -i $out/bin/* \
+        -e "s/-T//" \
+        -e "1s|$| -I$out/${perl538.libPrefix}/${perl538.version}|"
+    ''
+    + lib.optionalString enableLinstor ''
+      cp -rs ${linstor-proxmox}/lib $out
+    '';
 
     postFixup = ''
       find $out -type f | xargs sed -i \
@@ -130,8 +129,8 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "libpve-storage-perl"
     ];
 
     meta = with lib; {

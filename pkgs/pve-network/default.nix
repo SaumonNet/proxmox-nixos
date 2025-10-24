@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  net-subnet,
+  netsubnet,
   perl538,
   pve-access-control,
   pve-common,
@@ -14,11 +14,11 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [ 
+  perlDeps = with perl538.pkgs; [
     IOSocketSSL
     NetAddrIP
     NetIP
-    net-subnet
+    netsubnet
     uuid
     pve-access-control
     pve-common
@@ -39,7 +39,7 @@ perl538.pkgs.toPerlModule (
       hash = "sha256-bJp432j3wC4cRgti9YE+cNFxFcHp6HR0f7yZzFWBqHQ=";
     };
 
-    sourceRoot = "${src.name}/src/PVE/Network";
+    sourceRoot = "${src.name}/src/PVE";
 
     buildInputs = [
       pkg-config
@@ -57,8 +57,8 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "libpve-network-perl"
     ];
 
     meta = with lib; {

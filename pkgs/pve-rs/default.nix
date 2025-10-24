@@ -84,8 +84,6 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
       "--prefix"
       "pve: bump version to"
       "--root"

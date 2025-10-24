@@ -40,8 +40,9 @@ perl538.pkgs.toPerlModule (
     passthru.updateScript = [
       ../update.py
       pname
-      "--url"
-      src.url
+      "--deb-name"
+      "librados2-perl"
+      "--use-git-log"
     ];
 
     meta = with lib; {

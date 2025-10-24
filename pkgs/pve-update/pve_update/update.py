@@ -11,7 +11,7 @@ import sys
 import re
 
 # Defaults targeting Proxmox public repo / trixie pve-no-subscription
-DIST = "bookworm"
+DIST = "trixie"
 COMP = "pve-no-subscription"
 BASE_URL = "http://download.proxmox.com/debian/pve"
 PACKAGES_GZ_URL = f"{BASE_URL}/dists/{DIST}/{COMP}/binary-amd64/Packages.gz"
@@ -95,35 +95,25 @@ def find_commit_in_source(source_text):
     return m.group(0) if m else None
 
 
-def main():
-    p = argparse.ArgumentParser(
-        description="Update a nix package to the Proxmox repo revision"
-    )
-    p.add_argument(
-        "pkg_name",
-        help="Name of the nix package and proxmox git repo (e.g. pve-manager)",
-    )
-    p.add_argument(
-        "--deb-name",
-        help="Actual package name in the Proxmox repository (if different from nix package)",
-    )
-    p.add_argument(
-        "--use-git-log",
-        action="store_true",
-        help="Instead of extracting SOURCE from .deb, grep the git history for the version",
-    )
-    p.add_argument(
-        "--git-log-prefix",
-        help="Optional prefix to use when grepping git commit messages for the version",
-        default="bump version to ",
-    )
-    args = p.parse_args()
+def update_src(
+    pkg_name: str,
+    deb_name: str | None = None,
+    use_git_log: bool = False,
+    git_log_prefix: str = "bump version to "
+):
+    """
+    Update a nix package to the latest Proxmox repo revision.
 
+    Args:
+        pkg_name: Name of the nix package (and proxmox git repo)
+        deb_name: Optional actual package name in Proxmox repo
+        use_git_log: If True, grep the git history instead of extracting SOURCE from .deb
+        git_log_prefix: Optional prefix when searching git commit messages
+    """
     base_dir = os.getcwd()
-    pkg_name = args.pkg_name
-    deb_name = args.deb_name if args.deb_name else pkg_name
+    deb_name = deb_name or pkg_name
 
-    # get latest package version + filename from Proxmox Packages.gz
+    # Step 1: fetch latest version info
     print("Fetching package metadata...")
     version, filename = latest_pkg_info(deb_name)
     version = normalize_debian_version(version)
@@ -131,22 +121,19 @@ def main():
     print(f"Latest available: {deb_name} {version}")
     print(f"Deb URL: {deb_url}")
 
-    # read old version from nix expr
+    # Step 2: read old version from nix
     try:
-        old_version = (
-            run_command(f"nix eval .#{pkg_name}.version", check=True).strip().strip('"')
-        )
+        old_version = run_command(f"nix eval .#{pkg_name}.version", check=True).strip().strip('"')
     except Exception as e:
         print(f"Warning: failed to eval old version: {e}")
         old_version = None
 
-    # if same version, nothing to do
     if old_version and old_version == version:
         print("New version same as old version, nothing to do.")
         return
 
-    if args.use_git_log:
-        # Clone or update the repository
+    # Step 3: resolve commit hash
+    if use_git_log:
         with tempfile.TemporaryDirectory() as tmpdir:
             repo_url = run_command(f"nix eval .#{pkg_name}.src.url").strip().strip('"')
             repo_name = os.path.basename(repo_url).replace(".git", "")
@@ -155,28 +142,17 @@ def main():
             run_command(f"git clone {repo_url} {repo_path}")
 
             os.chdir(repo_path)
-            # Search the git history for a commit message matching the version
-            grep_prefix = args.git_log_prefix if args.git_log_prefix else ""
-            # Build the grep pattern: optionally include a prefix before the version
-            pattern = f"{grep_prefix}{version}" if grep_prefix else version
-
+            pattern = f"{git_log_prefix}{version}" if git_log_prefix else version
             print(f"Searching git history for version '{pattern}'...")
             try:
-                rev = run_command(
-                    f"git log --grep='{pattern}' -n 1 --pretty=format:'%H'"
-                )
+                rev = run_command(f"git log --grep='{pattern}' -n 1 --pretty=format:'%H'")
             except RuntimeError:
-                print(
-                    f"ERROR: Could not find a commit matching version '{pattern}' in git history."
-                )
+                print(f"ERROR: Could not find a commit matching version '{pattern}' in git history.")
                 sys.exit(1)
             if not rev:
-                print(
-                    f"ERROR: Could not find a commit matching version '{pattern}' in git history."
-                )
+                print(f"ERROR: Could not find a commit matching version '{pattern}' in git history.")
                 sys.exit(1)
     else:
-        # extract SOURCE and commit
         print("Downloading package and extracting SOURCE...")
         source_text = extract_source_from_deb(deb_url)
         if not source_text:
@@ -190,14 +166,8 @@ def main():
 
     print(f"Resolved commit: {rev}")
 
-    # go to provided root and run update-source-version
+    # Step 4: update nix expression
     os.chdir(base_dir)
-
     print(f"Updating {pkg_name} with hash: {rev} and version: {version}")
     run_command(f"update-source-version {pkg_name} {version} --rev={rev}")
-
     print("Done.")
-
-
-if __name__ == "__main__":
-    main()

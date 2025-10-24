@@ -14,6 +14,7 @@
   rustPlatform,
   git,
   mkRegistry,
+  writeScript,
 }:
 let
   sources = import ./sources.nix;
@@ -73,7 +74,21 @@ rustPlatform.buildRustPackage rec {
     openssl
   ];
 
-  passthru.registry = registry;
+  passthru = {
+    inherit registry;
+
+    updateScript = writeScript "update-linstor-server" ''
+      #!/usr/bin/env nix-shell
+      #!nix-shell -i bash -p cargo
+
+      pkgs/update.py ${pname} --deb-name libproxmox-backup-qemu0
+      tasks/generate-registry.py --package libproxmox-backup-qemu0 --mappings pkgs/mappings.json --output pkgs/${pname}/sources.nix
+      nix build .#packages.x86_64-linux.${pname}.cargoDeps
+      cd result
+      cargo generate-lockfile --lockfile-path ../pkgs/${pname}/Cargo.lock
+    '';
+
+  };
 
   postInstall = ''
     cp proxmox-backup-qemu.h $out/lib

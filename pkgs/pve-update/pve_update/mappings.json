@@ -1,19 +1,35 @@
 [
-{
+  {
+    "package_name": "termproxy",
+    "debian_package_name": "proxmox-termproxy",
+    "git_repository": "git://git.proxmox.com/git/pve-xtermjs.git",
+    "path": "termproxy"
+  },
+  {
+    "package_name": "pve-rs",
+    "debian_package_name": "libpve-rs-perl",
+    "git_repository": "git://git.proxmox.com/git/proxmox-perl-rs.git"
+  },
+  {
     "package_name": "proxmox-perl-rs",
-    "debian_package_name": "libproxmox-rs-perl", 
+    "debian_package_name": "libproxmox-rs-perl",
     "git_repository": "git://git.proxmox.com/git/proxmox-perl-rs.git",
     "path": "."
   },
   {
     "package_name": "proxmox-backup-qemu0",
-    "debian_package_name": "libproxmox-backup-qemu0", 
+    "debian_package_name": "libproxmox-backup-qemu0",
     "git_repository": "git://git.proxmox.com/git/proxmox-backup-qemu.git",
     "path": "."
   },
   {
+    "package_name": "proxmox-base64",
+    "debian_package_name": "librust-proxmox-base64-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
     "package_name": "proxmox-syslog-api",
-    "debian_package_name": "librust-proxmox-syslog-api-dev", 
+    "debian_package_name": "librust-proxmox-syslog-api-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
   },
   {
@@ -56,7 +72,6 @@
     "debian_package_name": "librust-pbs-api-types-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
   },
-
   {
     "package_name": "proxmox-async",
     "debian_package_name": "librust-proxmox-async-dev",
@@ -197,7 +212,7 @@
     "debian_package_name": "librust-proxmox-sendmail-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git",
     "exceptions": {
-	"0.1.0-1": "043fec42f82163a1e6e7012d1032ce67c26cafdc"
+      "0.1.0-1": "043fec42f82163a1e6e7012d1032ce67c26cafdc"
     }
   },
   {
@@ -263,20 +278,17 @@
   {
     "package_name": "perlmod",
     "debian_package_name": "librust-perlmod-dev",
-    "git_repository": "git://git.proxmox.com/git/perlmod.git",
-    "patches": [ "perlmod/remove_safe_putenv.patch" ]
+    "git_repository": "git://git.proxmox.com/git/perlmod.git"
   },
   {
     "package_name": "perlmod-macro",
     "debian_package_name": "librust-perlmod-macro-dev",
-    "git_repository": "git://git.proxmox.com/git/perlmod.git",
-    "patches": [ "perlmod/remove_safe_putenv.patch" ]
+    "git_repository": "git://git.proxmox.com/git/perlmod.git"
   },
   {
     "package_name": "proxmox-resource-scheduling",
     "debian_package_name": "librust-proxmox-resource-scheduling-dev",
-    "git_repository": "git://git.proxmox.com/git/proxmox-resource-scheduling.git",
-    "path": "."
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
   },
   {
     "package_name": "proxmox-ve-config",
@@ -295,6 +307,4 @@
     "git_repository": "git://git.proxmox.com/git/pxar.git",
     "path": "."
   }
-
-
 ]

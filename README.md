@@ -297,6 +297,8 @@ In order to enable live migrating VMs from a Proxmox-Debian to a Proxmox-NixOS:
 
 ```console
 $ ln -sf $(which true) /bin/true
+$ mkdir -p /usr/sbin
+$ ln -sf $(which qm) /usr/sbin/qm
 ```
 
 ## 🔧 Maintainance

@@ -18,9 +18,9 @@
 }:
 
 let
-  perlDeps = [ 
+  perlDeps = [
     pve-access-control
-    pve-cluster 
+    pve-cluster
     pve-network
     pve-rs
   ];

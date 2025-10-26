@@ -32,7 +32,11 @@ let
         "network-online.target"
         "time-sync.target"
         "pve-cluster.service"
-      ] ++ lib.optional (daemonType == "osd") "ceph-mon.target";
+      ]
+      ++ lib.optionals (daemonType == "osd") [
+        "ceph-mon.target"
+        "ceph-volume-all.service"
+      ];
       wants = [
         "network-online.target"
         "time-sync.target"
@@ -58,29 +62,28 @@ let
           5;
       startLimitIntervalSec = 60 * 30; # 30 mins
 
-      serviceConfig =
-        {
-          LimitNOFILE = 1048576;
-          LimitNPROC = 1048576;
-          Environment = "CLUSTER=${clusterName}";
-          ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
-          PrivateDevices = "yes";
-          PrivateTmp = "true";
-          ProtectHome = "true";
-          ProtectSystem = "full";
-          Restart = "on-failure";
-          ExecStart = ''
-            ${ceph.out}/bin/${if daemonType == "rgw" then "radosgw" else "ceph-${daemonType}"} \
-                                -f --cluster ${clusterName} --id ${daemonId} --setuser ceph --setgroup ceph'';
-        }
-        // lib.optionalAttrs (daemonType == "osd") {
-          ExecStartPre = "${ceph.lib}/libexec/ceph/ceph-osd-prestart.sh --id ${daemonId} --cluster ${clusterName}";
-          RestartSec = "20s";
-          PrivateDevices = "no"; # osd needs disk access
-        }
-        // lib.optionalAttrs (daemonType == "mon") {
-          RestartSec = "10";
-        };
+      serviceConfig = {
+        LimitNOFILE = 1048576;
+        LimitNPROC = 1048576;
+        Environment = "CLUSTER=${clusterName}";
+        ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
+        PrivateDevices = "yes";
+        PrivateTmp = "true";
+        ProtectHome = "true";
+        ProtectSystem = "full";
+        Restart = "on-failure";
+        ExecStart = ''
+          ${ceph.out}/bin/${if daemonType == "rgw" then "radosgw" else "ceph-${daemonType}"} \
+                              -f --cluster ${clusterName} --id ${daemonId} --setuser ceph --setgroup ceph'';
+      }
+      // lib.optionalAttrs (daemonType == "osd") {
+        ExecStartPre = "${ceph.lib}/libexec/ceph/ceph-osd-prestart.sh --id ${daemonId} --cluster ${clusterName}";
+        RestartSec = "20s";
+        PrivateDevices = "no"; # osd needs disk access
+      }
+      // lib.optionalAttrs (daemonType == "mon") {
+        RestartSec = "10";
+      };
     };
 
   makeTarget = daemonType: {
@@ -212,9 +215,9 @@ in
 
     networking.firewall = lib.mkIf config.services.proxmox-ve.openFirewall {
       allowedTCPPorts = lib.optionals cfg.mon.enable [
-          3300
-          6789
-        ];
+        3300
+        6789
+      ];
       allowedTCPPortRanges = lib.optionals (cfg.osd.enable || cfg.msd.enable || cfg.mgr.enable) [
         {
           from = 6800;
@@ -241,27 +244,49 @@ in
           ++ lib.optional cfg.mds.enable (makeServices "mds" cfg.mds.daemons)
           ++ lib.optional cfg.osd.enable (makeServices "osd" cfg.osd.daemons)
           ++ lib.optional cfg.rgw.enable (makeServices "rgw" cfg.rgw.daemons)
-          ++ lib.optional cfg.mgr.enable (makeServices "mgr" cfg.mgr.daemons);
+          ++ lib.optional cfg.mgr.enable (makeServices "mgr" cfg.mgr.daemons)
+          ++ lib.optional cfg.osd.enable {
+            ceph-volume-all = {
+              description = "Ceph Volume activation";
+              after = [
+                "local-fs.target"
+                "pve-cluster.service"
+              ];
+              wants = [ "local-fs.target" ];
+              wantedBy = [ "multi-user.target" ];
+              path = with pkgs; [
+                lvm2
+                util-linux
+              ];
+              serviceConfig = {
+                Type = "oneshot";
+                KillMode = "none";
+                Environment = "CEPH_VOLUME_TIMEOUT=10000";
+                ExecStart = "${cfg.osd.package}/bin/ceph-volume lvm activate --all --no-systemd";
+                TimeoutSec = 0;
+              };
+
+            };
+          };
       in
       lib.mkMerge services;
 
     systemd.targets =
       let
-        targets =
-          [
-            {
-              ceph = {
-                description = "Ceph target allowing to start/stop all ceph service instances at once";
-                wantedBy = [ "multi-user.target" ];
-                unitConfig.StopWhenUnneeded = true;
-              };
-            }
-          ]
-          ++ lib.optional cfg.mon.enable (makeTarget "mon")
-          ++ lib.optional cfg.mds.enable (makeTarget "mds")
-          ++ lib.optional cfg.osd.enable (makeTarget "osd")
-          ++ lib.optional cfg.rgw.enable (makeTarget "rgw")
-          ++ lib.optional cfg.mgr.enable (makeTarget "mgr");
+        targets = [
+          {
+            ceph = {
+              description = "Ceph target allowing to start/stop all ceph service instances at once";
+              wantedBy = [ "multi-user.target" ];
+              unitConfig.StopWhenUnneeded = true;
+            };
+          }
+        ]
+        ++ lib.optional cfg.mon.enable (makeTarget "mon")
+        ++ lib.optional cfg.mds.enable (makeTarget "mds")
+        ++ lib.optional cfg.osd.enable (makeTarget "osd")
+        ++ lib.optional cfg.rgw.enable (makeTarget "rgw")
+        ++ lib.optional cfg.mgr.enable (makeTarget "mgr");
       in
       lib.mkMerge targets;
 
@@ -286,6 +311,7 @@ in
         "/var/lib/ceph/bootstrap-osd".d = lib.mkIf cfg.osd.enable defaultConfig;
         "/var/lib/ceph/bootstrap-rgw".d = lib.mkIf cfg.rgw.enable defaultConfig;
         "/var/lib/ceph/bootstrap-mds".d = lib.mkIf cfg.mds.enable defaultConfig;
+        "/var/log/ceph".d = defaultConfig;
       };
   };
 }

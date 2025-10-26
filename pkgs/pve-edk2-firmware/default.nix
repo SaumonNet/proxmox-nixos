@@ -1,9 +1,9 @@
 {
   lib,
   python3,
-  pkgs, 
+  pkgs,
   pkgsCross,
-  stdenv, 
+  stdenv,
   fetchgit,
   writeShellScriptBin,
   dpkg,
@@ -29,34 +29,37 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-Xi9xv6Jgx1ik6ST+oriAopS5bQw0H4u+OMDJVcmqu2g=";
   };
 
-  hardeningDisable = [ 
-    "format" 
-    "fortify" 
-    "trivialautovarinit" 
+  hardeningDisable = [
+    "format"
+    "fortify"
+    "trivialautovarinit"
   ];
 
   nativeBuildInputs = [
     dpkg
-    fakeroot 
+    fakeroot
     pve-qemu
-    bc 
-    dosfstools 
-    acpica-tools 
-    mtools 
-    nasm 
+    bc
+    dosfstools
+    acpica-tools
+    mtools
+    nasm
     libuuid
-    qemu-utils 
-    libisoburn 
+    qemu-utils
+    libisoburn
     python3
     # Mock debhelper
-    (writeShellScriptBin "dh" "true") 
-  ] ++ (lib.optional (stdenv.hostPlatform.system != "aarch64-linux") pkgsCross.aarch64-multiplatform.stdenv.cc)
-    ++ (lib.optional (stdenv.hostPlatform.system != "x86_64-linux") pkgsCross.gnu64.stdenv.cc)
-    ++ (lib.optional (stdenv.hostPlatform.system != "riscv64-linux") pkgsCross.riscv64.stdenv.cc);
+    (writeShellScriptBin "dh" "true")
+  ]
+  ++ (lib.optional (
+    stdenv.hostPlatform.system != "aarch64-linux"
+  ) pkgsCross.aarch64-multiplatform.stdenv.cc)
+  ++ (lib.optional (stdenv.hostPlatform.system != "x86_64-linux") pkgsCross.gnu64.stdenv.cc)
+  ++ (lib.optional (stdenv.hostPlatform.system != "riscv64-linux") pkgsCross.riscv64.stdenv.cc);
 
   depsBuildBuild = [ stdenv.cc ];
 
-  postPatch = 
+  postPatch =
     let
       pythonPath = python3.pkgs.makePythonPath (with python3.pkgs; [ pexpect ]);
     in
@@ -123,6 +126,9 @@ stdenv.mkDerivation rec {
   meta = {
     description = "edk2 based UEFI firmware modules for virtual machines";
     homepage = "git://git.proxmox.com/git/${pname}.git";
-    maintainers = with lib.maintainers; [ codgician julienmalka ];
+    maintainers = with lib.maintainers; [
+      codgician
+      julienmalka
+    ];
   };
- }
+}

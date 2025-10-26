@@ -60,6 +60,7 @@ perl538.pkgs.toPerlModule (
       find $out -type f | xargs sed -i \
         -e "s|/usr/bin/dtach|${dtach}/bin/dtach|" \
         -e "s|/usr/bin/ssh|${openssh}/bin/ssh|" \
+        -e "s|/bin/true|true|" \
         -e "s|/usr/bin/vncterm||" \
         -e "s|/usr/bin/termproxy||" \
         -e "s|/usr/bin/lxc|${lxc}/bin/lxc|" \

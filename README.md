@@ -291,6 +291,14 @@ Truly declarative configuration of virtual machines is very difficult with Proxm
 - More coverage of NixOS tests
 - Proxmox backup server
 
+### Live migrate
+
+In order to enable live migrating VMs from a Proxmox-Debian to a Proxmox-NixOS:
+
+```console
+$ ln -sf $(which true) /bin/true
+```
+
 ## 🔧 Maintainance
 
 Most packages are regularly and automatically updated thanks to [a modified version](https://github.com/SaumonNet/proxmox-nixos-update) of the [`nixpkgs-update`](https://github.com/nix-community/nixpkgs-update) bot, whose logs are available [here](https://proxmox-nixos-update-logs.saumon.network/).

@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Proxmox VE Documentation";
-    homepage = "git://git.proxmox.com/?p=pve-docs.git";
+    homepage = "https://git.proxmox.com/?p=pve-docs.git";
     license = licenses.agpl3Plus;
     maintainers = with maintainers; [
       camillemndn

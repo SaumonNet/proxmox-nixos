@@ -80,7 +80,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE High Availabillity Manager";
-      homepage = "git://git.proxmox.com/?p=pve-ha-manager.git";
+      homepage = "https://git.proxmox.com/?p=pve-ha-manager.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

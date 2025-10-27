@@ -43,7 +43,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=proxmox-widget-toolkit.git";
+    homepage = "https://git.proxmox.com/?p=proxmox-widget-toolkit.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

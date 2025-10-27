@@ -61,7 +61,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=vncterm.git";
+    homepage = "https://git.proxmox.com/?p=vncterm.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

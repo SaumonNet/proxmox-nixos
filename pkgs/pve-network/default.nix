@@ -64,7 +64,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE's SDN (Software Defined Network) stack";
-      homepage = "git://git.proxmox.com/?p=pve-network.git";
+      homepage = "https://git.proxmox.com/?p=pve-network.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [ codgician ];
       platforms = platforms.linux;

@@ -57,7 +57,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE Access control framework";
-      homepage = "git://git.proxmox.com/?p=pve-access-control.git";
+      homepage = "https://git.proxmox.com/?p=pve-access-control.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

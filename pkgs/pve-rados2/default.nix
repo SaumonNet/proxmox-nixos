@@ -48,7 +48,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Perl bindings for librados";
-      homepage = "git://git.proxmox.com/?p=librados2-perl.git";
+      homepage = "https://git.proxmox.com/?p=librados2-perl.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

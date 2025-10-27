@@ -39,7 +39,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Perl API client library";
-      homepage = "git://git.proxmox.com/?p=pve-apiclient.git";
+      homepage = "https://git.proxmox.com/?p=pve-apiclient.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

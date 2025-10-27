@@ -51,7 +51,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=proxmox-i18n.git";
+    homepage = "https://git.proxmox.com/?p=proxmox-i18n.git";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn

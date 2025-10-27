@@ -73,7 +73,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE container manager & runtime";
-      homepage = "git://git.proxmox.com/?p=pve-container.git";
+      homepage = "https://git.proxmox.com/?p=pve-container.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

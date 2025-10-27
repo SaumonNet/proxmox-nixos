@@ -188,7 +188,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "The Proxmox VE Manager API and Web UI repository";
-      homepage = "git://git.proxmox.com/?p=pve-manager.git";
+      homepage = "https://git.proxmox.com/?p=pve-manager.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

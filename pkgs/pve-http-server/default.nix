@@ -60,7 +60,7 @@ perl538.pkgs.toPerlModule (
 
     meta = with lib; {
       description = "Proxmox VE HTTP Server";
-      homepage = "git://git.proxmox.com/?p=pve-http-server.git";
+      homepage = "https://git.proxmox.com/?p=pve-http-server.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

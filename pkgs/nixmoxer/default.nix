@@ -1,6 +1,9 @@
-{ python3Packages }:
+{
+  lib,
+  python3Packages,
+}:
 
-python3Packages.buildPythonApplication rec {
+python3Packages.buildPythonApplication {
   pname = "nixmoxer";
   version = "1.0.0";
   pyproject = true;
@@ -15,4 +18,15 @@ python3Packages.buildPythonApplication rec {
     requests_toolbelt
   ];
 
+  meta = with lib; {
+    description = "Declarative Proxmox VM bootstrap";
+    homepage = "https://github.com/SaumonNet/proxmox-nixos";
+    license = [ ];
+    maintainers = with maintainers; [
+      camillemndn
+      julienmalka
+    ];
+    mainProgram = "nixmoxer";
+    platforms = platforms.all;
+  };
 }

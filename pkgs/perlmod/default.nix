@@ -35,14 +35,6 @@ rustPlatform.buildRustPackage {
     cp perlmod-bin/genpackage.pl $out/lib/perlmod
   '';
 
-  passthru.updateScript = pve-update-script {
-    extraArgs = [
-      "--deb-name"
-      "librust-perlmod-dev"
-      "--use-git-log"
-    ];
-  };
-
   meta = with lib; {
     description = "Alternative to Perl XS for Rust";
     homepage = "https://git.proxmox.com/?p=perlmod.git";

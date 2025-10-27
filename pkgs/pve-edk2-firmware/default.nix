@@ -17,6 +17,7 @@
   libuuid,
   qemu-utils,
   libisoburn,
+  pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -118,15 +119,13 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-  ];
+  passthru.updateScript = pve-update-script { };
 
   meta = {
     description = "edk2 based UEFI firmware modules for virtual machines";
     homepage = "git://git.proxmox.com/git/${pname}.git";
     maintainers = with lib.maintainers; [
+      camillemndn
       codgician
       julienmalka
     ];

@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchgit,
+  pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -22,11 +23,11 @@ stdenv.mkDerivation rec {
     cp font-logos.css $out/share/fonts-font-logos/css
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--use-git-log"
-  ];
+  passthru.updateScript = pve-update-script {
+    extraArgs = [
+      "--use-git-log"
+    ];
+  };
 
   meta = with lib; {
     description = "";

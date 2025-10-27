@@ -3,6 +3,7 @@
   stdenv,
   fetchgit,
   perl538,
+  pve-update-script,
 }:
 
 let
@@ -29,12 +30,12 @@ perl538.pkgs.toPerlModule (
 
     propagatedBuildInputs = perlDeps;
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-apiclient-perl"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-apiclient-perl"
+      ];
+    };
 
     meta = with lib; {
       description = "Perl API client library";

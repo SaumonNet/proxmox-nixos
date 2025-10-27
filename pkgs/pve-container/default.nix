@@ -7,6 +7,7 @@
   lxc,
   openssh,
   tzdata,
+  pve-update-script,
 }:
 
 let
@@ -68,10 +69,7 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|"
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-    ];
+    passthru.updateScript = pve-update-script { };
 
     meta = with lib; {
       description = "Proxmox VE container manager & runtime";

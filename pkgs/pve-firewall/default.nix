@@ -15,6 +15,7 @@
   libnetfilter_log,
   libnfnetlink,
   pkg-config,
+  pve-update-script,
 }:
 
 let
@@ -78,10 +79,7 @@ perl538.pkgs.toPerlModule (
         --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-    ];
+    passthru.updateScript = pve-update-script { };
 
     meta = with lib; {
       description = "Firewall test scripts";

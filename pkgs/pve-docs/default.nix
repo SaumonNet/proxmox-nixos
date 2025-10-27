@@ -6,6 +6,7 @@
   proxmox-widget-toolkit,
   asciidoc,
   librsvg,
+  pve-update-script,
 }:
 
 let
@@ -49,10 +50,7 @@ stdenv.mkDerivation rec {
     "DESTDIR=$(out)"
   ];
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-  ];
+  passthru.updateScript = pve-update-script { };
 
   meta = with lib; {
     description = "Proxmox VE Documentation";

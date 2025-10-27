@@ -12,6 +12,7 @@
   perlmod,
   apt,
   mkRegistry,
+  pve-update-script,
 }:
 let
   sources = import ./sources.nix;
@@ -81,16 +82,17 @@ perl538.pkgs.toPerlModule (
       )    
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--prefix"
-      "pve: bump version to"
-      "--root"
-      pname
-    ];
+    passthru = {
+      inherit registry;
 
-    passthru.registry = registry;
+      updateScript = pve-update-script {
+        extraArgs = [
+          "--deb-name"
+          "libpve-rs-perl"
+          "--use-git-log"
+        ];
+      };
+    };
 
     meta = with lib; {
       description = "Proxmox Rust interface for Perl";

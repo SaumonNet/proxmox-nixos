@@ -2,7 +2,7 @@
   novnc,
   esbuild,
   fetchgit,
-  fetchurl,
+  pve-update-script,
 }:
 
 novnc.overrideAttrs (old: rec {
@@ -39,12 +39,12 @@ novnc.overrideAttrs (old: rec {
     mv $out/share/webapps/novnc/{vnc.html,index.html.tpl}
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--deb-name"
-    "novnc-pve"
-  ];
+  passthru.updateScript = pve-update-script {
+    extraArgs = [
+      "--deb-name"
+      "novnc-pve"
+    ];
+  };
 
   meta.position = builtins.dirOf ./.;
 })

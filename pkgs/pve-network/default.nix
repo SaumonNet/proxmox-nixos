@@ -11,6 +11,7 @@
   pve-rs,
   pkg-config,
   uuid,
+  pve-update-script,
 }:
 
 let
@@ -54,12 +55,12 @@ perl538.pkgs.toPerlModule (
       "PERL5DIR=$(out)/${perl538.libPrefix}/${perl538.version}"
     ];
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-network-perl"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-network-perl"
+      ];
+    };
 
     meta = with lib; {
       description = "Proxmox VE's SDN (Software Defined Network) stack";

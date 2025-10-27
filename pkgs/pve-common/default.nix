@@ -17,6 +17,7 @@
   mimebase32,
   mimebase64,
   replaceVars,
+  pve-update-script,
 }:
 
 let
@@ -139,12 +140,12 @@ perl538.pkgs.toPerlModule (
         -Ee "s|(/usr)?/s?bin/||"
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-common-perl"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-common-perl"
+      ];
+    };
 
     meta = with lib; {
       description = "Proxmox Project's Common Perl Code";

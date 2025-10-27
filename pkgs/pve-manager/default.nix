@@ -42,6 +42,7 @@
   corosync,
   openssl,
   systemd,
+  pve-update-script,
 }:
 
 let
@@ -183,10 +184,7 @@ perl538.pkgs.toPerlModule (
       done      
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-    ];
+    passthru.updateScript = pve-update-script { };
 
     meta = with lib; {
       description = "The Proxmox VE Manager API and Web UI repository";

@@ -9,6 +9,7 @@
   libnsl,
   libpng,
   bashInteractive,
+  pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -56,10 +57,7 @@ stdenv.mkDerivation rec {
     libpng
   ];
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-  ];
+  passthru.updateScript = pve-update-script { };
 
   meta = with lib; {
     description = "";

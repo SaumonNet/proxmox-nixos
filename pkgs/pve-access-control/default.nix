@@ -5,10 +5,11 @@
   perl538,
   pve-common,
   authenpam,
+  pve-update-script,
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = [
     authenpam
     pve-common
   ];
@@ -47,12 +48,12 @@ perl538.pkgs.toPerlModule (
       "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
     ];
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-access-control"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-access-control"
+      ];
+    };
 
     meta = with lib; {
       description = "Proxmox VE Access control framework";

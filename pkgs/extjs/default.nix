@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchgit,
+  pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -27,17 +28,17 @@ stdenv.mkDerivation rec {
     cp -r packages/charts/classic/crisp $out/share/javascript/extjs
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--deb-name"
-    "libjs-extjs"
-    "--use-git-log"
-  ];
+  passthru.updateScript = pve-update-script {
+    extraArgs = [
+      "--deb-name"
+      "libjs-extjs"
+      "--use-git-log"
+    ];
+  };
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=extjs.git";
+    homepage = "https://git.proxmox.com/?p=extjs.git";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn

@@ -4,10 +4,11 @@
   fetchgit,
   perl538,
   ceph,
+  pve-update-script,
 }:
 
 perl538.pkgs.toPerlModule (
-  stdenv.mkDerivation rec {
+  stdenv.mkDerivation {
     pname = "pve-rados2";
     version = "1.4.1";
 
@@ -37,13 +38,13 @@ perl538.pkgs.toPerlModule (
       "PERLSODIR=/${perl538.libPrefix}/auto"
     ];
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "librados2-perl"
-      "--use-git-log"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "librados2-perl"
+        "--use-git-log"
+      ];
+    };
 
     meta = with lib; {
       description = "Perl bindings for librados";

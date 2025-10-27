@@ -3,6 +3,7 @@
   stdenv,
   fetchgit,
   perl538,
+  pve-update-script,
 }:
 
 let
@@ -40,13 +41,13 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ perlEnv ];
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--deb-name"
-    "pve-i18n"
-    "--use-git-log"
-  ];
+  passthru.updateScript = pve-update-script {
+    extraArgs = [
+      "--deb-name"
+      "pve-i18n"
+      "--use-git-log"
+    ];
+  };
 
   meta = with lib; {
     description = "";

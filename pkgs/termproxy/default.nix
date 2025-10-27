@@ -3,12 +3,14 @@
   fetchgit,
   rustPlatform,
   mkRegistry,
+  pve-update-script,
 }:
 
 let
   sources = import ./sources.nix;
   registry = mkRegistry sources;
 in
+
 rustPlatform.buildRustPackage rec {
   pname = "termproxy";
   version = "1.1.0";
@@ -37,20 +39,21 @@ rustPlatform.buildRustPackage rec {
     mv $out/bin/{proxmox-,}termproxy
   '';
 
-  passthru.registry = registry;
+  passthru = {
+    inherit registry;
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--prefix"
-    "termproxy: bump version to"
-    "--root"
-    pname
-  ];
+    updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "proxmox-termproxy"
+        "--use-git-log"
+      ];
+    };
+  };
 
   meta = with lib; {
     description = "xterm.js helper utility";
-    homepage = "git://git.proxmox.com/?p=pve-xtermjs.git";
+    homepage = "https://git.proxmox.com/?p=pve-xtermjs.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

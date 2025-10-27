@@ -1,32 +1,46 @@
 {
   lib,
   python3Packages,
+  cargo,
+  common-updater-scripts,
+  dpkg,
+  git,
+  nix-prefetch-git,
 }:
 
 python3Packages.buildPythonApplication {
-  pname = "nixmoxer";
+  pname = "pve-update";
   version = "1.0.0";
   pyproject = true;
 
   src = ./.;
 
+  propagatedBuildInputs = [
+    cargo
+    common-updater-scripts
+    dpkg
+    git
+    nix-prefetch-git
+  ];
+
   build-system = with python3Packages; [ setuptools ];
 
   dependencies = with python3Packages; [
-    proxmoxer
-    click
-    requests_toolbelt
+    aiohttp
+    beautifulsoup4
+    python-debian
+    python-apt
   ];
 
   meta = with lib; {
-    description = "Declarative Proxmox VM bootstrap";
+    description = "Updater for Proxmox-NixOS derivations";
     homepage = "https://github.com/SaumonNet/proxmox-nixos";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn
       julienmalka
     ];
-    mainProgram = "nixmoxer";
+    mainProgram = "pve-update";
     platforms = platforms.all;
   };
 }

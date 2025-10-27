@@ -4,9 +4,10 @@
   fetchgit,
   perl538,
   libxcrypt,
+  pve-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "perlmod";
   version = "0.2.1-1";
 
@@ -34,18 +35,9 @@ rustPlatform.buildRustPackage rec {
     cp perlmod-bin/genpackage.pl $out/lib/perlmod
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--prefix"
-    "bump perlmod-bin to"
-    "--root"
-    pname
-  ];
-
   meta = with lib; {
     description = "Alternative to Perl XS for Rust";
-    homepage = "git://git.proxmox.com/?p=perlmod.git";
+    homepage = "https://git.proxmox.com/?p=perlmod.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

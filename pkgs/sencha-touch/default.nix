@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=sencha-touch.git";
+    homepage = "https://git.proxmox.com/?p=sencha-touch.git";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn

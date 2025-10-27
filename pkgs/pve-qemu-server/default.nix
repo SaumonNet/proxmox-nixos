@@ -20,6 +20,7 @@
   vncterm,
   swtpm,
   libglvnd,
+  pve-update-script,
 }:
 
 let
@@ -147,16 +148,16 @@ perl538.pkgs.toPerlModule (
       patchShebangs $out/libexec/
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "qemu-server"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "qemu-server"
+      ];
+    };
 
     meta = with lib; {
       description = "Proxmox VE's Virtual Machine Manager";
-      homepage = "git://git.proxmox.com/?p=qemu-server.git";
+      homepage = "https://git.proxmox.com/?p=qemu-server.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

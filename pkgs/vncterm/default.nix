@@ -9,6 +9,7 @@
   libnsl,
   libpng,
   bashInteractive,
+  pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -56,14 +57,11 @@ stdenv.mkDerivation rec {
     libpng
   ];
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-  ];
+  passthru.updateScript = pve-update-script { };
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=vncterm.git";
+    homepage = "https://git.proxmox.com/?p=vncterm.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

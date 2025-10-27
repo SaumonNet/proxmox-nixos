@@ -6,6 +6,7 @@
   acme-sh,
   bash,
   curl,
+  pve-update-script,
 }:
 
 let
@@ -50,17 +51,17 @@ perl538.pkgs.toPerlModule (
       find $out -type f | xargs sed -i -e "s|/usr/share/proxmox-acme|$out/share/proxmox-acme|"
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libproxmox-acme-perl"
-      "--use-git-log"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libproxmox-acme-perl"
+        "--use-git-log"
+      ];
+    };
 
     meta = with lib; {
       description = "ACME library and helpers for perl-based Proxmox projects";
-      homepage = "git://git.proxmox.com/?p=proxmox-acme.git";
+      homepage = "https://git.proxmox.com/?p=proxmox-acme.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

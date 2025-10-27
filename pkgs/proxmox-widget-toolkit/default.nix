@@ -5,6 +5,7 @@
   markedjs,
   nodePackages,
   sassc,
+  pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -38,14 +39,11 @@ stdenv.mkDerivation rec {
     cp api-viewer/APIViewer.js $out/share/javascript/proxmox-widget-toolkit
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-  ];
+  passthru.updateScript = pve-update-script { };
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=proxmox-widget-toolkit.git";
+    homepage = "https://git.proxmox.com/?p=proxmox-widget-toolkit.git";
     license = with licenses; [ ];
     maintainers = with maintainers; [
       camillemndn

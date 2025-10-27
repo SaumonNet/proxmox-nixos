@@ -7,6 +7,7 @@
   pkg-config,
   meson,
   cacert,
+  pve-update-script,
 }:
 
 let
@@ -72,13 +73,6 @@ in
       pkg-config
     ];
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "pve-qemu-kvm"
-    ];
-
     # Generate cpu flag files and machine versions json
     # This is done in /debian/rules of pve-qemu, and needed by pve-qemu-server
     postInstall = old.postInstall + ''
@@ -87,6 +81,13 @@ in
       $out/bin/qemu-system-x86_64 -machine help \
         | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
     '';
+
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "pve-qemu-kvm"
+      ];
+    };
 
     meta.position = builtins.dirOf ./.;
   })).override

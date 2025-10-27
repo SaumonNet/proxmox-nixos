@@ -1,3 +1,7 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i python3 -p python3 git nix-prefetch-git python3.pkgs.aiohttp python3.pkgs.beautifulsoup4 python3.pkgs.python-debian python3.pkgs.python-apt
+
+
 import argparse
 import asyncio
 import json
@@ -14,6 +18,7 @@ import gzip
 from bs4 import BeautifulSoup
 from debian.deb822 import Packages
 
+DIST = "trixie"
 
 @dataclass
 class PackageMapping:
@@ -59,8 +64,8 @@ class ProxmoxNixTool:
         self.package_mappings = {pm.package_name: pm for pm in package_mappings}
         self.debian_package_mappings = {pm.debian_package_name: pm for pm in package_mappings}
         self.temp_dir = temp_dir
-        self.pve_repo_url = "http://download.proxmox.com/debian/pve/dists/bookworm/pve-no-subscription/binary-amd64/"
-        self.devel_repo_url = "http://download.proxmox.com/debian/devel/dists/bookworm/main/binary-amd64/"
+        self.pve_repo_url = f"http://download.proxmox.com/debian/pve/dists/{DIST}/pve-no-subscription/binary-amd64/"
+        self.devel_repo_url = f"http://download.proxmox.com/debian/devel/dists/{DIST}/main/binary-amd64/"
         self._html_listing_cache: Dict[str, str] = {}
 
     async def _get_packages_index(self, repo_url: str) -> List[dict]:
@@ -297,37 +302,43 @@ def load_package_mappings(mapping_file: str) -> List[PackageMapping]:
     ) for item in data]
 
 
-async def main():
-    parser = argparse.ArgumentParser(description='Generate Nix packages for Proxmox Rust crates')
-    parser.add_argument('--mappings', required=True, help='JSON file with package mappings')
-    parser.add_argument('--package', required=True, help='Main package name to process')
-    parser.add_argument('--temp-dir', help='Temporary directory for git clones')
-    parser.add_argument('--output', help='Output file (default: stdout)')
-    
-    args = parser.parse_args()
-    mappings = load_package_mappings(args.mappings)
-    temp_dir = Path(args.temp_dir) if args.temp_dir else Path(tempfile.mkdtemp())
-    if args.temp_dir:
-        temp_dir.mkdir(parents=True, exist_ok=True)
-    
-    tool = ProxmoxNixTool(mappings, temp_dir)
-    
+async def generate_registry(
+    package_name: str,
+    mappings_file: str,
+    temp_dir: str | Path | None = None,
+    output_file: str | Path | None = None
+) -> str:
+    """
+    Generate a Nix registry (sources.nix) for a Rust package.
+
+    Args:
+        package_name: Main package to process.
+        mappings_file: JSON file with package mappings.
+        temp_dir: Optional temporary directory for git clones.
+        output_file: Optional file to write output (otherwise returns string).
+
+    Returns:
+        The generated Nix registry as a string.
+    """
+    mappings = load_package_mappings(mappings_file)
+    temp_dir_path = Path(temp_dir) if temp_dir else Path(tempfile.mkdtemp())
+    temp_dir_path.mkdir(parents=True, exist_ok=True)
+
+    tool = ProxmoxNixTool(mappings, temp_dir_path)
+
     try:
-        definitions = await tool.process_package(args.package)
+        definitions = await tool.process_package(package_name)
         output = tool.generate_nix_output(definitions)
-        
-        if args.output:
-            with open(args.output, 'w') as f:
-                f.write(output)
-            print(f"Output written to {args.output}")
+
+        if output_file:
+            output_path = Path(output_file)
+            output_path.write_text(output)
+            print(f"✅ Registry written to {output_path}")
         else:
             print(output)
+
+        return output
+
     except Exception as e:
-        print(f"Error: {e}")
-        return 1
-    
-    return 0
-
-
-if __name__ == '__main__':
-    exit(asyncio.run(main()))
+        print(f"❌ Error generating registry for {package_name}: {e}")
+        raise

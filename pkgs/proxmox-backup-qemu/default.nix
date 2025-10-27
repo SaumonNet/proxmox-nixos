@@ -14,6 +14,7 @@
   rustPlatform,
   git,
   mkRegistry,
+  pve-update-script,
 }:
 let
   sources = import ./sources.nix;
@@ -73,7 +74,17 @@ rustPlatform.buildRustPackage rec {
     openssl
   ];
 
-  passthru.registry = registry;
+  passthru = {
+    inherit registry;
+
+    updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libproxmox-backup-qemu0"
+        "--use-git-log"
+      ];
+    };
+  };
 
   postInstall = ''
     cp proxmox-backup-qemu.h $out/lib

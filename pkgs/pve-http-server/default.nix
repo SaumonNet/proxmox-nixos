@@ -8,6 +8,7 @@
   font-awesome_4,
   fonts-font-logos,
   sencha-touch,
+  pve-update-script,
 }:
 
 let
@@ -50,16 +51,16 @@ perl538.pkgs.toPerlModule (
       ln -s ${fonts-font-logos}/share/fonts-font-logos $out/share
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-http-server-perl"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-http-server-perl"
+      ];
+    };
 
     meta = with lib; {
       description = "Proxmox VE HTTP Server";
-      homepage = "git://git.proxmox.com/?p=pve-http-server.git";
+      homepage = "https://git.proxmox.com/?p=pve-http-server.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

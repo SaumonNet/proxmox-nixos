@@ -3,6 +3,7 @@
   stdenv,
   fetchgit,
   perl538,
+  pve-update-script,
 }:
 
 let
@@ -29,16 +30,16 @@ perl538.pkgs.toPerlModule (
 
     propagatedBuildInputs = perlDeps;
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-apiclient-perl"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-apiclient-perl"
+      ];
+    };
 
     meta = with lib; {
       description = "Perl API client library";
-      homepage = "git://git.proxmox.com/?p=pve-apiclient.git";
+      homepage = "https://git.proxmox.com/?p=pve-apiclient.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

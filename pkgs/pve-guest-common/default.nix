@@ -3,6 +3,7 @@
   stdenv,
   fetchgit,
   perl538,
+  pve-update-script,
 }:
 
 perl538.pkgs.toPerlModule (
@@ -23,17 +24,17 @@ perl538.pkgs.toPerlModule (
       "DOCDIR=$(out)/share/doc/${pname}"
     ];
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-guest-common-perl"
-      "--use-git-log"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-guest-common-perl"
+        "--use-git-log"
+      ];
+    };
 
     meta = with lib; {
       description = "Proxmox VE guest-related modules";
-      homepage = "git://git.proxmox.com/?p=pve-guest-common.git";
+      homepage = "https://git.proxmox.com/?p=pve-guest-common.git";
       license = with licenses; [ ];
       maintainers = with maintainers; [
         camillemndn

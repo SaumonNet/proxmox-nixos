@@ -28,6 +28,7 @@
   util-linux,
   zfs,
   posixstrptime,
+  pve-update-script,
 }:
 
 let
@@ -126,16 +127,16 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/share/perl5|$out/${perl538.libPrefix}/${perl538.version}|"
     '';
 
-    passthru.updateScript = [
-      ../update.py
-      pname
-      "--deb-name"
-      "libpve-storage-perl"
-    ];
+    passthru.updateScript = pve-update-script {
+      extraArgs = [
+        "--deb-name"
+        "libpve-storage-perl"
+      ];
+    };
 
     meta = with lib; {
       description = "Proxmox VE Storage Library";
-      homepage = "git://git.proxmox.com/?p=pve-storage.git";
+      homepage = "https://git.proxmox.com/?p=pve-storage.git";
       license = licenses.agpl3Plus;
       maintainers = with maintainers; [
         camillemndn

@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchgit,
+  pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -24,14 +25,11 @@ stdenv.mkDerivation rec {
     mv index.html.tpl.in index.html.tpl
   '';
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-  ];
+  passthru.updateScript = pve-update-script { };
 
   meta = with lib; {
     description = "xterm.js webclient";
-    homepage = "git://git.proxmox.com/?p=pve-xtermjs.git";
+    homepage = "https://git.proxmox.com/?p=pve-xtermjs.git";
     license = licenses.agpl3Plus;
     maintainers = with maintainers; [
       camillemndn

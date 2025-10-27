@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "nixmoxer"
 version = "1.0.0"
-description = "Declarative proxmox VM bootstrap"
+description = "Declarative Proxmox VM bootstrap"
 authors = [
     {name = "Julien Malka"},
     {name = "Camille Mondon"}

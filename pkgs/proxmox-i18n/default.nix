@@ -3,6 +3,7 @@
   stdenv,
   fetchgit,
   perl538,
+  pve-update-script,
 }:
 
 let
@@ -40,17 +41,17 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ perlEnv ];
 
-  passthru.updateScript = [
-    ../update.py
-    pname
-    "--deb-name"
-    "pve-i18n"
-    "--use-git-log"
-  ];
+  passthru.updateScript = pve-update-script {
+    extraArgs = [
+      "--deb-name"
+      "pve-i18n"
+      "--use-git-log"
+    ];
+  };
 
   meta = with lib; {
     description = "";
-    homepage = "git://git.proxmox.com/?p=proxmox-i18n.git";
+    homepage = "https://git.proxmox.com/?p=proxmox-i18n.git";
     license = [ ];
     maintainers = with maintainers; [
       camillemndn

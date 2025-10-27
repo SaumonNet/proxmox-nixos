@@ -67,7 +67,10 @@ let
       protobuf = pkgs-unstable.protobuf_24;
       jre = pkgs.jdk11_headless;
     };
+
     nixmoxer = callPackage ./nixmoxer { };
+    pve-update = callPackage ./pve-update { };
+    pve-update-script = callPackage ./pve-update/pve-update-script.nix { };
   };
 in
 ours

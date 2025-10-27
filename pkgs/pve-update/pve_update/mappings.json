@@ -163,6 +163,11 @@
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
   },
   {
+    "package_name": "proxmox-network-types",
+    "debian_package_name": "librust-proxmox-network-types-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
     "package_name": "proxmox-notify",
     "debian_package_name": "librust-proxmox-notify-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
@@ -293,6 +298,11 @@
   {
     "package_name": "proxmox-ve-config",
     "debian_package_name": "librust-proxmox-ve-config-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox-ve-rs.git"
+  },
+  {
+    "package_name": "proxmox-frr",
+    "debian_package_name": "librust-proxmox-frr-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox-ve-rs.git"
   },
   {

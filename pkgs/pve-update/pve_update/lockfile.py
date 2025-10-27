@@ -30,7 +30,7 @@ def write_cargo_lock(
       pkg = flake.packages.${{builtins.currentSystem}}."{package_name}" or flake."{package_name}";
     in
       pkg.overrideAttrs (old: {{
-        postPatch = old.postPatch + ''
+        postPatch = (old.postPatch or "") + ''
 	      cp -r . $out
 	      exit
 	    '';

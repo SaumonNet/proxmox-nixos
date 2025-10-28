@@ -172,17 +172,17 @@ class ProxmoxNixTool:
         if not repo_dir.exists():
             await self._clone_repository(mapping.git_repository, repo_dir)
 
-        commit_hash = await self._find_commit_by_message(
-            repo_dir, path, package_info.version
-        )
+        if package_info.version in mapping.exceptions.keys():
+            commit_hash = mapping.exceptions[package_info.version]
+        else:
+            commit_hash = await self._find_commit_by_message(
+                repo_dir, path, package_info.version
+            )
 
         if not commit_hash:
-            if package_info.version in mapping.exceptions.keys():
-                commit_hash = mapping.exceptions[package_info.version]
-            else:
-                raise ValueError(
-                    f"No commit found for {package_info.name} at version {package_info.version}"
-                )
+            raise ValueError(
+                f"No commit found for {package_info.name} at version {package_info.version}"
+            )
 
         commit_date = await self._get_commit_date(repo_dir, commit_hash)
         return CommitInfo(hash=commit_hash, date=commit_date)

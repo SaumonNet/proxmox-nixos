@@ -29,7 +29,6 @@ python3Packages.buildPythonApplication {
     aiohttp
     beautifulsoup4
     python-debian
-    python-apt
   ];
 
   meta = with lib; {

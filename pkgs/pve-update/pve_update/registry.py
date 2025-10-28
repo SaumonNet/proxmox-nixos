@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i python3 -p python3 git nix-prefetch-git python3.pkgs.aiohttp python3.pkgs.beautifulsoup4 python3.pkgs.python-debian python3.pkgs.python-apt
+#!nix-shell -i python3 -p python3 git nix-prefetch-git python3.pkgs.aiohttp python3.pkgs.beautifulsoup4 python3.pkgs.python-debian
 
 
 import argparse
@@ -17,6 +17,7 @@ import aiohttp
 import gzip
 from bs4 import BeautifulSoup
 from debian.deb822 import Packages
+from debian import debian_support
 
 DIST = "trixie"
 
@@ -83,7 +84,7 @@ class ProxmoxNixTool:
         if not matching_packages:
             raise ValueError(f"Package {package_name} not found in pve-no-subscription repository")
         
-        latest_pkg = max(matching_packages, key=lambda p: p.get('Version', ''))
+        latest_pkg = max(matching_packages, key=lambda p: debian_support.Version(p.get('Version', '')))
         date = await self._get_package_date_from_listing(self.pve_repo_url, latest_pkg['Package'], latest_pkg['Version'])
         if not date:
             print(f"Warning: Could not determine date for {latest_pkg['Package']} version {latest_pkg['Version']}, using now()")

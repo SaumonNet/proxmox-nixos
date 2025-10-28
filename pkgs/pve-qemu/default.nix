@@ -3,7 +3,7 @@
   qemu,
   fetchgit,
   proxmox-backup-qemu,
-  perl538,
+  perl540,
   pkg-config,
   meson,
   cacert,
@@ -11,8 +11,8 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [ JSON ];
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlDeps = with perl540.pkgs; [ JSON ];
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 (qemu.overrideAttrs (old: rec {
   pname = "pve-qemu";

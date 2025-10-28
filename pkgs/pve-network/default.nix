@@ -4,7 +4,7 @@
   fetchgit,
   makeWrapper,
   netsubnet,
-  perl538,
+  perl540,
   pve-access-control,
   pve-common,
   pve-cluster,
@@ -15,7 +15,7 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     IOSocketSSL
     NetAddrIP
     NetIP
@@ -26,10 +26,10 @@ let
     pve-cluster
     pve-rs
   ];
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-network";
     version = "1.1.8";
@@ -52,7 +52,7 @@ perl538.pkgs.toPerlModule (
 
     makeFlags = [
       "DESTDIR=$(out)"
-      "PERL5DIR=$(out)/${perl538.libPrefix}/${perl538.version}"
+      "PERL5DIR=$(out)/${perl540.libPrefix}/${perl540.version}"
     ];
 
     passthru.updateScript = pve-update-script {

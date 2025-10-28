@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   pve-common,
   authenpam,
   pve-update-script,
@@ -14,10 +14,10 @@ let
     pve-common
   ];
 
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-access-control";
     version = "9.0.3";
@@ -45,7 +45,7 @@ perl538.pkgs.toPerlModule (
       "PREFIX="
       "SBINDIR=/.bin"
       "BINDIR=/.bin"
-      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
+      "PERLDIR=/${perl540.libPrefix}/${perl540.version}"
     ];
 
     passthru.updateScript = pve-update-script {

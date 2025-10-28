@@ -2,20 +2,20 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   gettext,
   pve-update-script,
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     Encode
     GetoptLong
     JSON
     LocalePO
   ];
 
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 stdenv.mkDerivation rec {
   pname = "proxmox-i18n";

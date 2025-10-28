@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   pve-cluster,
   pve-rados2,
   enableLinstor ? false,
@@ -33,7 +33,7 @@
 
 let
   perlDeps =
-    with perl538.pkgs;
+    with perl540.pkgs;
     [
       Filechdir
       XMLLibXML
@@ -43,10 +43,10 @@ let
     ]
     ++ lib.optional enableLinstor linstor-proxmox;
 
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-storage";
     version = "9.0.13";
@@ -72,13 +72,13 @@ perl538.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=/bin"
-      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
+      "PERLDIR=/${perl540.libPrefix}/${perl540.version}"
     ];
 
     postInstall = ''
       sed -i $out/bin/* \
         -e "s/-T//" \
-        -e "1s|$| -I$out/${perl538.libPrefix}/${perl538.version}|"
+        -e "1s|$| -I$out/${perl540.libPrefix}/${perl540.version}|"
     ''
     + lib.optionalString enableLinstor ''
       cp -rs ${linstor-proxmox}/lib $out
@@ -124,7 +124,7 @@ perl538.pkgs.toPerlModule (
         -e "s|/usr/sbin/sbdadm||" \
         -e "s|/usr/sbin/smartctl|${smartmontools}/bin/smartctl|" \
         -e "s|/usr/sbin/stmfadm||" \
-        -e "s|/usr/share/perl5|$out/${perl538.libPrefix}/${perl538.version}|"
+        -e "s|/usr/share/perl5|$out/${perl540.libPrefix}/${perl540.version}|"
     '';
 
     passthru.updateScript = pve-update-script {

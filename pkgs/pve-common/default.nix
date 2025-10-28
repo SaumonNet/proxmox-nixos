@@ -6,7 +6,7 @@
   coreutils,
   diffutils,
   iproute2,
-  perl538,
+  perl540,
   glibc,
   openvswitch,
   pciutils,
@@ -21,7 +21,7 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     AnyEvent
     Carp
     Clone
@@ -69,7 +69,7 @@ let
   ];
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-common";
     version = "9.0.11";
@@ -107,7 +107,7 @@ perl538.pkgs.toPerlModule (
 
     makeFlags = [
       "PREFIX=$(out)"
-      "PERLDIR=$(out)/${perl538.libPrefix}/${perl538.version}"
+      "PERLDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
     ];
 
     postInstall =
@@ -123,12 +123,12 @@ perl538.pkgs.toPerlModule (
       in
       ''
         for h in ${includeHeaders}; do
-          ${perl538}/bin/h2ph -d $out ${glibc.dev}/include/$h
+          ${perl540}/bin/h2ph -d $out ${glibc.dev}/include/$h
           mkdir -p $out/include/$(dirname $h)
           mv $out${glibc.dev}/include/''${h%.h}.ph $out/include/$(dirname $h)
         done
         mv $out/_h2ph_pre.ph $out/include
-        cp -r $out/include/* $out/${perl538.libPrefix}/${perl538.version}
+        cp -r $out/include/* $out/${perl540.libPrefix}/${perl540.version}
         rm -r $out/{nix,include}
       '';
 

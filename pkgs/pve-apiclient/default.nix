@@ -2,15 +2,15 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   pve-update-script,
 }:
 
 let
-  perlDeps = with perl538.pkgs; [ IOSocketSSL ];
+  perlDeps = with perl540.pkgs; [ IOSocketSSL ];
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-apiclient";
     version = "3.4.0";
@@ -24,7 +24,7 @@ perl538.pkgs.toPerlModule (
     sourceRoot = "${src.name}/src";
 
     makeFlags = [
-      "PERL5DIR=$(out)/${perl538.libPrefix}/${perl538.version}"
+      "PERL5DIR=$(out)/${perl540.libPrefix}/${perl540.version}"
       "DOCDIR=$(out)/share/doc"
     ];
 

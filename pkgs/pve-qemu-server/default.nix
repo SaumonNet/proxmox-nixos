@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   glib,
   json_c,
   pkgconf,
@@ -24,7 +24,7 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     CryptOpenSSLRandom
     DataDumper
     DigestSHA
@@ -52,10 +52,10 @@ let
     XMLLibXML
   ];
 
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
     version = "9.0.23";
@@ -114,7 +114,7 @@ perl538.pkgs.toPerlModule (
         PREFIX= \
         SBINDIR=/.bin \
         USRSHAREDIR=$out/share/qemu-server \
-        PERLDIR=/${perl538.libPrefix}/${perl538.version}
+        PERLDIR=/${perl540.libPrefix}/${perl540.version}
 
       runHook postInstall
     '';

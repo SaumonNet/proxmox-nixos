@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   dtach,
   lxc,
   openssh,
@@ -12,10 +12,10 @@
 
 let
   perlDeps = [ ];
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-container";
     version = "6.0.13";
@@ -54,7 +54,7 @@ perl538.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX=$(out)"
       "SBINDIR=$(out)/.bin"
-      "PERLDIR=$(out)/${perl538.libPrefix}/${perl538.version}"
+      "PERLDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
     ];
 
     postFixup = ''

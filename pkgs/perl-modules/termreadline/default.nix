@@ -1,10 +1,10 @@
 {
   lib,
   fetchurl,
-  perl538,
+  perl540,
 }:
 
-perl538.pkgs.buildPerlPackage rec {
+perl540.pkgs.buildPerlPackage rec {
   pname = "TermReadLine";
   version = "1.14";
 

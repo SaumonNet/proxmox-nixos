@@ -1,10 +1,10 @@
 {
   lib,
   fetchurl,
-  perl538,
+  perl540,
 }:
 
-perl538.pkgs.buildPerlPackage rec {
+perl540.pkgs.buildPerlPackage rec {
   pname = "MIMEBase32";
   version = "1.303";
 
@@ -13,7 +13,7 @@ perl538.pkgs.buildPerlPackage rec {
     hash = "sha256-qyH6mRMOM6Cv9s21lvZH5eVl0gfWNLou8Gvb71BCTpk=";
   };
 
-  propagatedBuildInputs = [ perl538.pkgs.Exporter ];
+  propagatedBuildInputs = [ perl540.pkgs.Exporter ];
 
   passthru.updateScript = [
     ../update.pl

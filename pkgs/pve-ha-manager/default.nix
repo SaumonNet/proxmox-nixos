@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  perl538,
+  perl540,
   pve-container,
   pve-firewall,
   pve-guest-common,
@@ -22,10 +22,10 @@ let
     pve-qemu-server
     (pve-storage.override { inherit enableLinstor; })
   ];
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-ha-manager";
     version = "5.0.5";
@@ -53,7 +53,7 @@ perl538.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=/bin"
-      "PERLDIR=/${perl538.libPrefix}/${perl538.version}"
+      "PERLDIR=/${perl540.libPrefix}/${perl540.version}"
     ];
 
     buildInputs = [
@@ -72,7 +72,7 @@ perl538.pkgs.toPerlModule (
       for bin in $out/bin/*; do
         wrapProgram $bin \
           --prefix PATH : ${lib.makeBinPath [ pve-qemu ]} \
-          --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}
+          --prefix PERL5LIB : $out/${perl540.libPrefix}/${perl540.version}
       done      
     '';
 

@@ -4,7 +4,6 @@
   fetchgit,
   perl538,
   libxcrypt,
-  pve-update-script,
 }:
 
 rustPlatform.buildRustPackage {

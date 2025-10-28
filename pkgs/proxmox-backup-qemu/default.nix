@@ -1,42 +1,38 @@
 {
-  fetchgit,
-  pkg-config,
-  clang,
-  zstd,
-  apt,
-  sg3_utils,
-  libclang,
-  openssl,
-  libxcrypt,
-  acl,
-  linux-pam,
-  libuuid,
-  rustPlatform,
-  git,
   mkRegistry,
+  rustPlatform,
+  fetchgit,
+  git,
+  pkg-config,
+  acl,
+  apt,
+  clang,
+  libclang,
+  libuuid,
+  libxcrypt,
+  linux-pam,
+  openssl,
+  sg3_utils,
+  systemd,
+  zstd,
   pve-update-script,
 }:
+
 let
   sources = import ./sources.nix;
   registry = mkRegistry sources;
 in
+
 rustPlatform.buildRustPackage rec {
   pname = "proxmox-backup-qemu";
-  version = "1.5.1";
+  version = "2.0.1";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "c3cbcae289d04b4454a70fc59dc58a19d5edb681";
-    hash = "sha256-qynY7bt+lOzpg4YxeUnRk7/xoSbtk+tWGbuNMmAdzHY=";
+    rev = "2b8ebba0cffecd479f296aaad82d8bec89355599";
+    hash = "sha256-GLd/zNNZXaCKm1K8gSQ07m/7jn0XGC9gW51VLWEODkA=";
     fetchSubmodules = true;
   };
-
-  patches = [ ./backup-toml.patch ];
-  patchFlags = [
-    "-p1"
-    "-d"
-    "submodules/proxmox-backup/"
-  ];
 
   cargoLock.lockFile = ./Cargo.lock;
 
@@ -47,31 +43,22 @@ rustPlatform.buildRustPackage rec {
   '';
 
   nativeBuildInputs = [
-    acl
-    pkg-config
-    clang
-    zstd
-    zstd.dev
-    apt
-    sg3_utils
-    openssl
-    sg3_utils
-    libxcrypt
-    acl
-    linux-pam
     git
+    pkg-config
   ];
 
   buildInputs = [
     acl
-    libxcrypt
-    libuuid
-    zstd
+    apt
     clang
-    zstd.dev
-    registry
-    git
+    libuuid
+    libxcrypt
+    linux-pam
     openssl
+    registry
+    sg3_utils
+    systemd
+    zstd.dev
   ];
 
   passthru = {

@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  perl538,
+  perl540,
   proxmox-widget-toolkit,
   proxmox-acme,
   proxmox-i18n,
@@ -46,7 +46,7 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     CryptOpenSSLBignum
     FileReadBackwards
     NetDNS
@@ -58,18 +58,18 @@ let
     pve-network
   ];
 
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "8.4.14";
+    version = "9.0.11";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "b502d23c55afcba1";
-      hash = "sha256-MPCkUn1tt9oKlNkc0ebJKFX2bRo/4jAMnRGiBLLI9Bs=";
+      rev = "3bf5476b8a4699e2";
+      hash = "sha256-Nvi/XxvgYafZTzfzaB+1u6lwtfbCJrua+Gxq6CkAahQ=";
     };
 
     patches = [
@@ -87,8 +87,6 @@ perl538.pkgs.toPerlModule (
         -e '/architecture/d' \
         -e 's/aplinfo PVE bin www services configs network-hooks test/PVE bin www configs test/'
       sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+9d'
-      patchShebangs configs/country.pl
-      sed -i configs/country.pl -e "s|/usr|${tzdata}|"
       #cp PVE/pvecfg.pm{.in,}
       sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
     '';
@@ -106,7 +104,7 @@ perl538.pkgs.toPerlModule (
       "PVERELEASE=8.0"
       "VERSION=${version}"
       "REPOID=nixos"
-      "PERLLIBDIR=$(out)/${perl538.libPrefix}/${perl538.version}"
+      "PERLLIBDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
       "WIDGETKIT=${proxmox-widget-toolkit}/share/javascript/proxmox-widget-toolkit/proxmoxlib.js"
       "BASH_COMPLETIONS="
       "ZSH_COMPLETIONS="
@@ -115,7 +113,7 @@ perl538.pkgs.toPerlModule (
     ];
 
     postInstall = ''
-      rm -r $out/var $out/bin/pve{upgrade,update,version,7to8,8to9}
+      rm -r $out/var $out/bin/pve{upgrade,update,version,8to9}
       sed -i $out/{bin/*,share/pve-manager/helpers/pve-startall-delay} -e "s/-T//"
     '';
 
@@ -133,12 +131,12 @@ perl538.pkgs.toPerlModule (
         -Ee "s|(/usr)?/s?bin/||" \
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
         -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/" \
-        -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl538.libPrefix}/${perl538.version}/\$plug|"
+        -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl540.libPrefix}/${perl540.version}/\$plug|"
 
       # Ceph systemd units in NixOS do not use templates
       find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
 
-      sed -i $out/${perl538.libPrefix}/${perl538.version}/PVE/Ceph/Tools.pm \
+      sed -i $out/${perl540.libPrefix}/${perl540.version}/PVE/Ceph/Tools.pm \
         -e 's|=> "ceph|=> "${ceph}/bin/ceph|' \
         -e "s|=> 'ceph|=> '${ceph}/bin/ceph|" \
         -e "s|ceph-authtool|${ceph}/bin/ceph-authtool|"
@@ -180,7 +178,7 @@ perl538.pkgs.toPerlModule (
               zstd
             ]
           } \
-          --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}
+          --prefix PERL5LIB : $out/${perl540.libPrefix}/${perl540.version}
       done      
     '';
 

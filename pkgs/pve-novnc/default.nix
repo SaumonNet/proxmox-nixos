@@ -7,12 +7,12 @@
 
 novnc.overrideAttrs (old: rec {
   pname = "pve-novnc";
-  version = "1.6.0-2";
+  version = "1.6.0-3";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/novnc-pve.git";
-    rev = "87b1dc5c373427a03c56109332d5ee7cbd02468e";
-    hash = "sha256-5ZmHezMZbJHAOlL7fbGYOD4WYIecyb5y+WfJcKnhtfU=";
+    rev = "3d6c1bf3ba8bb7bb2aba3a6757b69ff8633f3b5c";
+    hash = "sha256-uhyn8IOiyV72DL2USE2WUn5QDk4tVQiCx2VUaskTbGQ=";
     fetchSubmodules = true;
   };
 

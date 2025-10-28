@@ -2,13 +2,14 @@
 #!nix-shell -i python3 -p python3 git common-updater-scripts dpkg
 
 import argparse
+import gzip
 import os
+import re
 import subprocess
+import sys
 import tempfile
 import urllib.request
-import gzip
-import sys
-import re
+from debian import debian_support
 
 # Defaults targeting Proxmox public repo / trixie pve-no-subscription
 DIST = "trixie"
@@ -45,28 +46,21 @@ def parse_packages_gz(url):
 
 
 def latest_pkg_info(package):
-    """Return (version, filename) of the latest available package using dpkg compare-versions."""
+    """Return (version, filename) of the latest available package using debian_support."""
     candidates = [
         p for p in parse_packages_gz(PACKAGES_GZ_URL) if p.get("Package") == package
     ]
     if not candidates:
         raise RuntimeError(f"Package '{package}' not found in {PACKAGES_GZ_URL}")
 
-    latest = candidates[0]
-    for c in candidates[1:]:
-        # dpkg --compare-versions latest lt c  -> exit 0 if latest < c
-        rc = subprocess.run(
-            ["dpkg", "--compare-versions", latest["Version"], "lt", c["Version"]],
-            check=False,
-        ).returncode
-        if rc == 0:
-            latest = c
+    latest = max(candidates, key=lambda p: debian_support.Version(p["Version"]))
+
     return latest["Version"], latest["Filename"]
 
 
 def normalize_debian_version(version):
     """
-    Strip everything after '~' (pre-release) for dpkg/git log comparison.
+    Strip everything after '~' (pre-release) for git log search.
     Example: '4.2025.02-4~bpo12+1' -> '4.2025.02-4'
     """
     if "~" in version:
@@ -99,7 +93,7 @@ def update_src(
     pkg_name: str,
     deb_name: str | None = None,
     use_git_log: bool = False,
-    git_log_prefix: str = "bump version to "
+    git_log_prefix: str = "bump version to ",
 ):
     """
     Update a nix package to the latest Proxmox repo revision.
@@ -123,7 +117,9 @@ def update_src(
 
     # Step 2: read old version from nix
     try:
-        old_version = run_command(f"nix eval .#{pkg_name}.version", check=True).strip().strip('"')
+        old_version = (
+            run_command(f"nix eval .#{pkg_name}.version", check=True).strip().strip('"')
+        )
     except Exception as e:
         print(f"Warning: failed to eval old version: {e}")
         old_version = None
@@ -145,12 +141,18 @@ def update_src(
             pattern = f"{git_log_prefix}{version}" if git_log_prefix else version
             print(f"Searching git history for version '{pattern}'...")
             try:
-                rev = run_command(f"git log --grep='{pattern}' -n 1 --pretty=format:'%H'")
+                rev = run_command(
+                    f"git log --grep='{pattern}' -n 1 --pretty=format:'%H'"
+                )
             except RuntimeError:
-                print(f"ERROR: Could not find a commit matching version '{pattern}' in git history.")
+                print(
+                    f"ERROR: Could not find a commit matching version '{pattern}' in git history."
+                )
                 sys.exit(1)
             if not rev:
-                print(f"ERROR: Could not find a commit matching version '{pattern}' in git history.")
+                print(
+                    f"ERROR: Could not find a commit matching version '{pattern}' in git history."
+                )
                 sys.exit(1)
     else:
         print("Downloading package and extracting SOURCE...")

@@ -16,7 +16,6 @@ dependencies = [
     "aiohttp",
     "beautifulsoup4",
     "python-debian",
-    "python-apt"
 ]
 
 [project.scripts]

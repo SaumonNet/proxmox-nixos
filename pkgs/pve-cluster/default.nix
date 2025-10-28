@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   pve-access-control,
   pve-apiclient,
   pve-rs,
@@ -27,27 +27,27 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     DigestHMAC
     uuid
-    (rrdtool.override { perl = perl538; })
+    (rrdtool.override { perl = perl540; })
     pve-access-control
     pve-apiclient
     pve-rs
   ];
 
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-cluster";
-    version = "8.1.2";
+    version = "9.0.6";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "3bd55f2f7ad11e0e517fb6b6ed5202bad1b480d4";
-      hash = "sha256-kQRo7nwShFWpsSD063KBH7wbn4MC++eKvQ0Gk1fdQzA=";
+      rev = "253de0cdfe1cd53ab8940c2e5147d363c82f9e46";
+      hash = "sha256-YFpL4XnfJPdeP8O83IZZk0cWmGbSuPqJEvWkWHcMvR0=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -83,8 +83,8 @@ perl538.pkgs.toPerlModule (
 
     makeFlags = [
       "DESTDIR=$(out)"
-      "PERL_VENDORARCH=${perl538.libPrefix}/${perl538.version}"
-      "PVEDIR=$(out)/${perl538.libPrefix}/${perl538.version}/PVE"
+      "PERL_VENDORARCH=${perl540.libPrefix}/${perl540.version}"
+      "PVEDIR=$(out)/${perl540.libPrefix}/${perl540.version}/PVE"
     ];
 
     postInstall = ''
@@ -108,7 +108,7 @@ perl538.pkgs.toPerlModule (
               libfaketime
             ]
           } \
-          --prefix PERL5LIB : $out/${perl538.libPrefix}/${perl538.version}
+          --prefix PERL5LIB : $out/${perl540.libPrefix}/${perl540.version}
       done      
     '';
 

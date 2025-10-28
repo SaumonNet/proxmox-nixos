@@ -8,7 +8,7 @@
   pkg-config,
   openssl,
   fetchgit,
-  perl538,
+  perl540,
   perlmod,
   apt,
   mkRegistry,
@@ -19,15 +19,15 @@ let
   registry = mkRegistry sources;
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rs";
-    version = "0.9.4";
+    version = "0.10.10";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/proxmox-perl-rs.git";
-      rev = "22a6b226309923ddf6ca1982e813f5a273e0d427";
-      hash = "sha256-YxioQTLVYMSvkZx4pYTjnFto9PhFMODS5ZwLa1Wa/JA=";
+      rev = "f2fbed015ec15d204193bcb751388d8acd3bf6ef";
+      hash = "sha256-4ZROGAeWDaFsULNpuYIJMbqyW8e+eVenzfLNsj4lOYQ=";
     };
 
     cargoDeps = rustPlatform.importCargoLock {
@@ -54,7 +54,7 @@ perl538.pkgs.toPerlModule (
       rustPlatform.cargoSetupHook
       cargo
       rustc
-      perl538
+      perl540
       apt
     ];
 
@@ -71,14 +71,14 @@ perl538.pkgs.toPerlModule (
       "BUILD_MODE=release"
       "DESTDIR=$(out)"
       "GITVERSION:=${src.rev}"
-      "PERL_INSTALLVENDORARCH=/${perl538.libPrefix}/${perl538.version}"
-      "PERL_INSTALLVENDORLIB=/${perl538.libPrefix}/${perl538.version}"
+      "PERL_INSTALLVENDORARCH=/${perl540.libPrefix}/${perl540.version}"
+      "PERL_INSTALLVENDORLIB=/${perl540.libPrefix}/${perl540.version}"
     ];
 
     postInstall = ''
       (
         cd common/pkg
-        PERL_INSTALLVENDORLIB=$out/${perl538.libPrefix}/${perl538.version} make install
+        PERL_INSTALLVENDORLIB=$out/${perl540.libPrefix}/${perl540.version} make install
       )    
     '';
 

@@ -23,18 +23,19 @@
   thin-provisioning-tools,
   util-linux,
   zfs,
+  writeScript,
 }:
 
 let
   self = stdenv.mkDerivation (finalAttrs: {
     pname = "linstor-server";
-    version = "1.29.0";
+    version = "1.32.3";
 
     src = fetchFromGitHub {
       owner = "LINBIT";
       repo = "linstor-server";
       rev = "v${finalAttrs.version}";
-      hash = "sha256-+rtvc6FrBQ9YjLiuJpVy/xzSpXp9AgIRNScRd4BPmYw=";
+      hash = "sha256-khXu6DGOMh+0SYt8T43sLAQs4FFBXTCIUPORcqQHNEU=";
       fetchSubmodules = true;
       leaveDotGit = true;
     };
@@ -116,7 +117,14 @@ let
           ]
         }
     '';
-  });
 
+    passthru.updateScript = writeScript "update-linstor-server" ''
+      #!/usr/bin/env nix-shell
+      #!nix-shell -i bash -p nix-update
+
+      nix-update linstor-server --flake # update version and hash
+      bash $(nix build --no-link --print-out-paths .#packages.x86_64-linux.linstor-server.mitmCache.updateScript)
+    '';
+  });
 in
 self

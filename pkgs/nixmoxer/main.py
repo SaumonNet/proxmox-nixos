@@ -9,8 +9,9 @@ import sys
 import time
 import urllib3
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -41,8 +42,7 @@ class Proxmox:
             if node["status"] == "online":
                 node_name = node["node"]
                 vms_node = self.api.nodes(node_name).qemu.get()
-                vms += list(map(lambda x: (x["vmid"],
-                            x["name"], node_name), vms_node))
+                vms += list(map(lambda x: (x["vmid"], x["name"], node_name), vms_node))
         return vms
 
     def iso_exists(self, node, storage, iso):
@@ -74,16 +74,20 @@ class Proxmox:
         """
         iso_name = os.path.basename(iso)
         if self.iso_exists(node, storage, iso_name):
-            logging.error(click.style(
-                f'The specified iso already exists on {node}/local.', fg='red'))
-            logging.info(click.style(
-                'Do you wish to destroy it?', fg='yellow'))
+            logging.error(
+                click.style(
+                    f"The specified iso already exists on {node}/local.", fg="red"
+                )
+            )
+            logging.info(click.style("Do you wish to destroy it?", fg="yellow"))
             verify_before_destructive_action("yes")
             self.delete_iso(node, storage, iso_name)
 
-
-        logging.info(click.style(
-            f'Uploading iso "{iso_name}" to "{node}/{storage}"...', fg='cyan'))
+        logging.info(
+            click.style(
+                f'Uploading iso "{iso_name}" to "{node}/{storage}"...', fg="cyan"
+            )
+        )
 
         self.api.nodes(node).storage(storage).upload.create(
             content="iso",
@@ -116,20 +120,32 @@ class Proxmox:
             ValueError: ISO does not exist.
         """
         iso_name = os.path.basename(iso)
-        logging.warn(click.style(
-            f'Deleting iso "{iso_name}" from "{node}/{storage}"...', fg='yellow'))
+        logging.warn(
+            click.style(
+                f'Deleting iso "{iso_name}" from "{node}/{storage}"...', fg="yellow"
+            )
+        )
 
         if not self.iso_exists(node, storage, iso_name):
-            logging.error(click.style(
-                f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}".', fg='red'))
+            logging.error(
+                click.style(
+                    f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}".',
+                    fg="red",
+                )
+            )
             raise ValueError(
-                f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}".')
+                f'The iso "{iso_name}" does not exist on storage "{storage}" on node "{node}".'
+            )
 
         self.api.nodes(node).storage(storage).content(f"iso/{iso_name}").delete(
             node=node,
         )
-        logging.info(click.style(
-            f'Successfully deleted iso "{iso_name}" from "{node}/{storage}".', fg='green'))
+        logging.info(
+            click.style(
+                f'Successfully deleted iso "{iso_name}" from "{node}/{storage}".',
+                fg="green",
+            )
+        )
 
     def find_free_vmid(self):
         """
@@ -155,7 +171,7 @@ class Proxmox:
             bool: True if the VM ID exists, False otherwise.
         """
         vms = self.list_vms_on_cluster()
-        if (len(vms) == 0):
+        if len(vms) == 0:
             return False, None, None
         ids, names, nodes = zip(*vms)
         if vmid in ids:
@@ -174,7 +190,7 @@ class Proxmox:
             bool: True if the VM ID exists, False otherwise.
         """
         vms = self.list_vms_on_cluster()
-        if (len(vms) == 0):
+        if len(vms) == 0:
             return False, None, None
         ids, names, nodes = zip(*vms)
         if vm_name in names:
@@ -190,29 +206,32 @@ class Proxmox:
             vmid (str): The VM ID.
             node (str): The name of the node.
         """
-        logging.info(click.style(
-            f'Stopping VM "{vmid}" on node "{node}"...', fg='yellow'))
+        logging.info(
+            click.style(f'Stopping VM "{vmid}" on node "{node}"...', fg="yellow")
+        )
 
         self.api.nodes(node).qemu(vmid).status.stop.post(node=node)
 
         status = "running"
         for _ in range(10):
-            status = self.api.nodes(node).qemu(
-                vmid).status.current.get()["status"]
+            status = self.api.nodes(node).qemu(vmid).status.current.get()["status"]
             if status == "stopped":
                 break
             time.sleep(1)
 
         if status == "running":
-            logging.error(click.style(
-                "The VM did not stop in time.", fg='red'))
+            logging.error(click.style("The VM did not stop in time.", fg="red"))
             sys.exit(1)
 
-        logging.info(click.style(
-            f'Deleting VM "{vmid}" on node "{node}"...', fg='yellow'))
+        logging.info(
+            click.style(f'Deleting VM "{vmid}" on node "{node}"...', fg="yellow")
+        )
         self.api.nodes(node).qemu(vmid).delete(node=node)
-        logging.info(click.style(
-            f'Successfully destroyed VM "{vmid}" on node "{node}".', fg='green'))
+        logging.info(
+            click.style(
+                f'Successfully destroyed VM "{vmid}" on node "{node}".', fg="green"
+            )
+        )
 
     def create_vm(self, node, config):
         """
@@ -227,45 +246,64 @@ class Proxmox:
         """
         api_params = config_to_api_params(config)
 
-        logging.info(click.style('Configuration:\n' +
-                     json.dumps(api_params, indent=2), fg='cyan'))
+        logging.info(
+            click.style(
+                "Configuration:\n" + json.dumps(api_params, indent=2), fg="cyan"
+            )
+        )
 
         if "vmid" not in api_params.keys():
-            logging.info(click.style(
-                'No VM ID set. Finding the smallest free VM ID...', fg='cyan'))
+            logging.info(
+                click.style(
+                    "No VM ID set. Finding the smallest free VM ID...", fg="cyan"
+                )
+            )
             api_params["vmid"] = int(self.find_free_vmid())
-            logging.info(click.style(
-                f'Set VM ID to "{api_params["vmid"]}."', fg='green'))
+            logging.info(
+                click.style(f'Set VM ID to "{api_params["vmid"]}."', fg="green")
+            )
 
-        vmid_exists, name, vm_node = self.vmid_exists(
-            int(api_params["vmid"]))
+        vmid_exists, name, vm_node = self.vmid_exists(int(api_params["vmid"]))
         if vmid_exists:
-            logging.warning(click.style(
-                f'The VM "{name}" already exists on the cluster with this ID, do you want to destroy it?\n'
-                'WARNING: This is irreversible and will delete associated disks.\n'
-                'Type the VM name to confirm deletion:', fg='yellow'
-            ))
+            logging.warning(
+                click.style(
+                    f'The VM "{name}" already exists on the cluster with this ID, do you want to destroy it?\n'
+                    "WARNING: This is irreversible and will delete associated disks.\n"
+                    "Type the VM name to confirm deletion:",
+                    fg="yellow",
+                )
+            )
             verify_before_destructive_action(name)
             self.destroy_vm(api_params["vmid"], vm_node)
 
         time.sleep(1)
 
-        vm_name_exists, vmid, vm_node = self.vm_name_exists(
-            api_params["name"])
+        vm_name_exists, vmid, vm_node = self.vm_name_exists(api_params["name"])
         if vm_name_exists:
-            logging.warning(click.style(
-                f'The VM "{api_params["name"]}" already exists on the cluster with VM ID {vmid}, do you want to destroy it?\n'
-                'WARNING: This is irreversible and will delete associated disks.\n'
-                'Type the VM name to confirm deletion:', fg='yellow'
-            ))
+            logging.warning(
+                click.style(
+                    f'The VM "{api_params["name"]}" already exists on the cluster with VM ID {vmid}, do you want to destroy it?\n'
+                    "WARNING: This is irreversible and will delete associated disks.\n"
+                    "Type the VM name to confirm deletion:",
+                    fg="yellow",
+                )
+            )
             verify_before_destructive_action(str(vmid))
             self.destroy_vm(api_params["vmid"], vm_node)
 
-        logging.info(click.style(
-            f'Creating VM "{api_params["name"]}" with VM ID {api_params["vmid"]} on node "{node}"...', fg='green'))
+        logging.info(
+            click.style(
+                f'Creating VM "{api_params["name"]}" with VM ID {api_params["vmid"]} on node "{node}"...',
+                fg="green",
+            )
+        )
         self.api.nodes(node).qemu.create(**api_params)
-        logging.info(click.style(
-            f'Successfully created VM "{api_params["name"]}" on node "{node}".', fg='green'))
+        logging.info(
+            click.style(
+                f'Successfully created VM "{api_params["name"]}" on node "{node}".',
+                fg="green",
+            )
+        )
 
 
 def eval_config(machine, flake):
@@ -279,25 +317,29 @@ def eval_config(machine, flake):
     Returns:
         str: The JSON output of the evaluated NixOS configuration.
     """
-    logging.info(click.style('Evaluating configuration...', fg='cyan'))
+    logging.info(click.style("Evaluating configuration...", fg="cyan"))
 
     try:
         result = subprocess.run(
             ["nix", "eval", "--json"]
             + ([] if flake else ["-f", "default.nix"])
-            + [(".#" if flake else"")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox"],
+            + [
+                (".#" if flake else "")
+                + f"nixosConfigurations.{machine}.config.virtualisation.proxmox"
+            ],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
         )
-        logging.info(click.style(
-            'Configuration evaluation completed successfully.', fg='green'))
+        logging.info(
+            click.style("Configuration evaluation completed successfully.", fg="green")
+        )
         return result.stdout
 
     except subprocess.CalledProcessError as e:
-        logging.error(click.style('Machine evaluation failed:', fg='red'))
-        logging.error(click.style(e.stderr, fg='red'))
+        logging.error(click.style("Machine evaluation failed:", fg="red"))
+        logging.error(click.style(e.stderr, fg="red"))
         sys.exit(1)
 
 
@@ -310,24 +352,26 @@ def build_iso(machine, flake):
         flake (bool): A flag indicating whether to use the Nix flake system.
     """
 
-    logging.info(click.style('Building iso...', fg='cyan'))
+    logging.info(click.style("Building iso...", fg="cyan"))
 
     try:
         subprocess.run(
             ["nix", "--print-build-logs", "build"]
             + ([] if flake else ["-f", "default.nix"])
-            + [(".#" if flake else "")+f"nixosConfigurations.{machine}.config.virtualisation.proxmox.iso"],
+            + [
+                (".#" if flake else "")
+                + f"nixosConfigurations.{machine}.config.virtualisation.proxmox.iso"
+            ],
             check=True,
             stdout=sys.stdout,
             stderr=sys.stderr,
-            text=True
+            text=True,
         )
-        logging.info(click.style(
-            'Iso built successfully.', fg='green'))
+        logging.info(click.style("Iso built successfully.", fg="green"))
 
     except subprocess.CalledProcessError as e:
-        logging.error(click.style('ISO building failed.', fg='red'))
-        logging.error(click.style(e.stderr, fg='red'))
+        logging.error(click.style("ISO building failed.", fg="red"))
+        logging.error(click.style(e.stderr, fg="red"))
         sys.exit(1)
 
 
@@ -338,15 +382,17 @@ def find_iso(path):
     iso_folder = os.path.join(path, "iso")
 
     if not os.path.exists(iso_folder):
-        logging.error(click.style(
-            f"The folder '{iso_folder}' does not exist.", fg='red'))
+        logging.error(
+            click.style(f"The folder '{iso_folder}' does not exist.", fg="red")
+        )
         return None
 
     files = os.listdir(iso_folder)
-    logging.info(click.style(f"Files in '{iso_folder}': {files}", fg='cyan'))
+    logging.info(click.style(f"Files in '{iso_folder}': {files}", fg="cyan"))
 
-    iso_files = [file for file in files if os.path.isfile(
-        os.path.join(iso_folder, file))]
+    iso_files = [
+        file for file in files if os.path.isfile(os.path.join(iso_folder, file))
+    ]
 
     return iso_files[0] if iso_files else None
 
@@ -358,19 +404,24 @@ def verify_before_destructive_action(confirmation):
     Args:
         confirmation (str): The word the user must type to confirm the action.
     """
-    logging.warning(click.style(
-        f"To proceed, please type the word '{confirmation}':", fg='yellow'))
+    logging.warning(
+        click.style(f"To proceed, please type the word '{confirmation}':", fg="yellow")
+    )
 
     while True:
-        user_input = input(click.style(
-            "Enter the confirmation word: ", fg='cyan')).strip()
+        user_input = input(
+            click.style("Enter the confirmation word: ", fg="cyan")
+        ).strip()
         if user_input == confirmation:
-            logging.info(click.style(
-                "Action confirmed. Proceeding...", fg='green'))
+            logging.info(click.style("Action confirmed. Proceeding...", fg="green"))
             break
         else:
-            logging.error(click.style(
-                f"Incorrect input. You must type '{confirmation}' to confirm, or exit.", fg='red'))
+            logging.error(
+                click.style(
+                    f"Incorrect input. You must type '{confirmation}' to confirm, or exit.",
+                    fg="red",
+                )
+            )
 
 
 def parse_configuration():
@@ -383,47 +434,71 @@ def parse_configuration():
     Returns:
         dict: A dictionary containing the configuration key-value pairs.
     """
-    xdg_config_home = os.getenv(
-        'XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
-    xdg_config_file_path = os.path.join(xdg_config_home, 'nixmoxer.conf')
-    local_config_file_path = os.path.join(os.getcwd(), 'nixmoxer.conf')
+    xdg_config_home = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+    xdg_config_file_path = os.path.join(xdg_config_home, "nixmoxer.conf")
+    local_config_file_path = os.path.join(os.getcwd(), "nixmoxer.conf")
     config = {}
 
     if os.path.exists(xdg_config_file_path):
-        logging.info(click.style(
-            f"Loading configuration from {xdg_config_file_path}...", fg='cyan'))
+        logging.info(
+            click.style(
+                f"Loading configuration from {xdg_config_file_path}...", fg="cyan"
+            )
+        )
         config.update(read_config_file(xdg_config_file_path))
 
     if os.path.exists(local_config_file_path):
-        logging.info(click.style(
-            f"Loading configuration from {local_config_file_path}...", fg='cyan'))
+        logging.info(
+            click.style(
+                f"Loading configuration from {local_config_file_path}...", fg="cyan"
+            )
+        )
         config.update(read_config_file(local_config_file_path))
 
     for key, value in os.environ.items():
         if key.startswith("PROXMOX_"):
-            config_key = key[len("PROXMOX_"):]
+            config_key = key[len("PROXMOX_") :]
             config[config_key.lower()] = value
-            logging.info(click.style(
-                f"Environment variable '{key}' loaded as '{config_key.lower()}'", fg='cyan'))
+            logging.info(
+                click.style(
+                    f"Environment variable '{key}' loaded as '{config_key.lower()}'",
+                    fg="cyan",
+                )
+            )
 
     # Validate required keys
     if "host" not in config.keys():
-        logging.error(click.style(
-            f'Missing authentication configuration for Proxmox. Please set "host" in {local_config_file_path}.', fg='red'))
+        logging.error(
+            click.style(
+                f'Missing authentication configuration for Proxmox. Please set "host" in {local_config_file_path}.',
+                fg="red",
+            )
+        )
         raise KeyError('Missing "host" configuration')
 
     if "user" not in config.keys():
-        logging.error(click.style(
-            f'Missing authentication configuration for Proxmox. Please set "user" in {local_config_file_path}.', fg='red'))
+        logging.error(
+            click.style(
+                f'Missing authentication configuration for Proxmox. Please set "user" in {local_config_file_path}.',
+                fg="red",
+            )
+        )
         raise KeyError('Missing "user" configuration.')
 
-    if "password" not in config.keys() and ("token_name" not in config.keys() or "token_value" not in config.keys()):
-        logging.error(click.style(
-            'Missing authentication configuration for Proxmox. Please set either "password" or both "token_name" and "token_value".', fg='red'))
+    if "password" not in config.keys() and (
+        "token_name" not in config.keys() or "token_value" not in config.keys()
+    ):
+        logging.error(
+            click.style(
+                'Missing authentication configuration for Proxmox. Please set either "password" or both "token_name" and "token_value".',
+                fg="red",
+            )
+        )
         raise KeyError(
-            'Missing "password" or "token_name" and "token_value" configuration.')
+            'Missing "password" or "token_name" and "token_value" configuration.'
+        )
 
-    logging.info(click.style("Configuration parsed successfully.", fg='green'))
+    logging.info(click.style("Configuration parsed successfully.", fg="green"))
     return config
 
 
@@ -438,12 +513,12 @@ def read_config_file(file_path):
         dict: A dictionary containing key-value pairs from the file.
     """
     config = {}
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
             line = line.strip()
             # Ignore empty lines and comments
-            if line and not line.startswith('#') and '=' in line:
-                key, value = line.split('=', 1)
+            if line and not line.startswith("#") and "=" in line:
+                key, value = line.split("=", 1)
                 config[key.strip().lower()] = value.strip()
     return config
 
@@ -460,6 +535,7 @@ def config_to_api_params(config):
     Returns:
         dict: Filtered Proxmox API parameters.
     """
+
     def process_value(key, value):
         # Convert boolean to 0 or 1
         if isinstance(value, bool):
@@ -474,14 +550,17 @@ def config_to_api_params(config):
 
         # Convert dictionary to "key1=value1,key2=value2,..."
         if isinstance(value, dict):
-            result = {k: process_value(k, v) for k, v in value.items() if v not in [
-                None, {}, []]}
-            return ','.join(f"{k}={v}" for k, v in result.items()) if result else None
+            result = {
+                k: process_value(k, v)
+                for k, v in value.items()
+                if v not in [None, {}, []]
+            }
+            return ",".join(f"{k}={v}" for k, v in result.items()) if result else None
 
         # Process list of strings by concatenating with a comma
         if isinstance(value, list):
             if all(isinstance(item, str) for item in value):
-                concatenated = ','.join(value)
+                concatenated = ",".join(value)
                 return concatenated if concatenated else None
 
             # Process list of dictionaries and flatten the keys
@@ -495,10 +574,10 @@ def config_to_api_params(config):
 
             # Process list of other values (e.g., numbers) by concatenating with a comma
             if all(isinstance(item, (int, float)) for item in value):
-                return ','.join(map(str, value)) if value else None
+                return ",".join(map(str, value)) if value else None
 
         # Filter out None or empty string values
-        if value in [None, '']:
+        if value in [None, ""]:
             return None
 
         # Return value directly if it's not a dict, list, None, or empty string
@@ -524,38 +603,36 @@ def authenticate_promox():
         config = parse_configuration()
 
         if "token_name" in config.keys() and "token_value" in config.keys():
-            logging.info(click.style(
-                "Authenticating with token...", fg='cyan'))
+            logging.info(click.style("Authenticating with token...", fg="cyan"))
             api = ProxmoxAPI(
                 config["host"],
                 user=config["user"],
                 token_name=config["token_name"],
                 token_value=config["token_value"],
                 verify_ssl=bool(int(config.get("verify_ssl", True))),
-                timeout=30
+                timeout=30,
             )
         else:
-            logging.info(click.style(
-                "Authenticating with password...", fg='cyan'))
+            logging.info(click.style("Authenticating with password...", fg="cyan"))
             api = ProxmoxAPI(
                 config["host"],
                 user=config["user"],
                 password=config["password"],
                 verify_ssl=bool(int(config.get("verify_ssl", True))),
-                timeout=30
+                timeout=30,
             )
 
-        logging.info(click.style("Authentication successful.", fg='green'))
+        logging.info(click.style("Authentication successful.", fg="green"))
         return Proxmox(api)
 
     except KeyError as e:
-        logging.error(click.style(
-            f"Authentication failed:\n {str(e)}", fg='red'))
+        logging.error(click.style(f"Authentication failed:\n {str(e)}", fg="red"))
         sys.exit(1)
 
+
 @click.command()
-@click.option('--flake', is_flag=True)
-@click.argument('machine')
+@click.option("--flake", is_flag=True)
+@click.argument("machine")
 def bootstrap(flake, machine):
     """
     Bootstrap the NixOS configuration for a specific machine using Nix flake or non-flake.
@@ -567,17 +644,17 @@ def bootstrap(flake, machine):
     proxmox = authenticate_promox()
     config = eval_config(machine, flake)
     config = json.loads(config)
-    node = config['node']
-    config.pop('autoInstall', None)
+    node = config["node"]
+    config.pop("autoInstall", None)
 
     build_iso(machine, flake)
     iso_file = find_iso(config["iso"])
-    proxmox.upload_iso(node, "local", config["iso"]+f"/iso/{iso_file}")
+    proxmox.upload_iso(node, "local", config["iso"] + f"/iso/{iso_file}")
     config["cdrom"] = f"local:iso/{iso_file}"
 
-    config.pop('iso', None)
+    config.pop("iso", None)
     proxmox.create_vm(node, config)
-    logging.info(click.style("Virtual machine successfully created!", fg='green'))
+    logging.info(click.style("Virtual machine successfully created!", fg="green"))
 
 
 def run_main():

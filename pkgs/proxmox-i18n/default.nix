@@ -2,28 +2,29 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
+  gettext,
   pve-update-script,
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     Encode
     GetoptLong
     JSON
     LocalePO
   ];
 
-  perlEnv = perl538.withPackages (_: perlDeps);
+  perlEnv = perl540.withPackages (_: perlDeps);
 in
 stdenv.mkDerivation rec {
   pname = "proxmox-i18n";
-  version = "3.4.5";
+  version = "3.6.1";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "24e0aeb18ee90b73a7c98f6d4479ba7e0899ebc7";
-    hash = "sha256-oAl3Fs9JW3JFNb2HJAxpPjLcRxU5WKaEiZVtbcKabpU=";
+    rev = "b43940b4d4387ebb9f101d5659704cb1126da0af";
+    hash = "sha256-r9u7KUqz1eh1imWH0mKpOH4Z1T6vgNavl9+QLk33r7M=";
   };
 
   postPatch = ''
@@ -39,7 +40,10 @@ stdenv.mkDerivation rec {
     "DESTDIR=$(out)"
   ];
 
-  nativeBuildInputs = [ perlEnv ];
+  nativeBuildInputs = [
+    perlEnv
+    gettext
+  ];
 
   passthru.updateScript = pve-update-script {
     extraArgs = [

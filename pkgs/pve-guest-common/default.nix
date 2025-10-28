@@ -2,25 +2,25 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   pve-update-script,
 }:
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-guest-common";
-    version = "5.2.2";
+    version = "6.0.2";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "58ad1835bf48ac8a62877cc8889c67b49330113f";
-      hash = "sha256-vKm8C5cAHaU0LRb9AYM1wyYrfeY1R7Z8HuZ7qgfeQCw=";
+      rev = "73531017bfedda96176521e04cfe2c39138cf638";
+      hash = "sha256-NxoDEv8aKdI3W6Wv2/AMwRg4ZtNlGUmqOi+/K1sAn9c=";
     };
 
     sourceRoot = "${src.name}/src";
 
     makeFlags = [
-      "PERL5DIR=$(out)/${perl538.libPrefix}/${perl538.version}"
+      "PERL5DIR=$(out)/${perl540.libPrefix}/${perl540.version}"
       "DOCDIR=$(out)/share/doc/${pname}"
     ];
 

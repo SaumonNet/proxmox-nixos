@@ -8,19 +8,17 @@
 }:
 sources:
 let
-  workspace-remove = (
-    python3.withPackages (python-pkgs: [
-      python-pkgs.toml
-    ])
-  );
+  workspace-remove = python3.withPackages (python-pkgs: [
+    python-pkgs.toml
+  ]);
 
   processed = map (
     source:
     let
       fetched = fetchgit {
-        url = source.url;
-        rev = source.rev;
-        sha256 = source.sha256;
+        inherit (source) url;
+        inherit (source) rev;
+        inherit (source) sha256;
       };
 
       patched =
@@ -28,7 +26,7 @@ let
           stdenv.mkDerivation {
             name = "${source.name}-patched";
             src = fetched;
-            patches = source.patches;
+            inherit (source) patches;
             phases = [
               "unpackPhase"
               "patchPhase"

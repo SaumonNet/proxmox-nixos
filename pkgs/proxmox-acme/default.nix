@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl538,
+  perl540,
   acme-sh,
   bash,
   curl,
@@ -10,21 +10,21 @@
 }:
 
 let
-  perlDeps = with perl538.pkgs; [
+  perlDeps = with perl540.pkgs; [
     HTTPDaemon
     HTTPMessage
   ];
 in
 
-perl538.pkgs.toPerlModule (
+perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "proxmox-acme";
-    version = "1.6.0";
+    version = "1.7.0";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "245c99f2a8049682a1a80733655140129a616342";
-      hash = "sha256-e4BkUeQ9AGaUvjN2c5zZvSW1z/9u4lq4HOFyWPgzHwE=";
+      rev = "6dc96d5a468d1553991589f4197f9ec6eab554c1";
+      hash = "sha256-4P1Zw5zBsxOyy0b5Blbsg/k8dzdnz0xvXxuS5JKT5Cw=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -32,7 +32,7 @@ perl538.pkgs.toPerlModule (
     postPatch = ''
       # Remove --reset-env so basic coreutils tools could be found
       substituteInPlace PVE/ACME/DNSChallenge.pm \
-        --replace-fail ', "--reset-env"' "" \
+        --replace-fail "--reset-env" "" \
         --replace-fail '/bin/bash' '${lib.getExe bash}'
       substituteInPlace proxmox-acme \
         --replace-fail '_CURL="curl' '_CURL="${lib.getExe curl}' 
@@ -42,7 +42,7 @@ perl538.pkgs.toPerlModule (
 
     makeFlags = [
       "PREFIX=$(out)"
-      "PERLDIR=$(out)/${perl538.libPrefix}/${perl538.version}"
+      "PERLDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
     ];
 
     propagatedBuildInputs = perlDeps;

@@ -2,6 +2,7 @@
   inputs = {
     nixpkgs-stable.url = "nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
+    nixpkgs-libvncserver.url = "nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
   };
@@ -16,12 +17,10 @@
       self,
       nixpkgs-stable,
       nixpkgs-unstable,
+      nixpkgs-libvncserver,
       utils,
       ...
     }:
-    let
-      inherit (nixpkgs-stable) lib;
-    in
     {
       nixosModules = import ./modules;
     }
@@ -38,21 +37,15 @@
           let
             pkgs = import nixpkgs-stable {
               inherit system;
-              overlays = [ self.overlays.${system} ];
+              overlays = [
+                self.overlays.${system}
+                (_: _: { inherit (nixpkgs-libvncserver.legacyPackages.${system}) libvncserver; })
+              ];
             };
+
             pkgs-unstable = import nixpkgs-unstable {
               inherit system;
-              overlays = [
-                (_: prev: {
-                  pacemaker = prev.pacemaker.overrideAttrs (_: {
-                    env.NIX_CFLAGS_COMPILE = toString (
-                      [ "-Wno-error=deprecated-declarations" ]
-                      ++ lib.optionals prev.stdenv.cc.isGNU [ "-Wno-error=strict-prototypes" ]
-                    );
-                  });
-
-                })
-              ];
+              overlays = [ ];
             };
           in
           {

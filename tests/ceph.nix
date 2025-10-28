@@ -1,5 +1,5 @@
 {
-  name = "pve-cluster";
+  name = "pve-ceph";
 
   nodes = {
     pve1 =
@@ -28,7 +28,10 @@
           hashedPasswordFile = null;
         };
 
-        virtualisation.emptyDiskImages = [ 1024 ];
+        virtualisation = {
+          emptyDiskImages = [ 1024 ];
+          memorySize = 2048;
+        };
       };
 
     pve2 = {
@@ -45,7 +48,10 @@
         };
       };
 
-      virtualisation.emptyDiskImages = [ 1024 ];
+      virtualisation = {
+        emptyDiskImages = [ 1024 ];
+        memorySize = 2048;
+      };
     };
 
     pve3 = {
@@ -62,7 +68,10 @@
         };
       };
 
-      virtualisation.emptyDiskImages = [ 1024 ];
+      virtualisation = {
+        emptyDiskImages = [ 1024 ];
+        memorySize = 2048;
+      };
     };
   };
 

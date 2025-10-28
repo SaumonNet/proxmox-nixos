@@ -55,6 +55,8 @@ def main():
     )
 
     args = parser.parse_args()
+    if not args.deb_name:
+        args.deb_name = args.package
     temp_dir = Path(args.temp_dir) if args.temp_dir else Path("/tmp/pve_update")
     temp_dir.mkdir(parents=True, exist_ok=True)
 

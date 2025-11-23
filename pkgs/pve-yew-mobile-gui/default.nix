@@ -98,10 +98,6 @@ stdenv.mkDerivation (finalAttrs: {
     "PREFIX="
   ];
 
-  preInstall = ''
-    mkdir -p $out
-  '';
-
   passthru = {
     inherit registry;
 

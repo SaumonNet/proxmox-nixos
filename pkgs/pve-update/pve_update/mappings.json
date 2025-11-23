@@ -28,6 +28,11 @@
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
   },
   {
+    "package_name": "proxmox-s3-client",
+    "debian_package_name": "librust-proxmox-s3-client-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
     "package_name": "proxmox-syslog-api",
     "debian_package_name": "librust-proxmox-syslog-api-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
@@ -327,5 +332,33 @@
     "debian_package_name": "proxmox-wasm-builder",
     "git_repository": "git://git.proxmox.com/git/ui/proxmox-wasm-builder.git",
     "path": "."
+  },
+  {
+    "package_name": "proxmox-yew-comp",
+    "debian_package_name": "librust-proxmox-yew-comp-dev",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-yew-comp.git",
+    "path": "."
+  },
+  {
+    "package_name": "pve-api-types",
+    "debian_package_name": "librust-pve-api-types-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "pwt",
+    "debian_package_name": "librust-pwt-dev",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git",
+    "path": "."
+  },
+  {
+    "package_name": "pwt-macros",
+    "debian_package_name": "librust-pwt-macros-dev",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git",
+    "path": "pwt-macros"
+  },
+  {
+    "package_name": "proxmox-node-status",
+    "debian_package_name": "librust-proxmox-node-status-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
   }
 ]

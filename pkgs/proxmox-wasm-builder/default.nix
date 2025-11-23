@@ -2,6 +2,7 @@
   lib,
   stdenv,
   rustPlatform,
+  binaryen,
   cargo,
   rustc,
   pkg-config,
@@ -46,6 +47,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
+    binaryen
     pkg-config
     registry
   ];

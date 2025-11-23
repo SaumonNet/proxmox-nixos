@@ -2,15 +2,18 @@
   lib,
   stdenv,
   rustPlatform,
+  binaryen,
   cargo,
+  esbuild,
+  grass-sass,
+  gzip,
   rustc,
   libuuid,
+  lld,
   pkg-config,
   openssl,
   fetchgit,
-  perl538,
-  perlmod,
-  apt,
+  proxmox-wasm-builder,
   mkRegistry,
   pve-update-script,
 }:
@@ -20,15 +23,34 @@ let
   registry = mkRegistry sources;
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "pve-yew-mobile-gui";
   version = "0.6.2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/ui/pve-yew-mobile-gui.git";
-    rev = "4e22axx15e892f75c8c96998feaf1e535b7167b8";
-    hash = "sha256-AzH1rZFqEH8sovZZfJykvsEmCedEZWigQFHWHl6/PdE=";
+    rev = "0d645b23ae2f733d0be7f6aab0fbe09e41096e1b";
+    hash = "sha256-UnhPBJwzsBFidPkNzjC1R+vuU6QYAJok//I07cCEJXY=";
+
+    # FIXME: remove patching submodule address after upgrading to 0.6.3+
     fetchSubmodules = false;
+    leaveDotGit = true;
+
+    postFetch = ''
+      pushd $out
+      git reset
+      substituteInPlace ./.gitmodules \
+        --replace-fail 'gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit-assets' \
+                       'git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit-assets.git' \
+        --replace-fail 'gitolite3@proxdev.maurer-it.com:/rust/proxmox-api-types' \
+                       'git://git.proxmox.com/git/proxmox-api-types.git'
+
+      git submodule update --init --recursive -j ''${NIX_BUILD_CORES:-1} --depth 1
+      # Remove .git dirs
+      find . -name .git -type f -exec rm -rf {} +
+      rm -rf .git/
+      popd
+    '';
   };
 
   cargoDeps = rustPlatform.importCargoLock {
@@ -37,33 +59,48 @@ stdenv.mkDerivation rec {
   };
 
   postPatch = ''
+    # Remove the `[patch.crates-io]` section from original Cargo.toml
+    sed -i '/\[patch.crates-io\]/,/^\[/d' Cargo.toml
+
     rm .cargo/config.toml
     cat ${registry}/cargo-patches.toml >> Cargo.toml
     ln -s ${./Cargo.lock} Cargo.lock
+
+    substituteInPlace ./Makefile \
+      --replace-fail 'include /usr/share/dpkg/default.mk' "" \
+      --replace-fail 'rust-grass' 'grass'
   '';
 
   nativeBuildInputs = [
     rustPlatform.cargoSetupHook
     cargo
+    lld
     rustc
-    perl538
-    apt
   ];
 
   buildInputs = [
+    binaryen
+    esbuild
+    grass-sass
+    gzip
     libuuid
     pkg-config
+    proxmox-wasm-builder
     openssl
     registry
-    apt
   ];
 
   makeFlags = [
     "BUILDIR=$NIX_BUILD_TOP"
     "BUILD_MODE=release"
     "DESTDIR=$(out)"
-    "GITVERSION:=${src.rev}"
+    "GITVERSION:=${finalAttrs.src.rev}"
+    "PREFIX="
   ];
+
+  preInstall = ''
+    mkdir -p $out
+  '';
 
   passthru = {
     inherit registry;
@@ -81,4 +118,4 @@ stdenv.mkDerivation rec {
     ];
     platforms = platforms.linux;
   };
-}
+})

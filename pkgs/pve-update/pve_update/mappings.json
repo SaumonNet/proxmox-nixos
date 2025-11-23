@@ -321,5 +321,11 @@
     "debian_package_name": "librust-pxar-dev",
     "git_repository": "git://git.proxmox.com/git/pxar.git",
     "path": "."
+  },
+  {
+    "package_name": "proxmox-wasm-builder",
+    "debian_package_name": "proxmox-wasm-builder",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-wasm-builder.git",
+    "path": "."
   }
 ]

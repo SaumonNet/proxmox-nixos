@@ -36,6 +36,7 @@ let
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
     proxmox-i18n = callPackage ./proxmox-i18n { };
     proxmox-ve = callPackage ./proxmox-ve { };
+    proxmox-wasm-builder = callPackage ./proxmox-wasm-builder { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
 
     pve-access-control = callPackage ./pve-access-control { };

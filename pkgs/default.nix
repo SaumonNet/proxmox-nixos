@@ -22,7 +22,7 @@ let
 
     extjs = callPackage ./extjs { };
     fonts-font-logos = callPackage ./fonts-font-logos { };
-    sencha-touch = callPackage ./sencha-touch { };
+    
     markedjs = callPackage ./markedjs { };
     perlmod = callPackage ./perlmod { };
     termproxy = callPackage ./termproxy { };
@@ -36,6 +36,7 @@ let
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };
     proxmox-i18n = callPackage ./proxmox-i18n { };
     proxmox-ve = callPackage ./proxmox-ve { };
+    proxmox-wasm-builder = callPackage ./proxmox-wasm-builder { };
     proxmox-widget-toolkit = callPackage ./proxmox-widget-toolkit { };
 
     pve-access-control = callPackage ./pve-access-control { };
@@ -58,6 +59,7 @@ let
     pve-rs = callPackage ./pve-rs { };
     pve-storage = callPackage ./pve-storage { };
     pve-xtermjs = callPackage ./pve-xtermjs { };
+    pve-yew-mobile-gui = callPackage ./pve-yew-mobile-gui { };
 
     linstor-api-py = callPackage ./linstor-api-py { };
     linstor-client = callPackage ./linstor-client { };

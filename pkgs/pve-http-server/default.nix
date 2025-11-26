@@ -3,11 +3,12 @@
   stdenv,
   fetchgit,
   perl540,
+  proxmox-i18n,
   proxmox-widget-toolkit,
   extjs,
   font-awesome_4,
   fonts-font-logos,
-  sencha-touch,
+  pve-yew-mobile-gui,
   pve-update-script,
 }:
 
@@ -44,9 +45,10 @@ perl540.pkgs.toPerlModule (
       find $out -type f | xargs sed -i \
         -e "s|/usr/share/javascript|$out/share/javascript|"
       mkdir -p $out/share/javascript
+      ln -s ${proxmox-i18n}/share/pve-yew-mobile-i18n $out/share
       ln -s ${proxmox-widget-toolkit}/share/javascript/proxmox-widget-toolkit $out/share/javascript
       ln -s ${extjs}/share/javascript/extjs $out/share/javascript
-      ln -s ${sencha-touch}/share/javascript/sencha-touch $out/share/javascript
+      ln -s ${pve-yew-mobile-gui}/share/pve-yew-mobile-gui $out/share
       ln -s ${fonts-font-awesome}/share/fonts-font-awesome $out/share
       ln -s ${fonts-font-logos}/share/fonts-font-logos $out/share
     '';

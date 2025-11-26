@@ -1,5 +1,10 @@
 [
   {
+    "package_name": "pve-yew-mobile-gui",
+    "debian_package_name": "pve-yew-mobile-gui",
+    "git_repository": "git://git.proxmox.com/git/ui/pve-yew-mobile-gui.git"
+  },
+  {
     "package_name": "termproxy",
     "debian_package_name": "proxmox-termproxy",
     "git_repository": "git://git.proxmox.com/git/pve-xtermjs.git",
@@ -20,6 +25,11 @@
   {
     "package_name": "proxmox-base64",
     "debian_package_name": "librust-proxmox-base64-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-s3-client",
+    "debian_package_name": "librust-proxmox-s3-client-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
   },
   {
@@ -316,5 +326,39 @@
     "debian_package_name": "librust-pxar-dev",
     "git_repository": "git://git.proxmox.com/git/pxar.git",
     "path": "."
+  },
+  {
+    "package_name": "proxmox-wasm-builder",
+    "debian_package_name": "proxmox-wasm-builder",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-wasm-builder.git",
+    "path": "."
+  },
+  {
+    "package_name": "proxmox-yew-comp",
+    "debian_package_name": "librust-proxmox-yew-comp-dev",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-yew-comp.git",
+    "path": "."
+  },
+  {
+    "package_name": "pve-api-types",
+    "debian_package_name": "librust-pve-api-types-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "pwt",
+    "debian_package_name": "librust-pwt-dev",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git",
+    "path": "."
+  },
+  {
+    "package_name": "pwt-macros",
+    "debian_package_name": "librust-pwt-macros-dev",
+    "git_repository": "git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git",
+    "path": "pwt-macros"
+  },
+  {
+    "package_name": "proxmox-node-status",
+    "debian_package_name": "librust-proxmox-node-status-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
   }
 ]

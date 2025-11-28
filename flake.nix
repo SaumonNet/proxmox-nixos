@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs-stable.url = "nixpkgs/nixos-25.05";
+    nixpkgs-stable.url = "nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     nixpkgs-libvncserver.url = "nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb";
     utils.url = "github:numtide/flake-utils";

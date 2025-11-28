@@ -24,7 +24,7 @@
   rpcbind,
   samba,
   smartmontools,
-  targetcli,
+  targetcli-fb,
   util-linux,
   zfs,
   posixstrptime,
@@ -112,7 +112,7 @@ perl540.pkgs.toPerlModule (
         -e "s|/usr/bin/scp|${openssh}/bin/scp|" \
         -e "s|/usr/bin/smbclient|${samba}/bin/smbclient|" \
         -e "s|/usr/bin/ssh|${openssh}/bin/ssh|" \
-        -e "s|/usr/bin/targetcli|${targetcli}/bin/targetcli|" \
+        -e "s|/usr/bin/targetcli|${targetcli-fb}/bin/targetcli|" \
         -e "s|/usr/bin/vma|${pve-qemu}/bin/vma|" \
         -e "s|/usr/bin/zcat|${gzip}/bin/zcat|" \
         -e "s|/usr/libexec/ceph|$out/libexec/ceph|" \

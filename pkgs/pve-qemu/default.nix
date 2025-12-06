@@ -54,7 +54,7 @@ in
       );
       patchPathsList = map (patch: "${src}/debian/patches/${patch}") patchList;
     in
-    old.patches ++ patchPathsList;
+    old.patches ++ patchPathsList ++ [ ./machine-types-non-x86.patch ];
 
   sourceRoot = "${src.name}/qemu";
 
@@ -77,8 +77,14 @@ in
   postInstall = old.postInstall + ''
     $out/bin/qemu-system-x86_64 -cpu help \
       | ${perlEnv}/bin/perl ${src}/debian/parse-cpu-flags.pl > $out/share/qemu/recognized-CPUID-flags-x86_64
+
     $out/bin/qemu-system-x86_64 -machine help \
       | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
+    $out/bin/qemu-system-x86_64 -machine help \
+      | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-aarch.json
+
+    # Concatenate machine types for all architectures
+    jq -s 'add' $out/share/qemu/machine-versions-*.json > $out/share/qemu/machine-versions.json
   '';
 
   passthru.updateScript = pve-update-script {

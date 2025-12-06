@@ -117,6 +117,8 @@ perl540.pkgs.toPerlModule (
           + (
             if (stdenv.buildPlatform.system == "x86_64-linux") then
               "asm/unistd{,_64}.h"
+            else if (stdenv.buildPlatform.system == "aarch64-linux") then
+              "asm/unistd{,_64}.h asm-generic/{unistd,bitsperlong}.h"
             else
               "asm{,-generic}/{unistd,bitsperlong}.h"
           );

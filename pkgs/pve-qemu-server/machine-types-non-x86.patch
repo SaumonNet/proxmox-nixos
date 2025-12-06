@@ -1,0 +1,20 @@
+diff --git a/PVE/API2/Qemu/Machine.pm b/PVE/API2/Qemu/Machine.pm
+index 0fc1ea6c..ae10ec0d 100644
+--- a/PVE/API2/Qemu/Machine.pm
++++ b/PVE/API2/Qemu/Machine.pm
+@@ -39,7 +39,7 @@ __PACKAGE__->register_method({
+                 },
+                 type => {
+                     type => 'string',
+-                    enum => ['q35', 'i440fx'],
++                    enum => ['q35', 'i440fx', 'virt'],
+                     description => "The machine type.",
+                 },
+                 version => {
+@@ -57,7 +57,7 @@ __PACKAGE__->register_method({
+     },
+     code => sub {
+         my $supported_machine_list = eval {
+-            my $raw = file_get_contents('/usr/share/kvm/machine-versions-x86_64.json');
++            my $raw = file_get_contents('/usr/share/kvm/machine-versions.json');
+             my $machines = from_json($raw, { utf8 => 1 });

@@ -1,0 +1,47 @@
+# Source: [PATCH qemu-server] query-machine-capabilities: make it work on non-x86 arch
+# From the pve-devel public inbox: https://lists.proxmox.com/cgi-bin/mailman/listinfo/pve-devel
+
+diff --git a/query-machine-capabilities/Makefile b/query-machine-capabilities/Makefile
+index 5db2bf97..cd55369c 100644
+--- a/query-machine-capabilities/Makefile
++++ b/query-machine-capabilities/Makefile
+@@ -6,6 +6,11 @@ SERVICEDIR=/lib/systemd/system
+ CC ?= gcc
+ CFLAGS += -O2 -fanalyzer -Werror -Wall -Wextra -Wpedantic -Wtype-limits -Wl,-z,relro -std=gnu11
+
++DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
++ifneq ($(DEB_HOST_ARCH),amd64)
++	CFLAGS += -DNOT_X86
++endif
++
+ query-machine-capabilities: query-machine-capabilities.c
+ 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+diff --git a/query-machine-capabilities/query-machine-capabilities.c b/query-machine-capabilities/query-machine-capabilities.c
+index 0c522afc..53a6badb 100644
+--- a/query-machine-capabilities/query-machine-capabilities.c
++++ b/query-machine-capabilities/query-machine-capabilities.c
+@@ -21,6 +21,7 @@ typedef struct {
+ } cpu_caps_t;
+
+ void query_cpu_capabilities(cpu_caps_t *res) {
++#ifndef NOT_X86
+     uint32_t eax, ebx, ecx, edx;
+
+     // query Encrypted Memory Capabilities, see:
+@@ -37,6 +38,14 @@ void query_cpu_capabilities(cpu_caps_t *res) {
+
+     res->cbitpos = ebx & 0x3f;
+     res->reduced_phys_bits = (ebx >> 6) & 0x3f;
++#else
++    res->sev_support = false;
++    res->sev_es_support = false;
++    res->sev_snp_support = false;
++
++    res->cbitpos = 0;
++    res->reduced_phys_bits = 0;
++#endif
+ }
+
+ int prepare_output_directory() {
+

@@ -70,6 +70,7 @@ perl540.pkgs.toPerlModule (
 
     patches = [
       ./query-machine-capabilities-non-x86.patch
+      ./machine-types-non-x86.patch
     ];
 
     postPatch = ''

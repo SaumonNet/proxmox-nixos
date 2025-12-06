@@ -54,7 +54,7 @@ in
       );
       patchPathsList = map (patch: "${src}/debian/patches/${patch}") patchList;
     in
-    old.patches ++ patchPathsList ++ [ ./machine-types-non-x86.patch ];
+    old.patches ++ patchPathsList;
 
   sourceRoot = "${src.name}/qemu";
 

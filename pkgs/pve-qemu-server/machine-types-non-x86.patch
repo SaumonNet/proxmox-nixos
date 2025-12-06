@@ -1,7 +1,7 @@
-diff --git a/src/PVE/API2/Qemu/Machine.pm b/src/PVE/API2/Qemu/Machine.pm
+diff --git a/PVE/API2/Qemu/Machine.pm b/PVE/API2/Qemu/Machine.pm
 index 0fc1ea6c..ae10ec0d 100644
---- a/src/PVE/API2/Qemu/Machine.pm
-+++ b/src/PVE/API2/Qemu/Machine.pm
+--- a/PVE/API2/Qemu/Machine.pm
++++ b/PVE/API2/Qemu/Machine.pm
 @@ -39,7 +39,7 @@ __PACKAGE__->register_method({
                  },
                  type => {
@@ -18,5 +18,3 @@ index 0fc1ea6c..ae10ec0d 100644
 -            my $raw = file_get_contents('/usr/share/kvm/machine-versions-x86_64.json');
 +            my $raw = file_get_contents('/usr/share/kvm/machine-versions.json');
              my $machines = from_json($raw, { utf8 => 1 });
-
-             my $pve_machines = [];

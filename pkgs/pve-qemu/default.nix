@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   qemu,
   fetchgit,
@@ -70,6 +71,7 @@ in
     proxmox-backup-qemu
     perlEnv
     pkg-config
+    pkgs.jq
   ];
 
   # Generate cpu flag files and machine versions json

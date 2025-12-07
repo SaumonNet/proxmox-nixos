@@ -75,6 +75,7 @@ perl540.pkgs.toPerlModule (
     patches = [
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
+      ./0003-ceph-consider-unit-condition-for-active.patch
     ];
 
     postPatch = ''
@@ -132,9 +133,6 @@ perl540.pkgs.toPerlModule (
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
         -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/" \
         -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl540.libPrefix}/${perl540.version}/\$plug|"
-
-      # Ceph systemd units in NixOS do not use templates
-      find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
 
       sed -i $out/${perl540.libPrefix}/${perl540.version}/PVE/Ceph/Tools.pm \
         -e 's|=> "ceph|=> "${ceph}/bin/ceph|' \

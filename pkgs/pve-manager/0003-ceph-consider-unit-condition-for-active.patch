@@ -1,13 +1,11 @@
 diff --git a/PVE/Ceph/Services.pm b/PVE/Ceph/Services.pm
-index 4c3f3d99..e9bcb465 100644
+index 4c3f3d99..1087f261 100644
 --- a/PVE/Ceph/Services.pm
 +++ b/PVE/Ceph/Services.pm
-@@ -21,16 +21,16 @@ sub get_local_services {
-     for my $type (qw(mds mgr mon)) {
-         $res->{$type} = {};
+@@ -23,14 +23,14 @@ sub get_local_services {
 
--        my $path = "/etc/systemd/system/ceph-$type.target.wants";
--        my $regex = "ceph-$type\@(.*)\.service";
+         my $path = "/etc/systemd/system/ceph-$type.target.wants";
+         my $regex = "ceph-$type\@(.*)\.service";
 -        PVE::Tools::dir_glob_foreach(
 -            $path,
 -            $regex,
@@ -16,8 +14,6 @@ index 4c3f3d99..e9bcb465 100644
 -                $res->{$type}->{$id}->{service} = 1;
 -            },
 -        );
-+        my $path = "/etc/systemd/system/ceph-mon.target.wants";
-+        my $regex = "ceph-mon-(.*)\\.service"; # your naming instead of @
 +
 +        PVE::Tools::dir_glob_foreach($path, $regex, sub {
 +            my (undef, $id) = @_;

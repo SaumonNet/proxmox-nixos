@@ -1,3 +1,16 @@
+diff --git a/PVE/API2/Ceph/OSD.pm b/PVE/API2/Ceph/OSD.pm
+index a952c952..c616f0f5 100644
+--- a/PVE/API2/Ceph/OSD.pm
++++ b/PVE/API2/Ceph/OSD.pm
+@@ -535,7 +535,7 @@ __PACKAGE__->register_method({
+                 # create allows for detailed configuration of DB and WAL devices
+                 # batch for easy creation of multiple OSDs (per device)
+                 my $create_mode = $param->{'osds-per-device'} ? 'batch' : 'create';
+-                my $cmd = ['ceph-volume', 'lvm', $create_mode];
++                my $cmd = ['ceph-volume', 'lvm', $create_mode, '--no-systemd'];
+                 push @$cmd, '--crush-device-class', $dev_class if $dev_class;
+
+                 my $devname = $devs->{dev}->{name};
 diff --git a/PVE/Ceph/Services.pm b/PVE/Ceph/Services.pm
 index 4c3f3d99..1087f261 100644
 --- a/PVE/Ceph/Services.pm

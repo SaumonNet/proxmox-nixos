@@ -43,6 +43,7 @@
   openssl,
   systemd,
   pve-update-script,
+  coreutils,
 }:
 
 let
@@ -75,7 +76,7 @@ perl540.pkgs.toPerlModule (
     patches = [
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
-      ./0003-ceph-consider-unit-condition-for-active.patch
+      ./0003-ceph-handle-system-units
     ];
 
     postPatch = ''
@@ -149,6 +150,7 @@ perl540.pkgs.toPerlModule (
         wrapProgram $bin \
           --prefix PATH : ${
             lib.makeBinPath [
+              coreutils
               ceph
               cdrkit # cloud-init
               corosync

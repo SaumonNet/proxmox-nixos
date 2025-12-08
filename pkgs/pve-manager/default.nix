@@ -75,6 +75,7 @@ perl540.pkgs.toPerlModule (
     patches = [
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
+      ./0003-virt-machine-type-aarch64.patch
     ];
 
     postPatch = ''
@@ -179,7 +180,7 @@ perl540.pkgs.toPerlModule (
             ]
           } \
           --prefix PERL5LIB : $out/${perl540.libPrefix}/${perl540.version}
-      done      
+      done
     '';
 
     passthru.updateScript = pve-update-script { };

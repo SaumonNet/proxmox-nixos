@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   qemu,
   fetchgit,
@@ -70,6 +71,7 @@ in
     proxmox-backup-qemu
     perlEnv
     pkg-config
+    pkgs.jq
   ];
 
   # Generate cpu flag files and machine versions json
@@ -77,8 +79,14 @@ in
   postInstall = old.postInstall + ''
     $out/bin/qemu-system-x86_64 -cpu help \
       | ${perlEnv}/bin/perl ${src}/debian/parse-cpu-flags.pl > $out/share/qemu/recognized-CPUID-flags-x86_64
+
     $out/bin/qemu-system-x86_64 -machine help \
       | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
+    $out/bin/qemu-system-x86_64 -machine help \
+      | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-aarch.json
+
+    # Concatenate machine types for all architectures
+    jq -s 'add' $out/share/qemu/machine-versions-*.json > $out/share/qemu/machine-versions.json
   '';
 
   passthru.updateScript = pve-update-script {

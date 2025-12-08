@@ -1,0 +1,22 @@
+diff --git a/www/manager6/qemu/MachineEdit.js b/www/manager6/qemu/MachineEdit.js
+index 1b1989e8..d7cb9faa 100644
+--- a/www/manager6/qemu/MachineEdit.js
++++ b/www/manager6/qemu/MachineEdit.js
+@@ -24,7 +24,7 @@ Ext.define('PVE.qemu.MachineInputPanel', {
+             let version = me.lookup('version');
+             let store = version.getStore();
+             let oldRec = store.findRecord('id', version.getValue(), 0, false, false, true);
+-            let type = value === 'q35' ? 'q35' : 'i440fx';
++            let type = ['q35', 'i440fx', 'virt'].find(t => t === value) ?? 'i440fx';
+             store.clearFilter();
+             store.addFilter((val) => val.data.id === 'latest' || val.data.type === type);
+             if (!me.getView().isWindows) {
+@@ -102,6 +102,7 @@ Ext.define('PVE.qemu.MachineInputPanel', {
+         comboItems: [
+             ['__default__', PVE.Utils.render_qemu_machine('')],
+             ['q35', 'q35'],
++            ['virt', 'virt'],
+         ],
+         bind: {
+             value: '{type}',
+

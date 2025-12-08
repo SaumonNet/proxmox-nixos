@@ -50,28 +50,28 @@ in
 
     # Seabios VM creation
     machine.succeed(
-      "qm create 101 --kvm 0 --bios seabios -cdrom local:iso/minimal.iso",
+      "qm create 101 --kvm 0 --bios seabios --scsi0 local:iso/minimal.iso,media=cdrom",
       "qm start 101",
       "qm stop 101 --timeout 0"
     )
 
     # Legacy ovmf vm creation
     machine.succeed(
-      "qm create 102 --kvm 0 --bios ovmf -cdrom local:iso/minimal.iso",
+      "qm create 102 --kvm 0 --bios ovmf --scsi0 local:iso/minimal.iso,media=cdrom",
       "qm start 102",
       "qm stop 102 --timeout 0"
     )
 
     # UEFI ovmf vm creation
     machine.succeed(
-      "qm create 103 --kvm 0 --bios ovmf --efidisk0 local:4,efitype=4m -cdrom local:iso/minimal.iso",
+      "qm create 103 --kvm 0 --bios ovmf --efidisk0 local:4,efitype=4m --scsi0 local:iso/minimal.iso,media=cdrom",
       "qm start 103",
       "qm stop 103 --timeout 0"
     )
 
     # UEFI ovmf vm creation with secure boot
     machine.succeed(
-      "qm create 104 --kvm 0 --bios ovmf --efidisk0 local:4,efitype=4m,pre-enrolled-keys=1 -cdrom local:iso/minimal.iso",
+      "qm create 104 --kvm 0 --bios ovmf --efidisk0 local:4,efitype=4m,pre-enrolled-keys=1 --scsi0 local:iso/minimal.iso,media=cdrom",
       "qm start 104",
       "qm stop 104 --timeout 0"
     )

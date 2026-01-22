@@ -1,7 +1,7 @@
 {
   inputs = {
-    nixpkgs-stable.url = "nixpkgs/nixos-25.05";
-    nixpkgs-libvncserver.url = "nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-libvncserver.url = "github:NixOS/nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
   };

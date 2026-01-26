@@ -14,12 +14,16 @@
             mon.enable = true;
             osd = {
               enable = true;
-              daemons = [ "1" ];
+              daemons = [ "0" ];
             };
           };
         };
 
-        environment.systemPackages = [ pkgs.openssl ];
+        environment.systemPackages = with pkgs; [
+          openssl
+          ceph
+          coreutils
+        ];
 
         users.users.root = {
           password = "mypassword";
@@ -43,7 +47,7 @@
           mon.enable = true;
           osd = {
             enable = true;
-            daemons = [ "2" ];
+            daemons = [ "1" ];
           };
         };
       };
@@ -63,7 +67,7 @@
           mon.enable = true;
           osd = {
             enable = true;
-            daemons = [ "3" ];
+            daemons = [ "2" ];
           };
         };
       };
@@ -93,26 +97,45 @@
     fingerprint = pve1.succeed("openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2")
 
     pve2.wait_for_unit("multi-user.target")
+    pve3.wait_for_unit("multi-user.target")
     time.sleep(10)
     pve2.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
+    pve3.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
 
     pve1.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "pveceph mgr create",
-      "ceph-volume lvm create --osd-id 1 --data /dev/vdb --no-systemd"
+      "pveceph init --network 192.168.1.0/24",
+      "pveceph mon create --mon-address 192.168.1.1", # First monitor in cluster also creates a manager.
+    )
+
+    pve1.wait_for_unit("ceph-mon-pve1.service")
+    pve1.wait_for_unit("ceph-mgr-pve1.service")
+
+    time.sleep(10)
+
+    pve1.succeed(
+      "pveceph osd create /dev/vdb",
     )
 
     pve2.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "ceph-volume lvm create --osd-id 2 --data /dev/vdb --no-systemd"
+      "pveceph init --network 192.168.1.0/24",
+      "pveceph mon create --mon-address 192.168.1.2",
+    )
+
+    pve2.wait_for_unit("ceph-mon-pve2.service")
+
+    pve2.succeed(
+      "pveceph osd create /dev/vdb",
     )
 
     pve3.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "ceph-volume lvm create --osd-id 3 --data /dev/vdb --no-systemd"
+      "pveceph init --network 192.168.1.0/24",
+      "pveceph mon create --mon-address 192.168.1.3",
+    )
+
+    pve3.wait_for_unit("ceph-mon-pve3.service")
+
+    pve3.succeed(
+      "pveceph osd create /dev/vdb",
     )
   '';
 }

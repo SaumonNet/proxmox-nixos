@@ -8,6 +8,7 @@
   extjs,
   font-awesome_4,
   fonts-font-logos,
+  twitterBootstrap,
   pve-yew-mobile-gui,
   pve-update-script,
 }:
@@ -51,6 +52,7 @@ perl540.pkgs.toPerlModule (
       ln -s ${pve-yew-mobile-gui}/share/pve-yew-mobile-gui $out/share
       ln -s ${fonts-font-awesome}/share/fonts-font-awesome $out/share
       ln -s ${fonts-font-logos}/share/fonts-font-logos $out/share
+      ln -s ${twitterBootstrap}/ $out/share/bootstrap5
     '';
 
     passthru.updateScript = pve-update-script {

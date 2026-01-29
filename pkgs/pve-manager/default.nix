@@ -122,7 +122,7 @@ perl540.pkgs.toPerlModule (
       find $out/lib -type f | xargs sed -i \
         -e "/API2::APT/d" \
         -e "/ENV{'PATH'}/d" \
-        -e "s|/usr/share/bootstrap-html|${pve-http-server}/share/bootstrap5|" \
+        -e "s|/usr/share/bootstrap-html|${pve-http-server}/share/bootstrap-html|" \
         -e "s|/usr/share/javascript|${pve-http-server}/share/javascript|" \
         -e "s|/usr/share/pve-yew-mobile-gui|${pve-yew-mobile-gui}/share/pve-yew-mobile-gui|" \
         -e "s|/usr/share/pve-yew-mobile-i18n|${proxmox-i18n}/share/pve-yew-mobile-i18n|" \

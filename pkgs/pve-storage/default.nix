@@ -24,7 +24,7 @@
   rpcbind,
   samba,
   smartmontools,
-  targetcli,
+  targetcli-fb,
   util-linux,
   zfs,
   posixstrptime,
@@ -49,12 +49,12 @@ in
 perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-storage";
-    version = "9.0.13";
+    version = "9.0.17";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "609752f3ae371537b65484caeee14d3ed1569743";
-      hash = "sha256-672k/ll1tw0N2ulOGFohIR0c83Q5NaZsdtrJWP5TmQU=";
+      rev = "60a80163e05500ebf40dffa1a4df681723cf346c";
+      hash = "sha256-jJw7/3QpKr670PtkQS2Cele/W3rJZ9sFKZ6mPMF3GGo=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -112,7 +112,7 @@ perl540.pkgs.toPerlModule (
         -e "s|/usr/bin/scp|${openssh}/bin/scp|" \
         -e "s|/usr/bin/smbclient|${samba}/bin/smbclient|" \
         -e "s|/usr/bin/ssh|${openssh}/bin/ssh|" \
-        -e "s|/usr/bin/targetcli|${targetcli}/bin/targetcli|" \
+        -e "s|/usr/bin/targetcli|${targetcli-fb}/bin/targetcli|" \
         -e "s|/usr/bin/vma|${pve-qemu}/bin/vma|" \
         -e "s|/usr/bin/zcat|${gzip}/bin/zcat|" \
         -e "s|/usr/libexec/ceph|$out/libexec/ceph|" \

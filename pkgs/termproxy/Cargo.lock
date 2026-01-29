@@ -56,21 +56,21 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.177"
+version = "0.2.180"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2874a2af47a2325c2001a6e6fad9b16a53b802102b528163885171cf92b15976"
+checksum = "bcc35a38544a891a5f7c865aca548a982ccb3b8650a5b06d0fd33a10283c56fc"
 
 [[package]]
 name = "log"
-version = "0.4.28"
+version = "0.4.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
+checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
 name = "mio"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69d83b0086dc8ecf3ce9ae2874b2d1290252e2a30720bea58a5c6639b0092873"
+checksum = "a69bcab0ad47271a0234d9422b131806bf3968021e5dc9328caf2d4cd58557fc"
 dependencies = [
  "libc",
  "log",
@@ -113,14 +113,14 @@ dependencies = [
 
 [[package]]
 name = "proxmox-io"
-version = "1.2.0"
+version = "1.2.1"
 dependencies = [
  "endian_trait",
 ]
 
 [[package]]
 name = "proxmox-termproxy"
-version = "2.0.2"
+version = "2.0.3"
 dependencies = [
  "anyhow",
  "form_urlencoded",
@@ -184,7 +184,7 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "pbs-api-types"
-version = "1.0.0"
+version = "1.0.4"
 
 [[patch.unused]]
 name = "perlmod"
@@ -196,27 +196,27 @@ version = "0.10.0"
 
 [[patch.unused]]
 name = "proxmox-access-control"
-version = "1.0.0"
+version = "1.2.0"
 
 [[patch.unused]]
 name = "proxmox-acme"
-version = "1.0.0"
+version = "1.0.3"
 
 [[patch.unused]]
 name = "proxmox-acme-api"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-api-macro"
-version = "1.4.0"
+version = "1.4.3"
 
 [[patch.unused]]
 name = "proxmox-apt"
-version = "0.99.0"
+version = "0.99.5"
 
 [[patch.unused]]
 name = "proxmox-apt-api-types"
-version = "2.0.0"
+version = "2.0.2"
 
 [[patch.unused]]
 name = "proxmox-async"
@@ -224,7 +224,7 @@ version = "0.5.0"
 
 [[patch.unused]]
 name = "proxmox-auth-api"
-version = "1.0.0"
+version = "1.0.4"
 
 [[patch.unused]]
 name = "proxmox-base64"
@@ -240,11 +240,11 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-compression"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-config-digest"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-daemon"
@@ -252,11 +252,15 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-dns-api"
-version = "1.0.0"
+version = "1.0.1"
+
+[[patch.unused]]
+name = "proxmox-frr"
+version = "0.2.0"
 
 [[patch.unused]]
 name = "proxmox-http"
-version = "1.0.0"
+version = "1.0.4"
 
 [[patch.unused]]
 name = "proxmox-http-error"
@@ -264,7 +268,7 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-human-byte"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-lang"
@@ -272,11 +276,15 @@ version = "1.5.0"
 
 [[patch.unused]]
 name = "proxmox-ldap"
-version = "1.0.0"
+version = "1.1.0"
 
 [[patch.unused]]
 name = "proxmox-log"
 version = "1.0.0"
+
+[[patch.unused]]
+name = "proxmox-login"
+version = "1.0.3"
 
 [[patch.unused]]
 name = "proxmox-metrics"
@@ -284,15 +292,23 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-network-api"
-version = "1.0.0"
+version = "1.0.4"
+
+[[patch.unused]]
+name = "proxmox-network-types"
+version = "0.1.2"
 
 [[patch.unused]]
 name = "proxmox-notify"
-version = "1.0.0"
+version = "1.0.3"
+
+[[patch.unused]]
+name = "proxmox-oci"
+version = "0.2.0"
 
 [[patch.unused]]
 name = "proxmox-openid"
-version = "1.0.0"
+version = "1.0.2"
 
 [[patch.unused]]
 name = "proxmox-product-config"
@@ -304,27 +320,35 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-rest-server"
-version = "1.0.0"
+version = "1.0.2"
 
 [[patch.unused]]
 name = "proxmox-router"
-version = "3.2.2"
+version = "3.2.3"
+
+[[patch.unused]]
+name = "proxmox-s3-client"
+version = "1.2.3"
 
 [[patch.unused]]
 name = "proxmox-schema"
-version = "4.1.0"
+version = "5.0.1"
+
+[[patch.unused]]
+name = "proxmox-sdn-types"
+version = "0.1.1"
 
 [[patch.unused]]
 name = "proxmox-section-config"
-version = "3.1.0"
+version = "3.1.1"
 
 [[patch.unused]]
 name = "proxmox-sendmail"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-serde"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-shared-cache"
@@ -336,7 +360,7 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-simple-config"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-sortable-macro"
@@ -344,7 +368,7 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-subscription"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-sys"
@@ -352,7 +376,7 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-syslog-api"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-systemd"
@@ -360,7 +384,7 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-tfa"
-version = "6.0.0"
+version = "6.0.4"
 
 [[patch.unused]]
 name = "proxmox-time"
@@ -368,7 +392,7 @@ version = "2.1.0"
 
 [[patch.unused]]
 name = "proxmox-time-api"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-uuid"
@@ -376,11 +400,27 @@ version = "1.1.0"
 
 [[patch.unused]]
 name = "proxmox-ve-config"
-version = "0.3.0"
+version = "0.4.5"
 
 [[patch.unused]]
 name = "proxmox-worker-task"
 version = "1.0.0"
+
+[[patch.unused]]
+name = "proxmox-yew-comp"
+version = "0.7.0"
+
+[[patch.unused]]
+name = "pve-api-types"
+version = "8.1.0"
+
+[[patch.unused]]
+name = "pwt"
+version = "0.7.6"
+
+[[patch.unused]]
+name = "pwt-macros"
+version = "0.5.0"
 
 [[patch.unused]]
 name = "pxar"

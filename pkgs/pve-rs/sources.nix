@@ -719,7 +719,7 @@
     url = "git://git.proxmox.com/git/proxmox.git";
     rev = "391412712c4dd6f86157eb0c3767ef6e36750896";
     
-    sha256 = "sha256-c3Z7LveHM34DNlEcVpFFgP8sQFIDYjPsxO6wdK2RdgE=";
+    sha256 = "00bnj6np9c7fqkn36qh3a902rzw08n8mc72i6q1pwcw7ywp7nxkk";
     crates = [
       {
         name = "proxmox-uuid";

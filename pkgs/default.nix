@@ -24,6 +24,7 @@ let
     fonts-font-logos = callPackage ./fonts-font-logos { };
     
     markedjs = callPackage ./markedjs { };
+    qrcodejs = callPackage ./qrcodejs { };
     perlmod = callPackage ./perlmod { };
     termproxy = callPackage ./termproxy { };
     unifont_hex = callPackage ./unifont { };

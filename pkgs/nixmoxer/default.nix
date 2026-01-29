@@ -15,7 +15,7 @@ python3Packages.buildPythonApplication {
   dependencies = with python3Packages; [
     proxmoxer
     click
-    requests_toolbelt
+    requests-toolbelt
   ];
 
   meta = with lib; {

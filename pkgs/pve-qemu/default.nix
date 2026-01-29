@@ -7,6 +7,7 @@
   pkg-config,
   meson,
   cacert,
+  git,
   pve-update-script,
 }:
 
@@ -16,19 +17,20 @@ let
 in
 (qemu.overrideAttrs (old: rec {
   pname = "pve-qemu";
-  version = "10.1.2-1";
+  version = "10.1.2-5";
 
   src =
     (fetchgit {
       url = "git://git.proxmox.com/git/pve-qemu.git";
-      rev = "49bb66e86b9e894e8db47a000033088bebc03881";
-      hash = "sha256-Ney7iKfZne8WRfyYtvkVk9POheykQesBTZJc4k3l1LY=";
+      rev = "de7f8fe356c7b1d346c3c15c971f7a0dcd11e70e";
+      hash = "sha256-gDKhnM0Rf20Fd82VQhrCDrrxB9e/ZCDYYpDOVOoxcmE=";
       fetchSubmodules = true;
 
       # Download subprojects managed by meson
       postFetch = ''
         cd "$out/qemu"
         export NIX_SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
+        export PATH="${git}/bin:$PATH"
         for prj in subprojects/*.wrap; do
           ${lib.getExe meson} subprojects download "$(basename "$prj" .wrap)"
         done

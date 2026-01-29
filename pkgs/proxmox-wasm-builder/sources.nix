@@ -652,9 +652,9 @@
   {
     name = "librust-proxmox-uuid-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "aced6d2b7d8c47e1a5825d825ac988eac7d90c8a";
+    rev = "391412712c4dd6f86157eb0c3767ef6e36750896";
     
-    sha256 = "01famhymykh5l99iq5gg6rifbfn8gwxpi4zlpnihbiv83kqx6xvc";
+    sha256 = "sha256-c3Z7LveHM34DNlEcVpFFgP8sQFIDYjPsxO6wdK2RdgE=";
     crates = [
       {
         name = "proxmox-uuid";

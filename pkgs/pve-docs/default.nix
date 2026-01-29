@@ -17,12 +17,12 @@ in
 
 stdenv.mkDerivation rec {
   pname = "pve-docs";
-  version = "9.1.1";
+  version = "9.1.2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "a93964e4a1fdc81fafee4c7e108ea18afa476c5e";
-    hash = "sha256-rq45Sb0hTl73DNDESvqimnjjlVBbE/0g2eKR9A9NvGg=";
+    rev = "b4b8695af1321d5e2f5bf87e6c728662ea5bf6df";
+    hash = "sha256-zYQWB85mzrKzyClSQWngtoLlLjH4NbhDaS7fzunioCY=";
   };
 
   postPatch = ''

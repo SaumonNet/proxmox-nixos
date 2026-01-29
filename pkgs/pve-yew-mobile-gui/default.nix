@@ -25,32 +25,13 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pve-yew-mobile-gui";
-  version = "0.6.2";
+  version = "0.6.4";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/ui/pve-yew-mobile-gui.git";
-    rev = "0d645b23ae2f733d0be7f6aab0fbe09e41096e1b";
-    hash = "sha256-UnhPBJwzsBFidPkNzjC1R+vuU6QYAJok//I07cCEJXY=";
-
-    # FIXME: remove patching submodule address after upgrading to 0.6.3+
-    fetchSubmodules = false;
-    leaveDotGit = true;
-
-    postFetch = ''
-      pushd $out
-      git reset
-      substituteInPlace ./.gitmodules \
-        --replace-fail 'gitolite3@proxdev.maurer-it.com:yew/proxmox-yew-widget-toolkit-assets' \
-                       'git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit-assets.git' \
-        --replace-fail 'gitolite3@proxdev.maurer-it.com:/rust/proxmox-api-types' \
-                       'git://git.proxmox.com/git/proxmox-api-types.git'
-
-      git submodule update --init --recursive -j ''${NIX_BUILD_CORES:-1} --depth 1
-      # Remove .git dirs
-      find . -name .git -type f -exec rm -rf {} +
-      rm -rf .git/
-      popd
-    '';
+    rev = "c0c8d4863387c28fa8db2c31ce65779bbaf39318";
+    hash = "sha256-EE73KfzXgcI9n5bkC1tAo2EVWGpIk/FzXJjkEDDMZ6E=";
+    fetchSubmodules = true;
   };
 
   cargoDeps = rustPlatform.importCargoLock {

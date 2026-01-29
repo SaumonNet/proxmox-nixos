@@ -80,5 +80,9 @@ rustPlatform.buildRustPackage rec {
 
   LIBCLANG_PATH = "${libclang.lib}/lib";
 
+  # Allow deprecated raw pointer dereference pattern until pbs-api-types gets fixed upstream
+  # This is needed for Rust 1.91+ which denies dangerous_implicit_autorefs by default
+  RUSTFLAGS = "-A dangerous_implicit_autorefs";
+
   cargoTestExtraArgs = "-- --skip=test_get_current_release_codename rrd::tests::load_and_save_rrd_v2 rrd::tests::upgrade_from_rrd_v1";
 }

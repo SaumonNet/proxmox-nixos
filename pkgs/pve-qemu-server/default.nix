@@ -21,6 +21,7 @@
   swtpm,
   libglvnd,
   pve-update-script,
+  python3Packages,
 }:
 
 let
@@ -58,12 +59,12 @@ in
 perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
-    version = "9.0.23";
+    version = "9.1.0";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/qemu-server.git";
-      rev = "78e5d8a8d06a061c464dfd5e3d794f4d729d02b1";
-      hash = "sha256-ujAVNq5bGxnmMAGLlfzJ/pvCoItsPohXvl3qTJhhsKA=";
+      rev = "2cf3f809dda5712b99016de7464d26e9515d32d9";
+      hash = "sha256-+mkgdxQ6EdNZYFf46sdSZ13UNcOduvkR8k6DhoNtao8=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -135,6 +136,7 @@ perl540.pkgs.toPerlModule (
         -e "s|/var/lib/qemu-server|$out/lib/qemu-server|" \
         -e "s|/usr/share/pve-edk2-firmware|${pve-edk2-firmware}/usr/share/pve-edk2-firmware|" \
         -e 's|/etc/swtpm_setup.conf|${swtpm}/etc/swtpm_setup.conf|' \
+        -e "s|virt-fw-vars|${python3Packages.virt-firmware}/bin/virt-fw-vars|g" \
         #-e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         #-e "s|/usr/sbin/qm|$out/bin/qm|" \
         #-e "s|/usr/bin/qemu|${pve-qemu}/bin/qemu|" \

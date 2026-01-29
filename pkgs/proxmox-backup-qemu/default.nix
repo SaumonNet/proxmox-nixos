@@ -25,12 +25,12 @@ in
 
 rustPlatform.buildRustPackage rec {
   pname = "proxmox-backup-qemu";
-  version = "2.0.1";
+  version = "2.0.2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "2b8ebba0cffecd479f296aaad82d8bec89355599";
-    hash = "sha256-GLd/zNNZXaCKm1K8gSQ07m/7jn0XGC9gW51VLWEODkA=";
+    rev = "594183eab9fa275f45dfff5dd15b16f150abd503";
+    hash = "sha256-YjP4TI/MoobK1RAdaDS3MO91DXsS55OFv9dpdXSkZmU=";
     fetchSubmodules = true;
   };
 
@@ -79,10 +79,6 @@ rustPlatform.buildRustPackage rec {
   '';
 
   LIBCLANG_PATH = "${libclang.lib}/lib";
-
-  # Allow deprecated raw pointer dereference pattern until pbs-api-types gets fixed upstream
-  # This is needed for Rust 1.91+ which denies dangerous_implicit_autorefs by default
-  RUSTFLAGS = "-A dangerous_implicit_autorefs";
 
   cargoTestExtraArgs = "-- --skip=test_get_current_release_codename rrd::tests::load_and_save_rrd_v2 rrd::tests::upgrade_from_rrd_v1";
 }

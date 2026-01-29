@@ -1028,6 +1028,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
 
 [[package]]
+name = "iso8601"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1082f0c48f143442a1ac6122f67e360ceee130b967af4d50996e5154a45df46"
+dependencies = [
+ "nom 8.0.0",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1166,6 +1175,12 @@ checksum = "31e24f1ad8321ca0e8a1e0ac13f23cb668e6f5466c2c57319f6a5cf1cc8e3b1c"
 dependencies = [
  "linked-hash-map",
 ]
+
+[[package]]
+name = "md5"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
 
 [[package]]
 name = "memchr"
@@ -1392,7 +1407,7 @@ dependencies = [
 
 [[package]]
 name = "pbs-api-types"
-version = "1.0.0"
+version = "1.0.9"
 dependencies = [
  "anyhow",
  "const_format",
@@ -1400,8 +1415,10 @@ dependencies = [
  "percent-encoding",
  "proxmox-apt-api-types",
  "proxmox-auth-api",
+ "proxmox-fixed-string",
  "proxmox-human-byte",
  "proxmox-lang",
+ "proxmox-s3-client",
  "proxmox-schema",
  "proxmox-serde",
  "proxmox-time",
@@ -1413,7 +1430,7 @@ dependencies = [
 
 [[package]]
 name = "pbs-buildcfg"
-version = "3.4.2"
+version = "4.1.1"
 
 [[package]]
 name = "pbs-client"
@@ -1445,6 +1462,7 @@ dependencies = [
  "proxmox-human-byte",
  "proxmox-io",
  "proxmox-log",
+ "proxmox-rate-limiter",
  "proxmox-router",
  "proxmox-schema",
  "proxmox-sys",
@@ -1475,6 +1493,7 @@ dependencies = [
  "pbs-buildcfg",
  "proxmox-notify",
  "proxmox-router",
+ "proxmox-s3-client",
  "proxmox-schema",
  "proxmox-section-config",
  "proxmox-shared-memory",
@@ -1496,6 +1515,8 @@ dependencies = [
  "endian_trait",
  "futures",
  "hex",
+ "http-body-util",
+ "hyper",
  "libc",
  "log",
  "nix 0.29.0",
@@ -1506,12 +1527,16 @@ dependencies = [
  "pbs-config",
  "pbs-key-config",
  "pbs-tools",
+ "proxmox-async",
  "proxmox-base64",
  "proxmox-borrow",
+ "proxmox-http",
  "proxmox-human-byte",
  "proxmox-io",
  "proxmox-lang",
+ "proxmox-s3-client",
  "proxmox-schema",
+ "proxmox-section-config",
  "proxmox-serde",
  "proxmox-sys",
  "proxmox-systemd",
@@ -1695,7 +1720,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-api-macro"
-version = "1.4.0"
+version = "1.4.4"
 dependencies = [
  "anyhow",
  "proc-macro2 1.0.106",
@@ -1705,10 +1730,12 @@ dependencies = [
 
 [[package]]
 name = "proxmox-apt-api-types"
-version = "2.0.0"
+version = "2.0.5"
 dependencies = [
  "proxmox-config-digest",
  "proxmox-schema",
+ "proxmox-serde",
+ "regex",
  "serde",
  "serde_plain",
 ]
@@ -1727,7 +1754,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-auth-api"
-version = "1.0.0"
+version = "1.0.5"
 dependencies = [
  "anyhow",
  "const_format",
@@ -1739,7 +1766,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-backup-qemu"
-version = "2.0.1"
+version = "2.0.2"
 dependencies = [
  "anyhow",
  "bincode",
@@ -1781,7 +1808,7 @@ version = "1.1.0"
 
 [[package]]
 name = "proxmox-compression"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1801,7 +1828,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-config-digest"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anyhow",
  "hex",
@@ -1811,8 +1838,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "proxmox-fixed-string"
+version = "0.1.1"
+dependencies = [
+ "serde",
+ "serde_plain",
+]
+
+[[package]]
 name = "proxmox-http"
-version = "1.0.0"
+version = "1.0.5"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1828,6 +1863,7 @@ dependencies = [
  "proxmox-compression",
  "proxmox-io",
  "proxmox-lang",
+ "proxmox-rate-limiter",
  "proxmox-sys",
  "serde_json",
  "sync_wrapper",
@@ -1849,7 +1885,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-human-byte"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anyhow",
  "proxmox-schema",
@@ -1859,7 +1895,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-io"
-version = "1.2.0"
+version = "1.2.1"
 dependencies = [
  "endian_trait",
  "tokio",
@@ -1886,7 +1922,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-notify"
-version = "1.0.0"
+version = "1.0.3"
 dependencies = [
  "anyhow",
  "const_format",
@@ -1913,8 +1949,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "proxmox-rate-limiter"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "hyper",
+ "nix 0.29.0",
+ "proxmox-shared-memory",
+ "proxmox-sys",
+]
+
+[[package]]
 name = "proxmox-router"
-version = "3.2.2"
+version = "3.2.4"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1933,12 +1980,46 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_plain",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.2",
+]
+
+[[package]]
+name = "proxmox-s3-client"
+version = "1.2.5"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "const_format",
+ "futures",
+ "hex",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "iso8601",
+ "md5",
+ "nix 0.29.0",
+ "openssl",
+ "proxmox-base64",
+ "proxmox-http",
+ "proxmox-human-byte",
+ "proxmox-rate-limiter",
+ "proxmox-schema",
+ "proxmox-serde",
+ "proxmox-time",
+ "quick-xml",
+ "regex",
+ "serde",
+ "serde-xml-rs",
+ "serde_plain",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "url",
 ]
 
 [[package]]
 name = "proxmox-schema"
-version = "4.1.0"
+version = "5.0.1"
 dependencies = [
  "anyhow",
  "const_format",
@@ -1951,7 +2032,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-section-config"
-version = "3.1.0"
+version = "3.1.1"
 dependencies = [
  "anyhow",
  "hex",
@@ -1963,7 +2044,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-sendmail"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anyhow",
  "percent-encoding",
@@ -1973,7 +2054,7 @@ dependencies = [
 
 [[package]]
 name = "proxmox-serde"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anyhow",
  "proxmox-base64",
@@ -2067,6 +2148,16 @@ dependencies = [
  "endian_trait",
  "libc",
  "siphasher",
+ "tokio",
+]
+
+[[package]]
+name = "quick-xml"
+version = "0.36.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7649a7b4df05aed9ea7ec6f628c67c9953a43869b8bc50929569b2999d443fe"
+dependencies = [
+ "memchr",
  "tokio",
 ]
 
@@ -2298,6 +2389,18 @@ checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
 dependencies = [
  "serde_core",
  "serde_derive",
+]
+
+[[package]]
+name = "serde-xml-rs"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65162e9059be2f6a3421ebbb4fef3e74b7d9e7c60c50a0e292c6239f19f1edfa"
+dependencies = [
+ "log",
+ "serde",
+ "thiserror",
+ "xml-rs",
 ]
 
 [[package]]
@@ -2650,6 +2753,7 @@ checksum = "9ae9cec805b01e8fc3fd2fe289f89149a9b66dd16786abd8b19cfa7b48cb0098"
 dependencies = [
  "bytes",
  "futures-core",
+ "futures-io",
  "futures-sink",
  "pin-project-lite",
  "tokio",
@@ -3295,6 +3399,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213b7324336b53d2414b2db8537e56544d981803139155afa84f76eeebb7a546"
 
 [[package]]
+name = "xml-rs"
+version = "0.8.28"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ae8337f8a065cfc972643663ea4279e04e7256de865aa66fe25cec5fb912d3f"
+
+[[package]]
 name = "yoke"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3441,23 +3551,23 @@ version = "0.10.0"
 
 [[patch.unused]]
 name = "proxmox-access-control"
-version = "1.0.0"
+version = "1.3.1"
 
 [[patch.unused]]
 name = "proxmox-acme"
-version = "1.0.0"
+version = "1.0.3"
 
 [[patch.unused]]
 name = "proxmox-acme-api"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-apt"
-version = "0.99.0"
+version = "0.99.7"
 
 [[patch.unused]]
 name = "proxmox-client"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-daemon"
@@ -3465,15 +3575,15 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-dns-api"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-ldap"
-version = "1.0.0"
+version = "1.1.0"
 
 [[patch.unused]]
 name = "proxmox-login"
-version = "1.0.1"
+version = "1.0.3"
 
 [[patch.unused]]
 name = "proxmox-metrics"
@@ -3481,11 +3591,23 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-network-api"
+version = "1.0.4"
+
+[[patch.unused]]
+name = "proxmox-network-types"
+version = "0.1.2"
+
+[[patch.unused]]
+name = "proxmox-node-status"
 version = "1.0.0"
 
 [[patch.unused]]
+name = "proxmox-oci"
+version = "0.2.1"
+
+[[patch.unused]]
 name = "proxmox-openid"
-version = "1.0.0"
+version = "1.0.2"
 
 [[patch.unused]]
 name = "proxmox-product-config"
@@ -3493,11 +3615,19 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-resource-scheduling"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-rest-server"
-version = "1.0.0"
+version = "1.0.3"
+
+[[patch.unused]]
+name = "proxmox-rrd"
+version = "1.0.2"
+
+[[patch.unused]]
+name = "proxmox-rrd-api-types"
+version = "1.1.1"
 
 [[patch.unused]]
 name = "proxmox-shared-cache"
@@ -3505,23 +3635,27 @@ version = "1.0.0"
 
 [[patch.unused]]
 name = "proxmox-simple-config"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-subscription"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-syslog-api"
-version = "1.0.0"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-tfa"
-version = "6.0.0"
+version = "6.0.4"
 
 [[patch.unused]]
 name = "proxmox-time-api"
-version = "1.0.0"
+version = "1.0.1"
+
+[[patch.unused]]
+name = "proxmox-upgrade-checks"
+version = "1.0.1"
 
 [[patch.unused]]
 name = "proxmox-ve-config"

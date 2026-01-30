@@ -128,6 +128,7 @@ perl540.pkgs.toPerlModule (
         -e "s|/usr/share/pve-yew-mobile-i18n|${proxmox-i18n}/share/pve-yew-mobile-i18n|" \
         -e "s|/usr/share/fonts-font-awesome|${pve-http-server}/share/fonts-font-awesome|" \
         -e "s|/usr/share/fonts-font-logos|${pve-http-server}/share/fonts-font-logos|" \
+        -e "s|/usr/share/pve-docs|${pve-docs}/share/pve-docs|" \
         -e "s|/usr/share/pve-i18n|${proxmox-i18n}/share/pve-i18n|" \
         -e "s|/usr/share/pve-manager|$out/share/pve-manager|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \

@@ -3,8 +3,7 @@
   stdenv,
   fetchFromGitHub,
   gradle,
-  protobuf,
-  git,
+  protobuf_31,
   python3,
   makeWrapper,
   jre,
@@ -29,15 +28,21 @@
 let
   self = stdenv.mkDerivation (finalAttrs: {
     pname = "linstor-server";
-    version = "1.32.3";
+    version = "1.33.1";
 
     src = fetchFromGitHub {
       owner = "LINBIT";
       repo = "linstor-server";
       rev = "v${finalAttrs.version}";
-      hash = "sha256-khXu6DGOMh+0SYt8T43sLAQs4FFBXTCIUPORcqQHNEU=";
+      hash = "sha256-yQEQjNtOPbND1kq+Jm7EegL5iSsm0Fg8QdTXbA8+MBE=";
       fetchSubmodules = true;
       leaveDotGit = true;
+      postFetch = ''
+        # Extract git info needed for version before removing .git
+        git -C $out rev-parse HEAD > $out/.git-revision
+        # Remove .git to make the output deterministic
+        rm -rf $out/.git $out/linstor-common/.git
+      '';
     };
 
     patches = [ ./build.patch ];
@@ -47,18 +52,19 @@ let
 
     nativeBuildInputs = [
       gradle
-      protobuf
-      git
+      protobuf_31
       python3
       makeWrapper
     ];
 
-    buildInputs = [ protobuf ];
+    buildInputs = [ protobuf_31 ];
 
     gradleBuildTask = "installDist";
 
     preBuild = ''
-      VERSION="${finalAttrs.version}" make versioninfo
+      # Use the git revision saved during fetch instead of running git commands
+      GITHASH=$(cat .git-revision)
+      VERSION="${finalAttrs.version}" GITHASH="$GITHASH" make versioninfo
     '';
 
     mitmCache = gradle.fetchDeps {

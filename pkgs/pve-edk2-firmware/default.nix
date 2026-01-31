@@ -22,12 +22,12 @@
 
 stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
-  version = "4.2025.02-4";
+  version = "4.2025.05-2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "221a2615288791f6673ae4d58d2669230071f4af";
-    sha256 = "sha256-Xi9xv6Jgx1ik6ST+oriAopS5bQw0H4u+OMDJVcmqu2g=";
+    rev = "224fdd7df4e9aedea8b6821eb44545cf9c247584";
+    sha256 = "sha256-BHjETJ7gB3M1XCIp9OpPDYZZPpl+3+PIS8nDgFBkD6Q=";
   };
 
   hardeningDisable = [
@@ -49,6 +49,7 @@ stdenv.mkDerivation rec {
     qemu-utils
     libisoburn
     python3
+    python3.pkgs.virt-firmware
     # Mock debhelper
     (writeShellScriptBin "dh" "true")
   ]
@@ -60,25 +61,20 @@ stdenv.mkDerivation rec {
 
   depsBuildBuild = [ stdenv.cc ];
 
-  postPatch =
-    let
-      pythonPath = python3.pkgs.makePythonPath (with python3.pkgs; [ pexpect ]);
-    in
-    ''
-      substituteInPlace ./Makefile ./debian/rules \
-        --replace-fail '/usr/share/dpkg' '${pkgs.dpkg}/share/dpkg'
-      substituteInPlace ./debian/rules \
-        --replace-fail '/bin/bash' '${pkgs.bash}/bin/bash' \
-        --replace-fail 'PYTHONPATH=$(CURDIR)/debian/python' 'PYTHONPATH=$(CURDIR)/debian/python:${pythonPath}'
+  postPatch = ''
+    substituteInPlace ./Makefile ./debian/rules \
+      --replace-fail '/usr/share/dpkg' '${pkgs.dpkg}/share/dpkg'
+    substituteInPlace ./debian/rules \
+      --replace-fail '/bin/bash' '${pkgs.bash}/bin/bash'
 
-      # Patch cross compiler paths
-      substituteInPlace ./debian/rules \
-         --replace-fail 'aarch64-linux-gnu-' '${pkgsCross.aarch64-multiplatform.stdenv.cc.targetPrefix}' \
-         --replace-fail 'riscv64-linux-gnu-' '${pkgsCross.riscv64.stdenv.cc.targetPrefix}'
-      sed -i '/^EDK2_TOOLCHAIN *=/a export $(EDK2_TOOLCHAIN)_BIN=${pkgsCross.gnu64.stdenv.cc.targetPrefix}' ./debian/rules
+    # Patch cross compiler paths
+    substituteInPlace ./debian/rules \
+        --replace-fail 'aarch64-linux-gnu-' '${pkgsCross.aarch64-multiplatform.stdenv.cc.targetPrefix}' \
+        --replace-fail 'riscv64-linux-gnu-' '${pkgsCross.riscv64.stdenv.cc.targetPrefix}'
+    sed -i '/^EDK2_TOOLCHAIN *=/a export $(EDK2_TOOLCHAIN)_BIN=${pkgsCross.gnu64.stdenv.cc.targetPrefix}' ./debian/rules
 
-      patchShebangs .
-    '';
+    patchShebangs .
+  '';
 
   buildPhase = ''
     runHook preBuild
@@ -119,7 +115,13 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  passthru.updateScript = pve-update-script { };
+  passthru.updateScript = pve-update-script { 
+    extraArgs = [
+      "--deb-name"
+      "pve-edk2-firmware"
+      "--use-git-log"
+    ];
+  };
 
   meta = {
     description = "edk2 based UEFI firmware modules for virtual machines";

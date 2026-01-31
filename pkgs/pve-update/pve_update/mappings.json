@@ -360,5 +360,10 @@
     "package_name": "proxmox-node-status",
     "debian_package_name": "librust-proxmox-node-status-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-oci",
+    "debian_package_name": "librust-proxmox-oci-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
   }
 ]

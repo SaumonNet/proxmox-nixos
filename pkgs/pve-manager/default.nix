@@ -65,12 +65,12 @@ in
 perl540.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "9.0.11";
+    version = "9.1.4";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "3bf5476b8a4699e2";
-      hash = "sha256-Nvi/XxvgYafZTzfzaB+1u6lwtfbCJrua+Gxq6CkAahQ=";
+      rev = "5ac30304265fbd8e";
+      hash = "sha256-nx6FyDSktgA70uGZPdjDsKP82nXrftlZ/M9Anghq2kU=";
     };
 
     patches = [
@@ -122,11 +122,13 @@ perl540.pkgs.toPerlModule (
       find $out/lib -type f | xargs sed -i \
         -e "/API2::APT/d" \
         -e "/ENV{'PATH'}/d" \
+        -e "s|/usr/share/bootstrap-html|${pve-http-server}/share/bootstrap-html|" \
         -e "s|/usr/share/javascript|${pve-http-server}/share/javascript|" \
         -e "s|/usr/share/pve-yew-mobile-gui|${pve-yew-mobile-gui}/share/pve-yew-mobile-gui|" \
         -e "s|/usr/share/pve-yew-mobile-i18n|${proxmox-i18n}/share/pve-yew-mobile-i18n|" \
         -e "s|/usr/share/fonts-font-awesome|${pve-http-server}/share/fonts-font-awesome|" \
         -e "s|/usr/share/fonts-font-logos|${pve-http-server}/share/fonts-font-logos|" \
+        -e "s|/usr/share/pve-docs|${pve-docs}/share/pve-docs|" \
         -e "s|/usr/share/pve-i18n|${proxmox-i18n}/share/pve-i18n|" \
         -e "s|/usr/share/pve-manager|$out/share/pve-manager|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \

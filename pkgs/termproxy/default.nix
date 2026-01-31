@@ -13,12 +13,12 @@ in
 
 rustPlatform.buildRustPackage rec {
   pname = "termproxy";
-  version = "2.0.2";
+  version = "2.0.3";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/pve-xtermjs.git";
-    rev = "c69379f49db91429eb01ea56b47f2a2832fec8e7";
-    hash = "sha256-U4sT3fXsq/Tza00ycnPaEaQrYlBtscsv5rRCJZPM3Uw=";
+    rev = "1c92330cccb21fb65abcff6e35848b712592dccb";
+    hash = "sha256-it1zIt+vVSgGw8mII+l7cq+vyV7tnuqNkBbgbBw7szw=";
   };
 
   cargoLock = {

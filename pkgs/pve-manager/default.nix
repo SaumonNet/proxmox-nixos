@@ -44,6 +44,7 @@
   openssl,
   systemd,
   pve-update-script,
+  coreutils,
 }:
 
 let
@@ -76,6 +77,7 @@ perl540.pkgs.toPerlModule (
     patches = [
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
+      ./0003-ceph-handle-system-units
     ];
 
     postPatch = ''
@@ -88,8 +90,8 @@ perl540.pkgs.toPerlModule (
         -e '/architecture/d' \
         -e 's/aplinfo PVE bin www services configs network-hooks test/PVE bin www configs test/'
       sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+9d'
-      #cp PVE/pvecfg.pm{.in,}
       sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
+      sed -i PVE/CLI/pveceph.pm -e '/use AptPkg::Cache;/d'
     '';
 
     buildInputs = [
@@ -153,6 +155,7 @@ perl540.pkgs.toPerlModule (
         wrapProgram $bin \
           --prefix PATH : ${
             lib.makeBinPath [
+              coreutils
               ceph
               cdrkit # cloud-init
               corosync

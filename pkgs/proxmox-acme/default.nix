@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   acme-sh,
   bash,
   curl,
@@ -10,13 +10,13 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     HTTPDaemon
     HTTPMessage
   ];
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "proxmox-acme";
     version = "1.7.0";
@@ -42,7 +42,7 @@ perl540.pkgs.toPerlModule (
 
     makeFlags = [
       "PREFIX=$(out)"
-      "PERLDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
+      "PERLDIR=$(out)/${perl5.libPrefix}/${perl5.version}"
     ];
 
     propagatedBuildInputs = perlDeps;

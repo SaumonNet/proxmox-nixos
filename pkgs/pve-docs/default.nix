@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   proxmox-widget-toolkit,
   asciidoc,
   dblatex,
@@ -15,12 +15,12 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     JSON
     TemplateToolkit
   ];
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 
   # Texlive packages required for PDF generation
   texliveEnv = texlive.withPackages (ps: with ps; [

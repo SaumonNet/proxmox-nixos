@@ -8,7 +8,7 @@
   pkg-config,
   openssl,
   fetchgit,
-  perl540,
+  perl5,
   perlmod,
   apt,
   mkRegistry,
@@ -19,7 +19,7 @@ let
   registry = mkRegistry sources;
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rs";
     version = "0.11.4";
@@ -54,7 +54,7 @@ perl540.pkgs.toPerlModule (
       rustPlatform.cargoSetupHook
       cargo
       rustc
-      perl540
+      perl5
       apt
     ];
 
@@ -71,14 +71,14 @@ perl540.pkgs.toPerlModule (
       "BUILD_MODE=release"
       "DESTDIR=$(out)"
       "GITVERSION:=${src.rev}"
-      "PERL_INSTALLVENDORARCH=/${perl540.libPrefix}/${perl540.version}"
-      "PERL_INSTALLVENDORLIB=/${perl540.libPrefix}/${perl540.version}"
+      "PERL_INSTALLVENDORARCH=/${perl5.libPrefix}/${perl5.version}"
+      "PERL_INSTALLVENDORLIB=/${perl5.libPrefix}/${perl5.version}"
     ];
 
     postInstall = ''
       (
         cd common/pkg
-        PERL_INSTALLVENDORLIB=$out/${perl540.libPrefix}/${perl540.version} make install
+        PERL_INSTALLVENDORLIB=$out/${perl5.libPrefix}/${perl5.version} make install
       )    
     '';
 

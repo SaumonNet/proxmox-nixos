@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   proxmox-i18n,
   proxmox-widget-toolkit,
   extjs,
@@ -15,7 +15,7 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [ AnyEventHTTP ];
+  perlDeps = with perl5.pkgs; [ AnyEventHTTP ];
   fonts-font-awesome = font-awesome_4.overrideAttrs (
     _: _: {
       installPhase = ''
@@ -28,7 +28,7 @@ let
   );
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-http-server";
     version = "6.0.5";
@@ -41,7 +41,7 @@ perl540.pkgs.toPerlModule (
 
     sourceRoot = "${src.name}/src";
     propagatedBuildInputs = perlDeps;
-    makeFlags = [ "PERL5DIR=$(out)/${perl540.libPrefix}/${perl540.version}" ];
+    makeFlags = [ "PERL5DIR=$(out)/${perl5.libPrefix}/${perl5.version}" ];
 
     postFixup = ''
       find $out -type f | xargs sed -i \

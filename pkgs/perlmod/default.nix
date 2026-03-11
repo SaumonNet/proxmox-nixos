@@ -2,7 +2,7 @@
   lib,
   rustPlatform,
   fetchgit,
-  perl540,
+  perl5,
   libxcrypt,
 }:
 
@@ -26,7 +26,7 @@ rustPlatform.buildRustPackage {
     ln -s ${./Cargo.lock} Cargo.lock
   '';
 
-  nativeBuildInputs = [ perl540 ];
+  nativeBuildInputs = [ perl5 ];
   buildInputs = [ libxcrypt ];
 
   postInstall = ''

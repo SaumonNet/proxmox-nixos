@@ -41,6 +41,8 @@
   lxc,
   libfaketime,
   corosync,
+  sequoia-sqv,
+  trustedkeysGpg,
   openssl,
   systemd,
   pve-update-script,
@@ -92,11 +94,15 @@ perl540.pkgs.toPerlModule (
       sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
     '';
 
+    nativeBuildInputs = [
+      makeWrapper
+      gnupg
+    ];
+
     buildInputs = [
       perlEnv
       biome
       graphviz
-      makeWrapper
     ];
     propagatedBuildInputs = perlDeps;
 
@@ -115,11 +121,13 @@ perl540.pkgs.toPerlModule (
 
     postInstall = ''
       rm -r $out/var $out/bin/pve{upgrade,update,version,8to9}
+      install -Dm0644 ${trustedkeysGpg} $out/share/doc/pve-manager/trustedkeys.gpg
       sed -i $out/{bin/*,share/pve-manager/helpers/pve-startall-delay} -e "s/-T//"
     '';
 
     postFixup = ''
       find $out/lib -type f | xargs sed -i \
+        -e "s|/usr/share/doc/pve-manager/trustedkeys.gpg|$out/share/doc/pve-manager/trustedkeys.gpg|g" \
         -e "/API2::APT/d" \
         -e "/ENV{'PATH'}/d" \
         -e "s|/usr/share/bootstrap-html|${pve-http-server}/share/bootstrap-html|" \
@@ -147,6 +155,7 @@ perl540.pkgs.toPerlModule (
         -e "s|ceph-authtool|${ceph}/bin/ceph-authtool|"
 
       find $out/bin -type f | xargs sed -i \
+        -e "s|/usr/share/doc/pve-manager/trustedkeys.gpg|$out/share/doc/pve-manager/trustedkeys.gpg|g" \
         -e "/ENV{'PATH'}/d"
 
       for bin in $out/{bin/*,share/pve-manager/helpers/pve-startall-delay}; do
@@ -163,6 +172,7 @@ perl540.pkgs.toPerlModule (
               openssh
               openssl
               openvswitch
+              sequoia-sqv
               (pve-ha-manager.override { inherit enableLinstor; })
               pve-qemu
               shadow

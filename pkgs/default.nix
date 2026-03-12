@@ -3,7 +3,19 @@
   ...
 }:
 let
-  callPackage = pkgs.lib.callPackageWith (pkgs // ours);
+  perl540 = pkgs.perl540.override {
+    overrides = p: {
+      CryptOpenSSLRSA = pkgs.perl540Packages.CryptOpenSSLRSA.overrideAttrs (_: rec {
+        version = "0.33";
+        src = pkgs.fetchurl {
+          url = "https://github.com/cpan-authors/Crypt-OpenSSL-RSA/archive/refs/tags/0.33.tar.gz";
+          hash = "sha256-u48vmHCVwwxNz5kL8mN4hNtolJaDw0I3+dNyZV0oSyE=";
+        };
+      });
+    };
+  };
+
+  callPackage = pkgs.lib.callPackageWith (pkgs // ours // { inherit perl540; });
 
   ours = {
     authenpam = callPackage ./perl-modules/authenpam { };
@@ -32,6 +44,7 @@ let
     cstream = callPackage ./cstream { };
 
     mkRegistry = callPackage ./proxmox-registry { };
+    trustedkeysGpg = ./pve-manager/trustedkeys.gpg;
 
     proxmox-acme = callPackage ./proxmox-acme { };
     proxmox-backup-qemu = callPackage ./proxmox-backup-qemu { };

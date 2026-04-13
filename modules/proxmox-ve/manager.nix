@@ -22,6 +22,7 @@ lib.mkIf cfg.enable {
         "pve-cluster.service"
       ];
       path = with pkgs; [
+        cfg.package
         bashInteractive
         btrfs-progs
         cdrkit

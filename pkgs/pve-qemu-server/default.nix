@@ -82,6 +82,11 @@ perl5.pkgs.toPerlModule (
         -e "/modules-load.conf/d" \
         -e "s,usr/,,g"
 
+      # qmeventd should resolve qm from PATH instead of relying on /usr/sbin.
+      for file in $(grep -rl '/usr/sbin/qm' qmeventd bin PVE); do
+        sed -i -e 's!/usr/sbin/qm!qm!g' "$file"
+      done
+
       # Fix QEMU version check
       sed -i PVE/QemuServer/Helpers.pm -e "s/\[,\\\s\]//"
 

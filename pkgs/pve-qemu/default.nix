@@ -23,7 +23,7 @@ in
     (fetchgit {
       url = "git://git.proxmox.com/git/pve-qemu.git";
       rev = "a7c7a6b2b1aa75360d914b252dfcb05506ce590b";
-      hash = "sha256-TE7FgMTzzlbuUgP/04UC0FzazNRfpFEbHfSUVXrT08U=";
+      hash = "sha256-Jpj7IJ0torAKaBov2p7C311FxEIdmnlFfRRbJ8FsY6c=";
       fetchSubmodules = true;
 
       # Download subprojects managed by meson

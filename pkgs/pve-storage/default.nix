@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   pve-cluster,
   pve-rados2,
   enableLinstor ? false,
@@ -32,7 +32,7 @@
 
 let
   perlDeps =
-    with perl540.pkgs;
+    with perl5.pkgs;
     [
       Filechdir
       XMLLibXML
@@ -42,18 +42,18 @@ let
     ]
     ++ lib.optional enableLinstor linstor-proxmox;
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-storage";
-    version = "9.1.0";
+    version = "9.1.5";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "6f49432acc6d030017c5f8833a17b33c6ae00324";
-      hash = "sha256-jyDunxby8WPR3BnqdmbOVbHKOERwchhsEb4WYo0j2q8=";
+      rev = "f7a34eb9e12da52d6ce8a2379702f7a330fe40aa";
+      hash = "sha256-yyWBzkJIHtpOKhRqFDtD4voVxw38cKFxweJMrHtMfmo=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -71,13 +71,13 @@ perl540.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=/bin"
-      "PERLDIR=/${perl540.libPrefix}/${perl540.version}"
+      "PERLDIR=/${perl5.libPrefix}/${perl5.version}"
     ];
 
     postInstall = ''
       sed -i $out/bin/* \
         -e "s/-T//" \
-        -e "1s|$| -I$out/${perl540.libPrefix}/${perl540.version}|"
+        -e "1s|$| -I$out/${perl5.libPrefix}/${perl5.version}|"
     ''
     + lib.optionalString enableLinstor ''
       cp -rs ${linstor-proxmox}/lib $out
@@ -124,7 +124,7 @@ perl540.pkgs.toPerlModule (
         -e "s|/usr/sbin/sbdadm||" \
         -e "s|/usr/sbin/smartctl|${smartmontools}/bin/smartctl|" \
         -e "s|/usr/sbin/stmfadm||" \
-        -e "s|/usr/share/perl5|$out/${perl540.libPrefix}/${perl540.version}|"
+        -e "s|/usr/share/perl5|$out/${perl5.libPrefix}/${perl5.version}|"
     '';
 
     passthru.updateScript = pve-update-script {

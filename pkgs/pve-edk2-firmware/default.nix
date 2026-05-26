@@ -5,6 +5,7 @@
   pkgsCross,
   stdenv,
   fetchgit,
+  fetchurl,
   writeShellScriptBin,
   dpkg,
   fakeroot,
@@ -20,6 +21,22 @@
   pve-update-script,
 }:
 
+let
+  # nasm 3.x rejects 32-bit operand-size instructions inside 64-bit blocks
+  # that older nasm accepted (e.g. `push strict dword %[Vector]` in
+  # UefiCpuPkg/.../X64/ExceptionHandlerAsm.nasm). edk2 stable-202505, the
+  # release pve-edk2-firmware 4.2025.05-2 is built against on Debian Trixie,
+  # still relies on the nasm 2.16 leniency. Pin nasm to 2.16.03 for this
+  # derivation only.
+  nasm_2_16 = nasm.overrideAttrs (_: rec {
+    version = "2.16.03";
+    src = fetchurl {
+      url = "https://www.nasm.us/pub/nasm/releasebuilds/${version}/nasm-${version}.tar.xz";
+      hash = "sha256-FBKhx2C70F2wJrbA0WV6/9ZjHNCmPN229zzG1KphYUg=";
+    };
+    patches = [ ];
+  });
+in
 stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
   version = "4.2025.05-2";
@@ -44,7 +61,7 @@ stdenv.mkDerivation rec {
     dosfstools
     acpica-tools
     mtools
-    nasm
+    nasm_2_16
     libuuid
     qemu-utils
     libisoburn

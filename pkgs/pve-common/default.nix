@@ -6,7 +6,7 @@
   coreutils,
   diffutils,
   iproute2,
-  perl540,
+  perl5,
   glibc,
   openvswitch,
   pciutils,
@@ -21,7 +21,7 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     AnyEvent
     Carp
     Clone
@@ -69,15 +69,15 @@ let
   ];
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-common";
-    version = "9.1.7";
+    version = "9.1.12";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "9c1d4f469b8baaaa1cb73c335d2be08925142d1a";
-      hash = "sha256-v28wjqVX3iviI3Ngb8PZqz3tlMAxshyu/kSfeJwrYxw=";
+      rev = "24efad6f8bc20dd5bd0fd06cfd9dfadb42248b8a";
+      hash = "sha256-ogjBZFhFdxiKAihkX+lGabLGpt6ZiDPCBOSSKxCujFg=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -105,7 +105,7 @@ perl540.pkgs.toPerlModule (
 
     makeFlags = [
       "PREFIX=$(out)"
-      "PERLDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
+      "PERLDIR=$(out)/${perl5.libPrefix}/${perl5.version}"
     ];
 
     postInstall =
@@ -121,12 +121,12 @@ perl540.pkgs.toPerlModule (
       in
       ''
         for h in ${includeHeaders}; do
-          ${perl540}/bin/h2ph -d $out ${glibc.dev}/include/$h
+          ${perl5}/bin/h2ph -d $out ${glibc.dev}/include/$h
           mkdir -p $out/include/$(dirname $h)
           mv $out${glibc.dev}/include/''${h%.h}.ph $out/include/$(dirname $h)
         done
         mv $out/_h2ph_pre.ph $out/include
-        cp -r $out/include/* $out/${perl540.libPrefix}/${perl540.version}
+        cp -r $out/include/* $out/${perl5.libPrefix}/${perl5.version}
         rm -r $out/{nix,include}
       '';
 

@@ -21,12 +21,16 @@ let
         inherit (source) sha256;
       };
 
+      hasPatches = (source ? patches && source.patches != [ ]);
+      hasPostPatch = (source ? postPatch && source.postPatch != "");
+
       patched =
-        if (source ? patches && source.patches != [ ]) then
+        if (hasPatches || hasPostPatch) then
           stdenv.mkDerivation {
             name = "${source.name}-patched";
             src = fetched;
-            inherit (source) patches;
+            patches = source.patches or [ ];
+            postPatch = source.postPatch or "";
             phases = [
               "unpackPhase"
               "patchPhase"

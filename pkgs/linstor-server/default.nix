@@ -27,13 +27,13 @@
 let
   self = stdenv.mkDerivation (finalAttrs: {
     pname = "linstor-server";
-    version = "1.33.1";
+    version = "1.33.3";
 
     src = fetchFromGitHub {
       owner = "LINBIT";
       repo = "linstor-server";
       rev = "v${finalAttrs.version}";
-      hash = "sha256-yQEQjNtOPbND1kq+Jm7EegL5iSsm0Fg8QdTXbA8+MBE=";
+      hash = "sha256-pbigwqoKW8R6Jto5bJLEo0sUWECIT4e7jMzJvVrgfro=";
       fetchSubmodules = true;
       leaveDotGit = true;
       postFetch = ''

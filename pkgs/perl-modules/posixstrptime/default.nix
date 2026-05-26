@@ -1,10 +1,10 @@
 {
   lib,
   fetchurl,
-  perl540,
+  perl5,
 }:
 
-perl540.pkgs.buildPerlPackage rec {
+perl5.pkgs.buildPerlPackage rec {
   pname = "POSIXstrptime";
   version = "0.13";
 

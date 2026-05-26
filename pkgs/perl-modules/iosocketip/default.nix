@@ -1,10 +1,10 @@
 {
   lib,
   fetchurl,
-  perl540,
+  perl5,
 }:
 
-perl540.pkgs.buildPerlModule rec {
+perl5.pkgs.buildPerlModule rec {
   pname = "IOSocketIP";
   version = "0.43";
 

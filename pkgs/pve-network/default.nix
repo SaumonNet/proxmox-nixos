@@ -4,7 +4,7 @@
   fetchgit,
   makeWrapper,
   netsubnet,
-  perl540,
+  perl5,
   pve-access-control,
   pve-common,
   pve-cluster,
@@ -15,7 +15,7 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     IOSocketSSL
     NetAddrIP
     NetIP
@@ -26,18 +26,18 @@ let
     pve-cluster
     pve-rs
   ];
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-network";
-    version = "1.2.5";
+    version = "1.6.6";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "5893df09e5858e0f4afbbedb410ea9325dd55a17";
-      hash = "sha256-KLS0nlXFnXjy4sqOpADF5wo1fb2vOZKM8o7KEfvTWfg=";
+      rev = "a2b0e828b9e260990469d81f7f24d902ddb6c2a2";
+      hash = "sha256-5Cv0ZI6we+yB/qTBmklDE03TbYzTYn56tNwTfaFo2b4=";
     };
 
     sourceRoot = "${src.name}/src/PVE";
@@ -52,7 +52,7 @@ perl540.pkgs.toPerlModule (
 
     makeFlags = [
       "DESTDIR=$(out)"
-      "PERL5DIR=$(out)/${perl540.libPrefix}/${perl540.version}"
+      "PERL5DIR=$(out)/${perl5.libPrefix}/${perl5.version}"
     ];
 
     passthru.updateScript = pve-update-script {

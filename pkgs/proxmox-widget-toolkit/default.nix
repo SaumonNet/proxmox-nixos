@@ -3,19 +3,19 @@
   stdenv,
   fetchgit,
   markedjs,
-  nodePackages,
+  uglify-js,
   sassc,
   pve-update-script,
 }:
 
 stdenv.mkDerivation rec {
   pname = "proxmox-widget-toolkit";
-  version = "5.1.8";
+  version = "5.2.2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/proxmox-widget-toolkit.git";
-    rev = "a5d03fff8f116c720e68394f7d6fbd41afe3e5bc";
-    hash = "sha256-b16nK3GYZXa/+LGi596m7lOiNF7ifmPHBg27qfqAzx8=";
+    rev = "af42d9316e9e25768c3b5a99a91758aaa5b8e933";
+    hash = "sha256-pTTe9RYUdie+iTFuV6uWIcHfnVE8f478F2eyYuP7NX8=";
   };
 
   sourceRoot = "${src.name}/src";
@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
   '';
 
   buildInputs = [
-    nodePackages.uglify-js
+    uglify-js
     sassc
   ];
 

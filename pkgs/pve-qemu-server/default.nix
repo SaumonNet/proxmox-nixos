@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   glib,
   json_c,
   pkgconf,
@@ -25,7 +25,7 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     CryptOpenSSLRandom
     DataDumper
     DigestSHA
@@ -53,18 +53,18 @@ let
     XMLLibXML
   ];
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
-    version = "9.1.4";
+    version = "9.1.16";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/qemu-server.git";
-      rev = "29ea3d0c10b2cd8b426a0a2f8f4dd5c90929be39";
-      hash = "sha256-cxX+D2g9FayzI4zdYXe/924qedyKfOfD9+xJG+LvMxI=";
+      rev = "02ba5c110a0c82acbfbf58c91350a0eb24ded686";
+      hash = "sha256-yfNb5p2zIbnFbfngHccuayy9TZLHwx/uHii/5LX40jw=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -115,7 +115,7 @@ perl540.pkgs.toPerlModule (
         PREFIX= \
         SBINDIR=/.bin \
         USRSHAREDIR=$out/share/qemu-server \
-        PERLDIR=/${perl540.libPrefix}/${perl540.version}
+        PERLDIR=/${perl5.libPrefix}/${perl5.version}
 
       runHook postInstall
     '';

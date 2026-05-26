@@ -25,12 +25,12 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pve-yew-mobile-gui";
-  version = "0.6.4";
+  version = "0.7.0";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/ui/pve-yew-mobile-gui.git";
-    rev = "c0c8d4863387c28fa8db2c31ce65779bbaf39318";
-    hash = "sha256-EE73KfzXgcI9n5bkC1tAo2EVWGpIk/FzXJjkEDDMZ6E=";
+    rev = "ce962a13330eb63b934c6159291eeb4dc188ac67";
+    hash = "sha256-orTve4l5pRik3txRJS1Ip2pjy1AtLoC7b44TTvrVhsw=";
     fetchSubmodules = true;
   };
 
@@ -40,8 +40,11 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   postPatch = ''
-    # Remove the `[patch.crates-io]` section from original Cargo.toml
-    sed -i '/\[patch.crates-io\]/,/^\[/d' Cargo.toml
+    # Strip the upstream `[patch.crates-io]` section from Cargo.toml without
+    # eating subsequent sections (e.g. `[lints.clippy]` introduced in 0.7.0).
+    # We delete `[patch.crates-io]` plus the lines that follow until (but not
+    # including) the next section header line.
+    sed -i '/^\[patch\.crates-io\]/,/^\[/{ /^\[patch\.crates-io\]/d; /^\[/!d; }' Cargo.toml
 
     rm .cargo/config.toml
     cat ${registry}/cargo-patches.toml >> Cargo.toml

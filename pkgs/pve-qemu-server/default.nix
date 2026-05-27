@@ -86,6 +86,19 @@ perl5.pkgs.toPerlModule (
 
       # Fix libGL and libEGL detection
       sed -i PVE/QemuServer.pm -e "s|/usr/lib/x86_64-linux-gnu/lib|${libglvnd}/lib/lib|"
+
+      # Fix Microsoft 2023 KEK cert path for `qm enroll-efi-keys`. Proxmox
+      # hardcodes the pre-2025 virt-firmware layout (matching Debian Trixie's
+      # v24.11), but nixpkgs ships virt-firmware >= 25.10 which moved the
+      # certs into a microsoft.com/ subdir with shorter names (upstream
+      # kraxel/virt-firmware@d2fb90a, 2025-03-17).
+      substituteInPlace PVE/QemuServer/OVMF.pm \
+        --replace-fail \
+          "'/usr/lib/python3/dist-packages/virt/firmware/certs/'" \
+          "'${python3Packages.virt-firmware}/${python3Packages.python.sitePackages}/virt/firmware/certs/microsoft.com/'" \
+        --replace-fail \
+          "'MicrosoftCorporationKEK2KCA2023.pem'" \
+          "'ms-kek-2023.pem'"
     '';
 
     buildInputs = [

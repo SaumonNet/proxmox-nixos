@@ -19,10 +19,16 @@ PACKAGES_GZ_URL = f"{BASE_URL}/dists/{DIST}/{COMP}/binary-amd64/Packages.gz"
 
 
 def run_command(command, check=True):
-    """Run a shell command and return stdout (raises on non-zero by default)."""
-    result = subprocess.run(command, shell=True, text=True, capture_output=True)
+    """Run a command and return stdout (raises on non-zero by default)."""
+    result = subprocess.run(
+        command,
+        text=True,
+        capture_output=True,
+    )
     if check and result.returncode != 0:
-        raise RuntimeError(f"Command '{command}' failed: {result.stderr.strip()}")
+        raise RuntimeError(
+            f"Command '{' '.join(command)}' failed: {result.stderr.strip()}"
+        )
     return result.stdout.strip()
 
 
@@ -94,6 +100,8 @@ def update_src(
     deb_name: str | None = None,
     use_git_log: bool = False,
     git_log_prefix: str = "bump version to ",
+    source_key: str = "src",
+    version_key: str = "version",
 ):
     """
     Update a nix package to the latest Proxmox repo revision.
@@ -103,6 +111,8 @@ def update_src(
         deb_name: Optional actual package name in Proxmox repo
         use_git_log: If True, grep the git history instead of extracting SOURCE from .deb
         git_log_prefix: Optional prefix when searching git commit messages
+        source_key: Attribute path of the source to update within the derivation
+        version_key: Attribute name of the version to update within the derivation
     """
     base_dir = os.getcwd()
     deb_name = deb_name or pkg_name
@@ -117,9 +127,10 @@ def update_src(
 
     # Step 2: read old version from nix
     try:
-        old_version = (
-            run_command(f"nix eval .#{pkg_name}.version", check=True).strip().strip('"')
-        )
+        old_version = run_command(
+            ["nix", "eval", f".#{pkg_name}.{version_key}"],
+            check=True,
+        ).strip().strip('"')
     except Exception as e:
         print(f"Warning: failed to eval old version: {e}")
         old_version = None
@@ -131,18 +142,20 @@ def update_src(
     # Step 3: resolve commit hash
     if use_git_log:
         with tempfile.TemporaryDirectory() as tmpdir:
-            repo_url = run_command(f"nix eval .#{pkg_name}.src.url").strip().strip('"')
+            repo_url = run_command(
+                ["nix", "eval", f".#{pkg_name}.{source_key}.url"]
+            ).strip().strip('"')
             repo_name = os.path.basename(repo_url).replace(".git", "")
             repo_path = os.path.join(tmpdir, repo_name)
             print(f"Cloning {repo_url} in {tmpdir}...")
-            run_command(f"git clone {repo_url} {repo_path}")
+            run_command(["git", "clone", repo_url, repo_path])
 
             os.chdir(repo_path)
             pattern = f"{git_log_prefix}{version}" if git_log_prefix else version
             print(f"Searching git history for version '{pattern}'...")
             try:
                 rev = run_command(
-                    f"git log --grep='{pattern}' -n 1 --pretty=format:'%H'"
+                    ["git", "log", f"--grep={pattern}", "-n", "1", "--pretty=format:%H"]
                 )
             except RuntimeError:
                 print(
@@ -171,5 +184,13 @@ def update_src(
     # Step 4: update nix expression
     os.chdir(base_dir)
     print(f"Updating {pkg_name} with hash: {rev} and version: {version}")
-    run_command(f"update-source-version {pkg_name} {version} --rev={rev}")
+    update_command = [
+        "update-source-version",
+        pkg_name,
+        version,
+        f"--source-key={source_key}",
+        f"--version-key={version_key}",
+        f"--rev={rev}",
+    ]
+    run_command(update_command)
     print("Done.")

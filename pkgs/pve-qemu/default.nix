@@ -1,97 +1,93 @@
 {
+  common-updater-scripts,
   lib,
+  nix,
   qemu,
+  fetchurl,
   fetchgit,
   proxmox-backup-qemu,
   perl5,
-  pkg-config,
-  meson,
-  cacert,
-  git,
-  pve-update-script,
+  pve-update,
+  writeShellScript,
 }:
 
 let
+  pveSrc = fetchgit {
+    url = "git://git.proxmox.com/git/pve-qemu.git";
+    rev = "ed7782b2471fc8f3888c3c4c0329d4d124cf38cb";
+    hash = "sha256-sP1IeDujfw+DLuP+adNddo4Guy+CVp9tqRgLymTdQnI=";
+    fetchSubmodules = false;
+  };
+
   perlDeps = with perl5.pkgs; [ JSON ];
   perlEnv = perl5.withPackages (_: perlDeps);
 in
-(qemu.overrideAttrs (old: rec {
-  pname = "pve-qemu";
-  version = "10.2.1-2";
+(qemu.overrideAttrs (
+  finalAttrs: old:
+  let
+    qemuVersion = lib.head (lib.splitString "-" finalAttrs.version);
+  in
+  {
+    pname = "pve-qemu";
+    version = "10.2.1-2";
 
-  src =
-    (fetchgit {
-      url = "git://git.proxmox.com/git/pve-qemu.git";
-      rev = "ed7782b2471fc8f3888c3c4c0329d4d124cf38cb";
-      hash = "sha256-dTzH3GoW0BxJ/y4tHMmKinCo1dgNCj/zboNWlOD0KMc=";
-      fetchSubmodules = true;
+    src = fetchurl {
+      url = "https://download.qemu.org/qemu-${qemuVersion}.tar.xz";
+      hash = "sha256-o3F0d9jiyE1jC//7wg9s0yk+tFqh5trG0MwnaJmRyeE=";
+    };
 
-      # Download subprojects managed by meson
-      postFetch = ''
-        cd "$out/qemu"
-        export NIX_SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
-        export PATH="${git}/bin:$PATH"
-        for prj in subprojects/*.wrap; do
-          ${lib.getExe meson} subprojects download "$(basename "$prj" .wrap)"
-        done
-        find subprojects -type d -name .git -prune -execdir rm -r {} +
-        rm -rf subprojects/packagecache/tmp*
+    patches =
+      let
+        series = builtins.readFile "${pveSrc}/debian/patches/series";
+        patchList = builtins.filter (patch: patch != "") (lib.splitString "\n" series);
+        patchPathsList = map (patch: "${pveSrc}/debian/patches/${patch}") patchList;
+      in
+      old.patches ++ patchPathsList;
+
+    sourceRoot = "qemu-${qemuVersion}";
+
+    buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
+
+    postPatch =
+      old.postPatch
+      + ''
+        cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
       '';
-    }).overrideAttrs
-      (_: {
-        GIT_CONFIG_COUNT = 2;
 
-        GIT_CONFIG_KEY_0 = "url.https://github.com/qemu/u-boot-sam460ex.git.insteadOf";
-        GIT_CONFIG_VALUE_0 = "https://gitlab.com/qemu-project/u-boot-sam460ex.git";
+    # Generate cpu flag files and machine versions json
+    # This is done in /debian/rules of pve-qemu, and needed by pve-qemu-server
+    postInstall = old.postInstall + ''
+      $out/bin/qemu-system-x86_64 -cpu help \
+        | ${perlEnv}/bin/perl ${pveSrc}/debian/parse-cpu-flags.pl > $out/share/qemu/recognized-CPUID-flags-x86_64
+      $out/bin/qemu-system-x86_64 -machine help \
+        | ${perlEnv}/bin/perl ${pveSrc}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
+    '';
 
-        GIT_CONFIG_KEY_1 = "url.https://github.com/u-boot/u-boot.git.insteadOf";
-        GIT_CONFIG_VALUE_1 = "https://gitlab.com/qemu-project/u-boot.git";
-      });
+    passthru = (old.passthru or { }) // {
+      inherit pveSrc;
 
-  patches =
-    let
-      series = builtins.readFile "${src}/debian/patches/series";
-      patchList = builtins.filter (patch: builtins.isString patch && patch != "") (
-        builtins.split "\n" series
-      );
-      patchPathsList = map (patch: "${src}/debian/patches/${patch}") patchList;
-    in
-    old.patches ++ patchPathsList;
+      updateScript = writeShellScript "update-pve-qemu" ''
+        set -euo pipefail
 
-  sourceRoot = "${src.name}/qemu";
+        attr="''${1:-''${UPDATE_NIX_ATTR_PATH:-pve-qemu}}"
 
-  buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
-  propagatedBuildInputs = [ proxmox-backup-qemu ];
+        ${lib.getExe pve-update} \
+          --deb-name pve-qemu-kvm \
+          --source-key pveSrc \
+          "$attr"
 
-  preBuild = ''
-    cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
-  ''
-  + old.preBuild;
+        version="$(${nix}/bin/nix eval --raw ".#$attr.version")"
+        ${common-updater-scripts}/bin/update-source-version \
+          "$attr" \
+          "$version" \
+          --source-key=src \
+          --ignore-same-version
+      '';
+    };
 
-  nativeBuildInputs = old.nativeBuildInputs ++ [
-    proxmox-backup-qemu
-    perlEnv
-    pkg-config
-  ];
-
-  # Generate cpu flag files and machine versions json
-  # This is done in /debian/rules of pve-qemu, and needed by pve-qemu-server
-  postInstall = old.postInstall + ''
-    $out/bin/qemu-system-x86_64 -cpu help \
-      | ${perlEnv}/bin/perl ${src}/debian/parse-cpu-flags.pl > $out/share/qemu/recognized-CPUID-flags-x86_64
-    $out/bin/qemu-system-x86_64 -machine help \
-      | ${perlEnv}/bin/perl ${src}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
-  '';
-
-  passthru.updateScript = pve-update-script {
-    extraArgs = [
-      "--deb-name"
-      "pve-qemu-kvm"
-    ];
-  };
-
-  meta.position = builtins.dirOf ./.;
-})).override
+    meta.position = dirOf ./.;
+  }
+)).override
   {
     glusterfsSupport = true;
     enableDocs = false;

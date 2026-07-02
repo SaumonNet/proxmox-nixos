@@ -35,7 +35,7 @@
   util-linux,
   system-sendmail,
   rsync,
-  busybox,
+  coreutils,
   cstream,
   lvm2,
   lxc,
@@ -174,7 +174,7 @@ perl540.pkgs.toPerlModule (
 
               ## dependencies of backup and restore
               bash
-              busybox
+              coreutils
               cstream
               lvm2
               lxc

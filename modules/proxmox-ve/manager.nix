@@ -22,9 +22,10 @@ lib.mkIf cfg.enable {
         "pve-cluster.service"
       ];
       path = with pkgs; [
-        btrfs-progs
         bashInteractive
+        btrfs-progs
         cdrkit
+        pve-storage
         swtpm
       ] ++ [ config.boot.zfs.package ];
       serviceConfig = {

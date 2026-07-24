@@ -36,6 +36,7 @@
   system-sendmail,
   rsync,
   busybox,
+  gnutar,
   cstream,
   lvm2,
   lxc,
@@ -171,6 +172,7 @@ perl540.pkgs.toPerlModule (
               termproxy
               util-linux
               wget
+              gnutar
 
               ## dependencies of backup and restore
               bash

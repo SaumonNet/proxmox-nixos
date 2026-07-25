@@ -2,6 +2,7 @@
   inputs = {
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-libvncserver.url = "github:NixOS/nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb";
+    nixpkgs-lxc.url = "github:NixOS/nixpkgs/nixos-26.05";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
   };
@@ -16,6 +17,7 @@
       self,
       nixpkgs-stable,
       nixpkgs-libvncserver,
+      nixpkgs-lxc,
       utils,
       ...
     }:
@@ -37,7 +39,10 @@
               inherit system;
               overlays = [
                 self.overlays.${system}
-                (_: _: { inherit (nixpkgs-libvncserver.legacyPackages.${system}) libvncserver; })
+                (_: _: {
+                  inherit (nixpkgs-libvncserver.legacyPackages.${system}) libvncserver;
+                  inherit (nixpkgs-lxc.legacyPackages.${system}) lxc;
+                })
               ];
             };
           in

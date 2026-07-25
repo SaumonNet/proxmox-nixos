@@ -58,6 +58,7 @@ perl540.pkgs.toPerlModule (
     ];
 
     postFixup = ''
+      cp -rn ${lxc}/share/lxc/config/. $out/share/lxc/config/
       find $out -type f | xargs sed -i \
         -e "s|/usr/bin/dtach|${dtach}/bin/dtach|" \
         -e "s|/usr/bin/ssh|${openssh}/bin/ssh|" \

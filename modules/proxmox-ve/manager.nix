@@ -90,7 +90,6 @@ lib.mkIf cfg.enable {
       ];
       path = with pkgs; [
         bashInteractive
-        virtiofsd
         cdrkit
         swtpm
       ];

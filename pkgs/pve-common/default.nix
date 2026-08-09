@@ -5,6 +5,7 @@
   bash,
   coreutils,
   diffutils,
+  dpkg,
   iproute2,
   perl5,
   glibc,
@@ -96,6 +97,7 @@ perl5.pkgs.toPerlModule (
       bash
       coreutils
       diffutils
+      dpkg
       iproute2
       proxmox-backup-client
       systemd
@@ -136,6 +138,10 @@ perl5.pkgs.toPerlModule (
         -e "s|ovs-vsctl|${openvswitch}/bin/ovs-vsctl|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -Ee "s|(/usr)?/s?bin/||"
+
+      substituteInPlace $out/${perl5.libPrefix}/${perl5.version}/PVE/Tools.pm \
+        --replace-fail "['dpkg', '--print-architecture']" \
+        "['${dpkg}/bin/dpkg', '--print-architecture']"
     '';
 
     passthru.updateScript = pve-update-script {

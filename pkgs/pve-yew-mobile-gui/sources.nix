@@ -15,9 +15,9 @@
   {
     name = "librust-pbs-api-types-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "45e78435bc9c34c7034521e718dca528e191164c";
+    rev = "068a3b32f7d89a32f8ae112bd1e10149c7d310d7";
     
-    sha256 = "0lh3c4qz58gpadv4hjv8j54ayhjfbc935dzgpz032ywz678dvvj4";
+    sha256 = "1qfw3yp0n87h86q5bfqmy2qfvbgc8axycam3jpa9imqpc904m7i1";
     crates = [
       {
         name = "pbs-api-types";
@@ -28,9 +28,9 @@
   {
     name = "librust-perlmod-dev";
     url = "git://git.proxmox.com/git/perlmod.git";
-    rev = "3f0fcc1f1601bad6ccacd38796865a927d100cda";
+    rev = "72c3df3371ab15a0439b57b02242d23db3b4a07b";
     
-    sha256 = "1q6zq05dq5awfy50mi6cj374g0lnvy1vi4x4w6sw2c7xphswrr5n";
+    sha256 = "0w7ihh687b658pislgmxidyv2qs3wz0r97g9xf2xx4wljv218nmw";
     crates = [
       {
         name = "perlmod";
@@ -41,9 +41,9 @@
   {
     name = "librust-perlmod-macro-dev";
     url = "git://git.proxmox.com/git/perlmod.git";
-    rev = "4f946ea4362a5bdbbb131aa71dc6e3b19cb02467";
+    rev = "664689a4e74376f12396c3bd07ccbaaaf10cb95e";
     
-    sha256 = "0rnyd6jhkxacclm342239cvz903fwxgnmy07lwvszyiy0f23im0z";
+    sha256 = "008rwg4nqngfllyk4g3v294z68pvq0ra6mavk7vx1g824pv4p8hw";
     crates = [
       {
         name = "perlmod-macro";
@@ -93,9 +93,9 @@
   {
     name = "librust-proxmox-api-macro-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "99539446a40447c7bc2a494d9f3f432665b70c92";
+    rev = "555033c3a59b7d83147e9efad160e0dab09eb645";
     
-    sha256 = "1bcm0556c69jxs3ylzfjlbxg8ypnr9psl0ljw7753zmg4zgps1zj";
+    sha256 = "1xyig4dqa6yw9gf28lbgwrr91fvvcpznsd0rvbpir5igrjz7bkc9";
     crates = [
       {
         name = "proxmox-api-macro";
@@ -106,8 +106,6 @@
   {
     name = "librust-proxmox-apt-api-types-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    # Manually bumped: pve-api-types 8.1.6 requires proxmox-apt-api-types ^2.0.4;
-    # 617c37f6 = "apt-api-types: bump version to 2.0.5-1" (last 2.0.x before 3.0)
     rev = "43ebf2b351df1e8b974af67402991c7bbbbe7968";
     
     sha256 = "199pw87ji59d6waxwzab30xs8dz6ihb5danhnp4x0fjwkyksnafd";
@@ -186,9 +184,9 @@
   {
     name = "librust-proxmox-client-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "99c5453fbd9856b6cffdd0227a535d23f258fd93";
+    rev = "0746104b1fa5af3e4fa08725563c4b4d69b67c9d";
     
-    sha256 = "0ylbzhgk7qapqnjlfiw4g827hp0aq8amapisfg56aamqwsndk0iq";
+    sha256 = "0rzrhgp5vn1rgz8r14h23pmzkj54glsxl2d267wm8vp7wz4a2p9a";
     crates = [
       {
         name = "proxmox-client";
@@ -249,6 +247,19 @@
     ];
   }
   {
+    name = "librust-proxmox-disks-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "29b095ab00eebbc7f8f2ce89b16d12fb565a7cce";
+    
+    sha256 = "10qwfrgz6w1bjzhzygakm1i04rval2pdpzw103lwgk7z6hn7p52i";
+    crates = [
+      {
+        name = "proxmox-disks";
+        path = "proxmox-disks";
+      }
+    ];
+  }
+  {
     name = "librust-proxmox-dns-api-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
     rev = "ad022fe03631d74be151e91ececb9698c55465a8";
@@ -262,15 +273,15 @@
     ];
   }
   {
-    name = "librust-proxmox-frr-dev";
-    url = "git://git.proxmox.com/git/proxmox-ve-rs.git";
-    rev = "e36668c887ffd349ca52553254476d1c52a5388b";
+    name = "librust-proxmox-docgen-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "86fd18094faac6dea37a50f678154bb16f8c5336";
     
-    sha256 = "0nv3nfd2rzw060w3xvlyq035kizj2pmprwk5kx4a9whq3qfaq1s3";
+    sha256 = "1bjd8181shhl402i9zihcfy24z6jswxxqp7vshbkckijm7s5hnls";
     crates = [
       {
-        name = "proxmox-frr";
-        path = "proxmox-frr";
+        name = "proxmox-docgen";
+        path = "proxmox-docgen";
       }
     ];
   }
@@ -284,6 +295,19 @@
       {
         name = "proxmox-fixed-string";
         path = "proxmox-fixed-string";
+      }
+    ];
+  }
+  {
+    name = "librust-proxmox-frr-dev";
+    url = "git://git.proxmox.com/git/proxmox-ve-rs.git";
+    rev = "a258e4633f65a20a76d182cc0436443a95e332df";
+    
+    sha256 = "1aqhdqqd5sniayn3n3kvk8l10f59ilziyi09796sc94y05s53w3p";
+    crates = [
+      {
+        name = "proxmox-frr";
+        path = "proxmox-frr";
       }
     ];
   }
@@ -303,9 +327,9 @@
   {
     name = "librust-proxmox-http-error-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "4cf0bd384305e3bc113dc479dda95de66a786185";
+    rev = "c54d689db2328803d1c7944311e55bc83805a1fa";
     
-    sha256 = "0nr4ay5cj417j5n700badkmp3f6cgljg5wqx7qv0z0yw2lmdb2j1";
+    sha256 = "1q39jkgjbn4cd7crvdinpx3z60zz53xyk0rfv10vkp0h46xd8da8";
     crates = [
       {
         name = "proxmox-http-error";
@@ -323,6 +347,32 @@
       {
         name = "proxmox-human-byte";
         path = "proxmox-human-byte";
+      }
+    ];
+  }
+  {
+    name = "librust-proxmox-ini-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "1f70f19a65d9a2e3c89d1bad8bab581f28f4e6dd";
+    
+    sha256 = "1mbxl1vnrsc7gcxxgjv4771dbq0ix8hfv06fhin6jya4zkcbbzwb";
+    crates = [
+      {
+        name = "proxmox-ini";
+        path = "proxmox-ini";
+      }
+    ];
+  }
+  {
+    name = "librust-proxmox-installer-types-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "cc0db6ae88bc2d701cb1eaca7eb1ce38a551f4b9";
+    
+    sha256 = "02s7hwmgbwx3k6a0z3dpyi670cxyma5xawa6sygjrkcvmdqjshb1";
+    crates = [
+      {
+        name = "proxmox-installer-types";
+        path = "proxmox-installer-types";
       }
     ];
   }
@@ -355,9 +405,9 @@
   {
     name = "librust-proxmox-ldap-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "c13754571eb37e157fa5dc9d21651dc29827459d";
+    rev = "ff45a34a29a7e35bb6cde09cdaa1da49d2a5440d";
     
-    sha256 = "03cv9sgxcxmrlk4h4mb072aq4ds44pds07hlh72lrbrp4kjaa7nh";
+    sha256 = "0zn29gn15kv30q8vygq56xb3y402iy9jl8idxglrr73hkbd2gmw0";
     crates = [
       {
         name = "proxmox-ldap";
@@ -420,13 +470,26 @@
   {
     name = "librust-proxmox-network-types-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "81e9fcbe40a5f591c06e76307d875bfb716278ee";
+    rev = "d06a664ec5fa62aeaa72836a2ebe92c99b882a0f";
     
-    sha256 = "0q8whwi5h9gshdn2zflrhg3j398s9v07hvpiykll109ylrg4jbh8";
+    sha256 = "0rbpv0n0v3yvkajdln7hacdq8hpyw81qhzgxvzbj9jpj512qb5nz";
     crates = [
       {
         name = "proxmox-network-types";
         path = "proxmox-network-types";
+      }
+    ];
+  }
+  {
+    name = "librust-proxmox-node-status-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "1de120c4cc832caa007699658fc12e7fa43a3717";
+    
+    sha256 = "0pqyg9iw104qmvgdlls97cjjflrqf6cl1cdsqf0jnrlfg55dpw71";
+    crates = [
+      {
+        name = "proxmox-node-status";
+        path = "proxmox-node-status";
       }
     ];
   }
@@ -470,6 +533,32 @@
     ];
   }
   {
+    name = "librust-proxmox-parallel-handler-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "46350fd4c0555bfeca02021dd6cd09f5a80be718";
+    
+    sha256 = "1862yw538pcmlni41vybj69hkmiwhdjacgk1c3ych5j8qb03ld1d";
+    crates = [
+      {
+        name = "proxmox-parallel-handler";
+        path = "proxmox-parallel-handler";
+      }
+    ];
+  }
+  {
+    name = "librust-proxmox-procfs-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "c0d55631993e3b981caa8ea6799e241fa79a66b7";
+    
+    sha256 = "1hcsnknsnarqpxb5dk59nc87b2b7ig8qzip82qz42flviwbk1gqf";
+    crates = [
+      {
+        name = "proxmox-procfs";
+        path = "proxmox-procfs";
+      }
+    ];
+  }
+  {
     name = "librust-proxmox-product-config-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
     rev = "d42d5038bc4998200d18c9d190b9b013d6522722";
@@ -498,9 +587,9 @@
   {
     name = "librust-proxmox-rest-server-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "71c3f68ee477a6a68dac69e914eff66e064eebc2";
+    rev = "64cb179dfaa09b132de554870a45bf7d1392aca1";
     
-    sha256 = "09s5w4ckliv994j9c7d97j4kwqvcml0f4x7z93zyr84cq0zgbfd8";
+    sha256 = "0va0455qmnhr0rsvvamib11pfsbzg8rnlswwszxncnpzswldpncx";
     crates = [
       {
         name = "proxmox-rest-server";
@@ -511,9 +600,9 @@
   {
     name = "librust-proxmox-router-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "6d102c80927c7e33bcaa5d84f466a5ef894e00d4";
+    rev = "aa6a31b22aa674f30e8b24ab2fb904b5d50ad8bb";
     
-    sha256 = "1lplk8yyaifc1qylc54z3cf3rkfrdhfw14hdvdik809qz2nw993j";
+    sha256 = "08ab3bbqmm6sccki8js808ac1h1sa4fkdaljjcxhghkngrxpg2s2";
     crates = [
       {
         name = "proxmox-router";
@@ -524,9 +613,9 @@
   {
     name = "librust-proxmox-s3-client-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "cdc7a1d16cd5842debd381244e61d902f27d4fac";
+    rev = "89c1d597a9d15743049eadcb1add380573265904";
     
-    sha256 = "11ws9j1656qcwy8n6yncnlxqdfwpzf67500biclfi6pl75n47g1g";
+    sha256 = "1mzj8y37n3x08kqhppmj7zy497sh188aym06wi0aa85bgmvi4wa5";
     crates = [
       {
         name = "proxmox-s3-client";
@@ -537,10 +626,9 @@
   {
     name = "librust-proxmox-schema-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    # Manually bumped: pve-api-types 8.1.6 requires proxmox-schema ^5.1.1
-    rev = "e053379c31034c4de64a45818113ea809e61aa0c";
+    rev = "e6a27600f8e4362f2703fd517ed8cc51e2d039cc";
     
-    sha256 = "09vnc5ag002mqxs208jraqbcy8rjbg8r1ifnzc4l2fkbi30xyzx5";
+    sha256 = "0w8v28za4ghm1pfz2lbs9x941pfq2dgwzqps2f94jriajxklacb7";
     crates = [
       {
         name = "proxmox-schema";
@@ -551,9 +639,9 @@
   {
     name = "librust-proxmox-sdn-types-dev";
     url = "git://git.proxmox.com/git/proxmox-ve-rs.git";
-    rev = "17af874c77f767323a0cf19ef1345f9910ccb5ff";
+    rev = "13ea4ef176d0b71ce6081ee9bb7ae3951c8a5132";
     
-    sha256 = "187g9sy767qh8hzmj3ydcys5b3i2di2dnbvrpkzm0h0g3xskk2q0";
+    sha256 = "0k9y71gdi4pvk6vm929m1qkgmdllyh99ggkrbh90xrvww79jrq86";
     crates = [
       {
         name = "proxmox-sdn-types";
@@ -564,9 +652,9 @@
   {
     name = "librust-proxmox-section-config-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "2a375fa97ea361fb7b2c283b754478a1a6e791c7";
+    rev = "f9d312f1bd30634d9296dfe9e501729754be4b99";
     
-    sha256 = "1f3rlcf8w0zfdn3znah79k3f55rqjvrg2k0w02klsr7knqv8s050";
+    sha256 = "13729gnz6daphc6qxdp83dyqmm4xbwsy04arxdfl4gnv1kl85y8d";
     crates = [
       {
         name = "proxmox-section-config";
@@ -577,9 +665,9 @@
   {
     name = "librust-proxmox-sendmail-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "512dae51a6262dbff8001688b2ccd6985fe340a9";
+    rev = "6bd69b4c89de956f88f47b6cb8ff0e573b98d1c7";
     
-    sha256 = "11vx6z39j0mhfb1nn8jqw0hz188si2w22hvqih824dq0jav4acva";
+    sha256 = "1m136a63mh9ik9dg556rdakpqbkrhpb4jb08bal8kr67h86264ln";
     crates = [
       {
         name = "proxmox-sendmail";
@@ -668,9 +756,9 @@
   {
     name = "librust-proxmox-sys-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "a698370acc08380ed08a1541f0b3c55466768517";
+    rev = "e95adeb55a05016950dd26dc1934eabb6d53705d";
     
-    sha256 = "12h57cq5x5im0k2z3q68pfz91wjyr42669d7j6n39hdyrxlsydp4";
+    sha256 = "0lvx8i0qwpsc8zazhdydd0isxf8wzrd5b7jyvn81400n2yg503jd";
     crates = [
       {
         name = "proxmox-sys";
@@ -681,9 +769,9 @@
   {
     name = "librust-proxmox-syslog-api-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "7440ea15b3a70fe4b00a4986957dfd031053ac14";
+    rev = "82941eaf48e008d980fdbce82fd65dd6b4869cd9";
     
-    sha256 = "08ysn6z0cfcic9w0xcpm9a590ry4dd60n3gs2c9nj5n81gz06rr8";
+    sha256 = "0kwcyn9vim4vrp29nms9sqkgvzh4dnm8zjq2lnmbdkbzwqzz08dq";
     crates = [
       {
         name = "proxmox-syslog-api";
@@ -707,9 +795,9 @@
   {
     name = "librust-proxmox-tfa-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "fa6a32d2c853ef21b3e9bf068880b81af93d7cec";
+    rev = "02c2a5859201943c4cea451eeba5d91ac6816422";
     
-    sha256 = "00r0a8rbwj3y0r7d4m700d2dzh4m98l38xvf6lsbsy7891chxs53";
+    sha256 = "0h0iqndmpfkflv39nsna445ssr0qp9xwxpkz3v0r0w5jvs2xgx0z";
     crates = [
       {
         name = "proxmox-tfa";
@@ -733,9 +821,9 @@
   {
     name = "librust-proxmox-time-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "1aa746c2a50ea24b4fa52702c51b0a173e1ff53b";
+    rev = "28f5f5aea165558c3400e8c24436d9f2fcec3dfb";
     
-    sha256 = "1kmy2hfcgi6v7yhww72ns75q7lkjxjixkg0v9lsgdgrrnklkwfdq";
+    sha256 = "1mf97pyz8y0v168qakmciqljbhrfv47lz1d3zf9731jkp86ay65l";
     crates = [
       {
         name = "proxmox-time";
@@ -744,14 +832,24 @@
     ];
   }
   {
+    name = "librust-proxmox-upgrade-checks-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "bf2f5742a23fe24398cc062b9d04d86f8396d762";
+    
+    sha256 = "082x5vjal8gg5h0a1rjbgglwsxj01r75zjgl0vdvwjqx3yycxfxy";
+    crates = [
+      {
+        name = "proxmox-upgrade-checks";
+        path = "proxmox-upgrade-checks";
+      }
+    ];
+  }
+  {
     name = "librust-proxmox-uuid-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    # Bumped past the 1.1.0 version-bump commit (aced6d2b) to include the
-    # rustc 1.95 autoref-on-raw-pointer fix (39141271). Same exception
-    # already applied for pve-rs's sources.nix.
-    rev = "f3305009a21264dea2771f5c86c818146796125f";
-    
-    sha256 = "08fq0mgvdjj41yzbsywahkn20ka33l5zv40rix04zxhpx0lf578w";
+    rev = "aced6d2b7d8c47e1a5825d825ac988eac7d90c8a";
+    patches = [ ../pve-yew-mobile-gui/0001-proxmox-uuid-fix-implicit-autoref.patch ];
+    sha256 = "01famhymykh5l99iq5gg6rifbfn8gwxpi4zlpnihbiv83kqx6xvc";
     crates = [
       {
         name = "proxmox-uuid";
@@ -762,13 +860,26 @@
   {
     name = "librust-proxmox-ve-config-dev";
     url = "git://git.proxmox.com/git/proxmox-ve-rs.git";
-    rev = "4f236d3ce6aa882158bfc01a5cf86d87632542df";
+    rev = "2b03260f0f6a3607b1a2b6d4910171825785235a";
     
-    sha256 = "1py4rr61rrpmavphhibc7nq6764kiy4q9cns0s38sjgrfd9fphfw";
+    sha256 = "1impbykdzpky2jkkjwh6f97c4favhqdcb0ws0xpgf1xn42y8nc6b";
     crates = [
       {
         name = "proxmox-ve-config";
         path = "proxmox-ve-config";
+      }
+    ];
+  }
+  {
+    name = "librust-proxmox-wireguard-dev";
+    url = "git://git.proxmox.com/git/proxmox.git";
+    rev = "cbe54e1cf49a96b939829989826650ea7aebad1d";
+    
+    sha256 = "1nqa78j6bxnh4zlxa3sdvmjj7i1ypgpyslrd420dzxwswh4mpghq";
+    crates = [
+      {
+        name = "proxmox-wireguard";
+        path = "proxmox-wireguard";
       }
     ];
   }
@@ -786,24 +897,11 @@
     ];
   }
   {
-    name = "librust-proxmox-node-status-dev";
-    url = "git://git.proxmox.com/git/proxmox.git";
-    rev = "1de120c4cc832caa007699658fc12e7fa43a3717";
-    
-    sha256 = "0pqyg9iw104qmvgdlls97cjjflrqf6cl1cdsqf0jnrlfg55dpw71";
-    crates = [
-      {
-        name = "proxmox-node-status";
-        path = "proxmox-node-status";
-      }
-    ];
-  }
-  {
     name = "librust-proxmox-yew-comp-dev";
     url = "git://git.proxmox.com/git/ui/proxmox-yew-comp.git";
-    rev = "d5151d80e7f216b0019a4aba5267164ab5ebfd82";
+    rev = "713c4b5f06648b339b41d8ab23c981f479673634";
     
-    sha256 = "09xbc0czmgx7hg5c1zhyqz0rs0bjvikcj48gzczrr2fc1p30qiav";
+    sha256 = "0qwld157czx9cchj5i6sa2vbdzv8cwprhh2gmm57dfdwh1wrlzjp";
     crates = [
       {
         name = "proxmox-yew-comp";
@@ -814,12 +912,9 @@
   {
     name = "librust-pve-api-types-dev";
     url = "git://git.proxmox.com/git/proxmox.git";
-    # Manually bumped: proxmox-yew-comp 0.8.2 requires pve-api-types ^8.1.2,
-    # but pve-yew-mobile-gui 0.7.0 still wants proxmox-apt-api-types "2.0",
-    # so pick the last 8.1.x that uses apt-api-types 2.0 (8.1.6 → 0508cc16).
-    rev = "46fde7ab032fd40077de94aca71270635693506d";
+    rev = "253905e4f3ea2b2fc88f0eff68a65b9f04ca0929";
     
-    sha256 = "0w4vjwqy5ivbm1b9q2jggmmzc9i5np34q0lv326dc1sz9whq4gqf";
+    sha256 = "0g11a0smp4sw504pg4pcpjcxzq0drmi0msqzw2m7glk2r96n7qmh";
     crates = [
       {
         name = "pve-api-types";
@@ -830,10 +925,9 @@
   {
     name = "librust-pwt-dev";
     url = "git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git";
-    # Manually bumped: pve-yew-mobile-gui 0.7.0 requires pwt ^0.8.0
-    rev = "609f6fcf9f9ae04bcefd006e8b81136d2edadeae";
+    rev = "b3a5c5da12bc0479ac975cb4884414d48bde09e6";
     
-    sha256 = "0gwsm9f97f8z5b3ghwwvv5lms9cb5dy5pv6631b16z2m2vy0fyvx";
+    sha256 = "0jj4x8h1c5vglzg4pmzzn53hfrm7ig55k5hiva7gkxkcwh71pdfi";
     crates = [
       {
         name = "pwt";
@@ -844,10 +938,9 @@
   {
     name = "librust-pwt-macros-dev";
     url = "git://git.proxmox.com/git/ui/proxmox-yew-widget-toolkit.git";
-    # Manually bumped to track pwt 0.8.x; pve-yew-mobile-gui 0.7.0 uses pwt-macros 0.5
-    rev = "232ea89a960cfa5a4c18c92c40d22d365553de79";
+    rev = "a5313d5fa01a513adb3dc54e5b724ad9c9b48377";
     
-    sha256 = "11kw9wkhqq610p5hhm21v5150km6r5vw090q37rwiym1pwcnml4g";
+    sha256 = "0nk350m710x5jaclkqgrlvfzl6np82ajnh7lqjk3pcfdars7d2ij";
     crates = [
       {
         name = "pwt-macros";
@@ -858,9 +951,9 @@
   {
     name = "librust-pxar-dev";
     url = "git://git.proxmox.com/git/pxar.git";
-    rev = "993c66fcb8819770f279cb9fb4d13f58f367606c";
+    rev = "091a8a382d0d6fc71025351fb35c51b1f3b0074d";
     
-    sha256 = "1bqfdq15kq45wrqmsh559ijbv48k73fjca5l4198mflgii6f942p";
+    sha256 = "1c3jcmi0kjrcpd94pxrcjzd6x1labasi0di4xbr5dfd77spna8gm";
     crates = [
       {
         name = "pxar";

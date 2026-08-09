@@ -25,12 +25,12 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pve-yew-mobile-gui";
-  version = "0.7.0";
+  version = "0.8.0";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/ui/pve-yew-mobile-gui.git";
-    rev = "ce962a13330eb63b934c6159291eeb4dc188ac67";
-    hash = "sha256-orTve4l5pRik3txRJS1Ip2pjy1AtLoC7b44TTvrVhsw=";
+    rev = "ccb273f8187d8c78eda2710777d26a8ccb044495";
+    hash = "sha256-YLCu7m49S4IApHEYazyhu3Tvo9q2mMOor1tC1qBSzW8=";
     fetchSubmodules = true;
   };
 

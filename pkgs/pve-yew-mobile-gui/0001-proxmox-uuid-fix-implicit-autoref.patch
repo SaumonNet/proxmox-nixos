@@ -1,0 +1,37 @@
+From 391412712c4dd6f86157eb0c3767ef6e36750896 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Tue, 1 Jul 2025 14:39:37 +0200
+Subject: [PATCH] uuid: fix implicit autoref on raw pointer
+
+The code allocates using the layout of [u8; 16] which should be safe
+to turn into a [u8], yet nightly complains currently.
+
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+---
+ proxmox-uuid/src/lib.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/proxmox-uuid/src/lib.rs b/proxmox-uuid/src/lib.rs
+index 800a8563..793b5761 100644
+--- a/proxmox-uuid/src/lib.rs
++++ b/proxmox-uuid/src/lib.rs
+@@ -97,7 +97,7 @@ impl Uuid {
+         if src.len() == 36 {
+             // Unfortunately the manpage of `uuid_parse(3)` states that it technically requires a
+             // terminating null byte at the end, which we don't have, so do this manually:
+-            let uuid: &mut [u8] = unsafe { &mut (*uuid)[..] };
++            let uuid: &mut [u8] = unsafe { &mut (&mut *uuid)[..] };
+             let src = src.as_bytes();
+             if src[8] != b'-' || src[13] != b'-' || src[18] != b'-' || src[23] != b'-' {
+                 return Err(UuidError);
+@@ -118,7 +118,7 @@ impl Uuid {
+                 uuid[i] = (hex_digit(src[2 * i + 4])? << 4) | hex_digit(src[2 * i + 5])?;
+             }
+         } else if src.len() == 32 {
+-            let uuid: &mut [u8] = unsafe { &mut (*uuid)[..] };
++            let uuid: &mut [u8] = unsafe { &mut (&mut *uuid)[..] };
+             let src = src.as_bytes();
+             for i in 0..16 {
+                 uuid[i] = (hex_digit(src[2 * i])? << 4) | hex_digit(src[2 * i + 1])?;
+-- 
+2.51.0

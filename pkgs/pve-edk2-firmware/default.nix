@@ -39,12 +39,12 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "pve-edk2-firmware";
-  version = "4.2025.05-2";
+  version = "4.2025.05-3";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "224fdd7df4e9aedea8b6821eb44545cf9c247584";
-    sha256 = "sha256-BHjETJ7gB3M1XCIp9OpPDYZZPpl+3+PIS8nDgFBkD6Q=";
+    rev = "cb8a660902ffa10d58f41933d26ccd3c46544918";
+    sha256 = "sha256-exJNFCIzFM90qhJNAlDKSFSVy7leuCd1fPHFE/O0Rkg=";
   };
 
   hardeningDisable = [

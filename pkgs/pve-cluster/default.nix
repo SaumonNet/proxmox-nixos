@@ -42,12 +42,12 @@ in
 perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-cluster";
-    version = "9.1.5";
+    version = "9.1.6";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "1a39105b35c1dc9f9823de971ff3b304860faf4b";
-      hash = "sha256-pM/pqLTDttcswu8DxXWGD26sNkTUjpe0OU5/RXn+PTA=";
+      rev = "7091d92e594952dba65c1e57568b3d7cc244e960";
+      hash = "sha256-NCG8O8mvF3WhZZISFT7BzHCQxuoV9FKar+6IGw3L7uE=";
     };
 
     sourceRoot = "${src.name}/src";

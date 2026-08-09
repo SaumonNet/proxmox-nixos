@@ -14,12 +14,12 @@
 
 stdenv.mkDerivation rec {
   pname = "vncterm";
-  version = "1.9.1";
+  version = "1.9.2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/vncterm.git";
-    rev = "de6a5507b053cf73f817ba2822028c69ec60d557";
-    hash = "sha256-XQtYOAOCZvLzFJQGWfARGrMSR2KVhKLN//LDOrTryW4=";
+    rev = "b8d28ad764934edf3f32721dcbbcfc301a5ded93";
+    hash = "sha256-fmEiS2Nm3MU41HSpZED5fa+4PDeyOLDCr7I1SwFMrjw=";
   };
 
   postPatch = ''

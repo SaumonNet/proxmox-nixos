@@ -10,6 +10,7 @@
   imagemagick,
   librsvg,
   makeWrapper,
+  writeShellScriptBin,
   pve-update-script,
   texlive,
 }:
@@ -23,37 +24,41 @@ let
   perlEnv = perl5.withPackages (_: perlDeps);
 
   # Texlive packages required for PDF generation
-  texliveEnv = texlive.withPackages (ps: with ps; [
-    scheme-medium
-    appendix
-    bibtopic
-    bookmark
-    changebar
-    colortbl
-    enumitem
-    eepic
-    fancybox
-    fancyhdr
-    fancyvrb
-    float
-    footmisc
-    lastpage
-    listings
-    multirow
-    overpic
-    pdfpages
-    psnfss
-    subfigure
-    titlesec
-    upquote
-    courier
-    helvetic
-    rsfs
-    pxfonts
-    symbol
-    txfonts
-    zapfding
-  ]);
+  texliveEnv = texlive.withPackages (
+    ps:
+    with ps;
+    [
+      scheme-medium
+      appendix
+      bibtopic
+      bookmark
+      changebar
+      colortbl
+      enumitem
+      eepic
+      fancybox
+      fancyhdr
+      fancyvrb
+      float
+      footmisc
+      lastpage
+      listings
+      multirow
+      overpic
+      pdfpages
+      psnfss
+      subfigure
+      titlesec
+      upquote
+      courier
+      helvetic
+      rsfs
+      pxfonts
+      symbol
+      txfonts
+      zapfding
+    ]
+  );
 
   # Override dblatex to use our texlive environment
   dblatexBase = dblatex.override {
@@ -84,11 +89,17 @@ let
   # - Patches a2x.py ENV to include PATH for subprocess calls
   # - Hardcodes absolute paths for dblatex, xsltproc, xmllint, epubcheck, etc.
   # Override both texliveMinimal and dblatexFull to use our custom wrapped dblatex.
-  asciidocFull = asciidoc.override {
-    enableStandardFeatures = true;
-    texliveMinimal = texliveEnv;
-    dblatexFull = dblatexCustom;
-  };
+  asciidocFull = asciidoc.override (
+    {
+      enableStandardFeatures = true;
+      texliveMinimal = texliveEnv;
+      dblatexFull = dblatexCustom;
+    }
+    // lib.optionalAttrs (stdenv.hostPlatform.system == "riscv64-linux") {
+      enableJava = false;
+      epubcheck = writeShellScriptBin "epubcheck" "exec true";
+    }
+  );
 in
 
 stdenv.mkDerivation rec {

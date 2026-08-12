@@ -124,6 +124,11 @@ let
         --suffix PATH : /run/booted-system/sw/bin
     '';
 
+    meta.platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
+
     passthru.updateScript = writeScript "update-linstor-server" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p nix-update

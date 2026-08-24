@@ -92,7 +92,7 @@ lib.mkIf cfg.enable {
         bashInteractive
         cdrkit
         swtpm
-      ];
+      ] ++ [ config.boot.zfs.package ];
       unitConfig = {
         RefuseManualStart = true;
         RefuseManualStop = true;

@@ -303,7 +303,7 @@ in
         types.submodule {
           options = {
             enabled = mkEnableOption "Enable or disable communication with the QEMU Guest Agent.";
-            freeze_fs_on_backup = mkEnableOption "Freeze file systems on backup.";
+            freeze-fs-on-backup = mkEnableOption "Freeze file systems on backup.";
             fstrim_cloned_disks = mkEnableOption "Enable or disable fstrim on cloned disks.";
             type = mkOption {
               type = types.enum [

@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   proxmox-widget-toolkit,
   asciidoc,
   dblatex,
@@ -15,12 +15,12 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     JSON
     TemplateToolkit
   ];
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 
   # Texlive packages required for PDF generation
   texliveEnv = texlive.withPackages (ps: with ps; [
@@ -93,17 +93,17 @@ in
 
 stdenv.mkDerivation rec {
   pname = "pve-docs";
-  version = "9.1.2";
+  version = "9.2.4";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "b4b8695af1321d5e2f5bf87e6c728662ea5bf6df";
-    hash = "sha256-zYQWB85mzrKzyClSQWngtoLlLjH4NbhDaS7fzunioCY=";
+    rev = "eddebdcd67b1435a565d19ddd397943680686ec4";
+    hash = "sha256-V2GKDtFIRLOJOHhiX580pm5Sz04gLmnUlmbAnfMo+Sc=";
   };
 
   postPatch = ''
-    patchShebangs scan-adoc-refs png-verify.pl
-    sed -i '1s|#!/usr/bin/perl|#!${perlEnv}/bin/perl|' asciidoc-pve.in
+    patchShebangs scripts/scan-adoc-refs scripts/png-verify.pl
+    sed -i '1s|#!/usr/bin/perl|#!${perlEnv}/bin/perl|' scripts/asciidoc-pve.in
 
     sed -i Makefile \
       -e '/GITVERSION/d' \

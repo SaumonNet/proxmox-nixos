@@ -17,12 +17,12 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "proxmox-wasm-builder";
-  version = "0.3.0-1";
+  version = "0.3.0-2";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/ui/proxmox-wasm-builder.git";
-    rev = "160f45fec3993f238ff2bc54d5bfef4a8877f34c";
-    hash = "sha256-LJp2nf1qpP/sJXeBDwSsany6X1BuidvUXA1j1HCMExc=";
+    rev = "3f9346fbf64866cd4989f131c09959d5c7081d47";
+    hash = "sha256-iV0tYJ2zSzVA81Dofn1qD+vZ9bXt4HeUFCPHtkyd3UQ=";
   };
 
   cargoDeps = rustPlatform.importCargoLock {

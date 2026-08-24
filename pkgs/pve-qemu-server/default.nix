@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   glib,
   json_c,
   pkgconf,
@@ -25,7 +25,7 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     CryptOpenSSLRandom
     DataDumper
     DigestSHA
@@ -53,18 +53,18 @@ let
     XMLLibXML
   ];
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-qemu-server";
-    version = "9.1.4";
+    version = "9.2.5";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/qemu-server.git";
-      rev = "29ea3d0c10b2cd8b426a0a2f8f4dd5c90929be39";
-      hash = "sha256-cxX+D2g9FayzI4zdYXe/924qedyKfOfD9+xJG+LvMxI=";
+      rev = "0f5055d88e1458117d7f716265285d28978a9d1d";
+      hash = "sha256-AyTLGJQvyxHN7oAcUO3dr8FNtM2aenZEQXtWXeZ2C8E=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -85,7 +85,22 @@ perl540.pkgs.toPerlModule (
       sed -i PVE/QemuServer/Helpers.pm -e "s/\[,\\\s\]//"
 
       # Fix libGL and libEGL detection
-      sed -i PVE/QemuServer.pm -e "s|/usr/lib/x86_64-linux-gnu/lib|${libglvnd}/lib/lib|"
+      substituteInPlace PVE/QemuServer.pm \
+        --replace-fail 'my $base = "/usr/lib/''${host_arch}-linux-gnu/lib";' \
+        'my $base = "${libglvnd}/lib/lib";'
+
+      # Fix Microsoft 2023 KEK cert path for `qm enroll-efi-keys`. Proxmox
+      # hardcodes the pre-2025 virt-firmware layout (matching Debian Trixie's
+      # v24.11), but nixpkgs ships virt-firmware >= 25.10 which moved the
+      # certs into a microsoft.com/ subdir with shorter names (upstream
+      # kraxel/virt-firmware@d2fb90a, 2025-03-17).
+      substituteInPlace PVE/QemuServer/OVMF.pm \
+        --replace-fail \
+          "'/usr/lib/python3/dist-packages/virt/firmware/certs/'" \
+          "'${python3Packages.virt-firmware}/${python3Packages.python.sitePackages}/virt/firmware/certs/microsoft.com/'" \
+        --replace-fail \
+          "'MicrosoftCorporationKEK2KCA2023.pem'" \
+          "'ms-kek-2023.pem'"
     '';
 
     buildInputs = [
@@ -115,7 +130,7 @@ perl540.pkgs.toPerlModule (
         PREFIX= \
         SBINDIR=/.bin \
         USRSHAREDIR=$out/share/qemu-server \
-        PERLDIR=/${perl540.libPrefix}/${perl540.version}
+        PERLDIR=/${perl5.libPrefix}/${perl5.version}
 
       runHook postInstall
     '';

@@ -1,11 +1,11 @@
 {
   lib,
-  python310,
+  python311,
   fetchFromGitHub,
   nix-update-script,
 }:
 
-python310.pkgs.buildPythonPackage rec {
+python311.pkgs.buildPythonPackage rec {
   pname = "linstor-api-py";
   version = "1.27.1";
   pyproject = true;
@@ -19,9 +19,9 @@ python310.pkgs.buildPythonPackage rec {
   };
 
   nativeBuildInputs = [
-    python310.pkgs.setuptools
-    python310.pkgs.wheel
-    python310.pkgs.distutils
+    python311.pkgs.setuptools
+    python311.pkgs.wheel
+    python311.pkgs.distutils
   ];
 
   pythonImportsCheck = [ "linstor" ];

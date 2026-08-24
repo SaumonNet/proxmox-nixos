@@ -4,11 +4,15 @@
   rustPlatform,
   cargo,
   rustc,
+  clang,
+  libclang,
   libuuid,
+  nettle,
   pkg-config,
   openssl,
+  systemdLibs,
   fetchgit,
-  perl540,
+  perl5,
   perlmod,
   apt,
   mkRegistry,
@@ -19,15 +23,15 @@ let
   registry = mkRegistry sources;
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-rs";
-    version = "0.11.4";
+    version = "0.15.3";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/proxmox-perl-rs.git";
-      rev = "284e10f01c1334d37a93ef490435d6622b7a8bdb";
-      hash = "sha256-uZ4u+h5SkRsZNQ0FIAdVQoUjhgZaIfCHtRljZO7g6r4=";
+      rev = "c6b798f72a7e9f1063d75b144835d63781006ef4";
+      hash = "sha256-wvCD56HkdpvjJqQ3UlnggUF30yMfhPPM3AALC3ojrAg=";
     };
 
     cargoDeps = rustPlatform.importCargoLock {
@@ -54,31 +58,36 @@ perl540.pkgs.toPerlModule (
       rustPlatform.cargoSetupHook
       cargo
       rustc
-      perl540
+      clang
+      perl5
       apt
     ];
 
     buildInputs = [
       libuuid
+      nettle
       pkg-config
       openssl
+      systemdLibs
       registry
       apt
     ];
+
+    LIBCLANG_PATH = "${libclang.lib}/lib";
 
     makeFlags = [
       "BUILDIR=$NIX_BUILD_TOP"
       "BUILD_MODE=release"
       "DESTDIR=$(out)"
       "GITVERSION:=${src.rev}"
-      "PERL_INSTALLVENDORARCH=/${perl540.libPrefix}/${perl540.version}"
-      "PERL_INSTALLVENDORLIB=/${perl540.libPrefix}/${perl540.version}"
+      "PERL_INSTALLVENDORARCH=/${perl5.libPrefix}/${perl5.version}"
+      "PERL_INSTALLVENDORLIB=/${perl5.libPrefix}/${perl5.version}"
     ];
 
     postInstall = ''
       (
         cd common/pkg
-        PERL_INSTALLVENDORLIB=$out/${perl540.libPrefix}/${perl540.version} make install
+        PERL_INSTALLVENDORLIB=$out/${perl5.libPrefix}/${perl5.version} make install
       )    
     '';
 

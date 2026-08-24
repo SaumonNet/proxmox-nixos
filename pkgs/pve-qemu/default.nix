@@ -3,7 +3,7 @@
   qemu,
   fetchgit,
   proxmox-backup-qemu,
-  perl540,
+  perl5,
   pkg-config,
   meson,
   cacert,
@@ -12,18 +12,18 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [ JSON ];
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlDeps = with perl5.pkgs; [ JSON ];
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 (qemu.overrideAttrs (old: rec {
   pname = "pve-qemu";
-  version = "10.1.2-7";
+  version = "10.2.1-2";
 
   src =
     (fetchgit {
       url = "git://git.proxmox.com/git/pve-qemu.git";
-      rev = "a7c7a6b2b1aa75360d914b252dfcb05506ce590b";
-      hash = "sha256-TE7FgMTzzlbuUgP/04UC0FzazNRfpFEbHfSUVXrT08U=";
+      rev = "ed7782b2471fc8f3888c3c4c0329d4d124cf38cb";
+      hash = "sha256-dTzH3GoW0BxJ/y4tHMmKinCo1dgNCj/zboNWlOD0KMc=";
       fetchSubmodules = true;
 
       # Download subprojects managed by meson

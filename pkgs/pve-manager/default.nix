@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   makeWrapper,
-  perl540,
+  perl5,
   proxmox-widget-toolkit,
   proxmox-acme,
   proxmox-i18n,
@@ -47,7 +47,7 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     CryptOpenSSLBignum
     FileReadBackwards
     NetDNS
@@ -59,18 +59,18 @@ let
     pve-network
   ];
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-manager";
-    version = "9.1.6";
+    version = "9.2.10";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "71482d1833ded40a";
-      hash = "sha256-kydLVhu7mXJRGp8baKUsWAoB6ZJ2DLs0IqdP+jaJtFs=";
+      rev = "43df2e01f27a1a19e4a3671007554f934432d0a4";
+      hash = "sha256-lzYCkxswqOBGx2lg9gL9IDD4ICUpEQJ9N1uDu4+wve4=";
     };
 
     patches = [
@@ -105,7 +105,7 @@ perl540.pkgs.toPerlModule (
       "PVERELEASE=8.0"
       "VERSION=${version}"
       "REPOID=nixos"
-      "PERLLIBDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
+      "PERLLIBDIR=$(out)/${perl5.libPrefix}/${perl5.version}"
       "WIDGETKIT=${proxmox-widget-toolkit}/share/javascript/proxmox-widget-toolkit/proxmoxlib.js"
       "BASH_COMPLETIONS="
       "ZSH_COMPLETIONS="
@@ -136,12 +136,12 @@ perl540.pkgs.toPerlModule (
         -Ee "s|(/usr)?/s?bin/||" \
         -e "s|/usr/share/novnc-pve|${pve-novnc}/share/webapps/novnc|" \
         -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/" \
-        -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl540.libPrefix}/${perl540.version}/\$plug|"
+        -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl5.libPrefix}/${perl5.version}/\$plug|"
 
       # Ceph systemd units in NixOS do not use templates
       find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
 
-      sed -i $out/${perl540.libPrefix}/${perl540.version}/PVE/Ceph/Tools.pm \
+      sed -i $out/${perl5.libPrefix}/${perl5.version}/PVE/Ceph/Tools.pm \
         -e 's|=> "ceph|=> "${ceph}/bin/ceph|' \
         -e "s|=> 'ceph|=> '${ceph}/bin/ceph|" \
         -e "s|ceph-authtool|${ceph}/bin/ceph-authtool|"
@@ -183,7 +183,7 @@ perl540.pkgs.toPerlModule (
               zstd
             ]
           } \
-          --prefix PERL5LIB : $out/${perl540.libPrefix}/${perl540.version}
+          --prefix PERL5LIB : $out/${perl5.libPrefix}/${perl5.version}
       done      
     '';
 

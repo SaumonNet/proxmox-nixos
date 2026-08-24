@@ -2,12 +2,12 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   ceph,
   pve-update-script,
 }:
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation {
     pname = "pve-rados2";
     version = "1.5.0";
@@ -26,7 +26,7 @@ perl540.pkgs.toPerlModule (
     '';
 
     buildInputs = [
-      perl540
+      perl5
       ceph.dev
     ];
 
@@ -34,8 +34,8 @@ perl540.pkgs.toPerlModule (
       "DESTDIR=$(out)"
       "PREFIX="
       "SBINDIR=/bin"
-      "PERLDIR=/${perl540.libPrefix}/${perl540.version}"
-      "PERLSODIR=/${perl540.libPrefix}/auto"
+      "PERLDIR=/${perl5.libPrefix}/${perl5.version}"
+      "PERLSODIR=/${perl5.libPrefix}/auto"
     ];
 
     passthru.updateScript = pve-update-script {

@@ -2,20 +2,20 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   proxmox-i18n,
   proxmox-widget-toolkit,
   extjs,
   qrcodejs,
   font-awesome_4,
   fonts-font-logos,
-  twitterBootstrap,
+  twitter-bootstrap,
   pve-yew-mobile-gui,
   pve-update-script,
 }:
 
 let
-  perlDeps = with perl540.pkgs; [ AnyEventHTTP ];
+  perlDeps = with perl5.pkgs; [ AnyEventHTTP ];
   fonts-font-awesome = font-awesome_4.overrideAttrs (
     _: _: {
       installPhase = ''
@@ -28,7 +28,7 @@ let
   );
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-http-server";
     version = "6.0.5";
@@ -41,7 +41,7 @@ perl540.pkgs.toPerlModule (
 
     sourceRoot = "${src.name}/src";
     propagatedBuildInputs = perlDeps;
-    makeFlags = [ "PERL5DIR=$(out)/${perl540.libPrefix}/${perl540.version}" ];
+    makeFlags = [ "PERL5DIR=$(out)/${perl5.libPrefix}/${perl5.version}" ];
 
     postFixup = ''
       find $out -type f | xargs sed -i \
@@ -55,7 +55,7 @@ perl540.pkgs.toPerlModule (
       ln -s ${pve-yew-mobile-gui}/share/pve-yew-mobile-gui $out/share
       ln -s ${fonts-font-awesome}/share/fonts-font-awesome $out/share
       ln -s ${fonts-font-logos}/share/fonts-font-logos $out/share
-      ln -s ${twitterBootstrap}/ $out/share/bootstrap-html
+      ln -s ${twitter-bootstrap}/ $out/share/bootstrap-html
     '';
 
     passthru.updateScript = pve-update-script {

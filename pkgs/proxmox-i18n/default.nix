@@ -2,29 +2,29 @@
   lib,
   stdenv,
   fetchgit,
-  perl540,
+  perl5,
   gettext,
   pve-update-script,
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     Encode
     GetoptLong
     JSON
     LocalePO
   ];
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 stdenv.mkDerivation rec {
   pname = "proxmox-i18n";
-  version = "3.6.6";
+  version = "3.10.0";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/${pname}.git";
-    rev = "b86b5b63ed94b01e0378a42f11467fd1e5851997";
-    hash = "sha256-XqYovh3rwcobOhyKpRiZqpARoxl5n4jVD4rNl1ePTtg=";
+    rev = "89c4a4900da7448a5e62a33fb3bfaebc6e818dd5";
+    hash = "sha256-1MoO2/vj8PV4diHu8WAJUszQPDB7i2CEusHJoL7Ettw=";
   };
 
   postPatch = ''

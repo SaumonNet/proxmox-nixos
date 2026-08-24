@@ -13,12 +13,12 @@ in
 
 rustPlatform.buildRustPackage rec {
   pname = "termproxy";
-  version = "2.0.3";
+  version = "2.1.0";
 
   src = fetchgit {
     url = "git://git.proxmox.com/git/pve-xtermjs.git";
-    rev = "1c92330cccb21fb65abcff6e35848b712592dccb";
-    hash = "sha256-it1zIt+vVSgGw8mII+l7cq+vyV7tnuqNkBbgbBw7szw=";
+    rev = "e1ab45d3d60239e4ee3ba5058258ccdc34d6e43b";
+    hash = "sha256-A4MYfT+2Sf4HvKthgVmX0CeqTc0BMggm/BrT6hG+7II=";
   };
 
   cargoLock = {
@@ -30,7 +30,7 @@ rustPlatform.buildRustPackage rec {
     rm .cargo/config.toml
     cd termproxy
     cat ${registry}/cargo-patches.toml >> Cargo.toml
-    cp ${./Cargo.lock} Cargo.lock
+    ln -s ${./Cargo.lock} Cargo.lock
   '';
 
   buildInputs = [ registry ];

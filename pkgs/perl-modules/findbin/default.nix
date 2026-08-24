@@ -1,9 +1,9 @@
 {
   lib,
   fetchurl,
-  perl540,
+  perl5,
 }:
-perl540.pkgs.buildPerlPackage rec {
+perl5.pkgs.buildPerlPackage rec {
   pname = "FindBin";
   version = "1.54";
   src = fetchurl {

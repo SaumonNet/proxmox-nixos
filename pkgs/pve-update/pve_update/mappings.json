@@ -2,7 +2,8 @@
   {
     "package_name": "pve-yew-mobile-gui",
     "debian_package_name": "pve-yew-mobile-gui",
-    "git_repository": "git://git.proxmox.com/git/ui/pve-yew-mobile-gui.git"
+    "git_repository": "git://git.proxmox.com/git/ui/pve-yew-mobile-gui.git",
+    "path": "."
   },
   {
     "package_name": "termproxy",
@@ -278,7 +279,8 @@
   {
     "package_name": "proxmox-uuid",
     "debian_package_name": "librust-proxmox-uuid-dev",
-    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+    "git_repository": "git://git.proxmox.com/git/proxmox.git",
+    "patches": ["pve-yew-mobile-gui/0001-proxmox-uuid-fix-implicit-autoref.patch"]
   },
   {
     "package_name": "proxmox-worker-task",
@@ -364,6 +366,66 @@
   {
     "package_name": "proxmox-oci",
     "debian_package_name": "librust-proxmox-oci-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-wireguard",
+    "debian_package_name": "librust-proxmox-wireguard-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-deb-version",
+    "debian_package_name": "librust-proxmox-deb-version-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-disks",
+    "debian_package_name": "librust-proxmox-disks-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-docgen",
+    "debian_package_name": "librust-proxmox-docgen-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-fixed-string",
+    "debian_package_name": "librust-proxmox-fixed-string-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-ini",
+    "debian_package_name": "librust-proxmox-ini-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-installer-types",
+    "debian_package_name": "librust-proxmox-installer-types-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-parallel-handler",
+    "debian_package_name": "librust-proxmox-parallel-handler-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-pgp",
+    "debian_package_name": "librust-proxmox-pgp-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-procfs",
+    "debian_package_name": "librust-proxmox-procfs-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-rate-limiter",
+    "debian_package_name": "librust-proxmox-rate-limiter-dev",
+    "git_repository": "git://git.proxmox.com/git/proxmox.git"
+  },
+  {
+    "package_name": "proxmox-upgrade-checks",
+    "debian_package_name": "librust-proxmox-upgrade-checks-dev",
     "git_repository": "git://git.proxmox.com/git/proxmox.git"
   }
 ]

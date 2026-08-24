@@ -5,8 +5,9 @@
   bash,
   coreutils,
   diffutils,
+  dpkg,
   iproute2,
-  perl540,
+  perl5,
   glibc,
   openvswitch,
   pciutils,
@@ -21,7 +22,7 @@
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     AnyEvent
     Carp
     Clone
@@ -69,15 +70,15 @@ let
   ];
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "pve-common";
-    version = "9.1.7";
+    version = "9.2.1";
 
     src = fetchgit {
       url = "git://git.proxmox.com/git/${pname}.git";
-      rev = "9c1d4f469b8baaaa1cb73c335d2be08925142d1a";
-      hash = "sha256-v28wjqVX3iviI3Ngb8PZqz3tlMAxshyu/kSfeJwrYxw=";
+      rev = "f665029eac78022e81810ab2e44eace57ade13fb";
+      hash = "sha256-dbx62D2ePcmSp1TiGVqQ0cdhOdJ7LwP4ZM/vAaXUAfA=";
     };
 
     sourceRoot = "${src.name}/src";
@@ -96,6 +97,7 @@ perl540.pkgs.toPerlModule (
       bash
       coreutils
       diffutils
+      dpkg
       iproute2
       proxmox-backup-client
       systemd
@@ -105,7 +107,7 @@ perl540.pkgs.toPerlModule (
 
     makeFlags = [
       "PREFIX=$(out)"
-      "PERLDIR=$(out)/${perl540.libPrefix}/${perl540.version}"
+      "PERLDIR=$(out)/${perl5.libPrefix}/${perl5.version}"
     ];
 
     postInstall =
@@ -121,12 +123,12 @@ perl540.pkgs.toPerlModule (
       in
       ''
         for h in ${includeHeaders}; do
-          ${perl540}/bin/h2ph -d $out ${glibc.dev}/include/$h
+          ${perl5}/bin/h2ph -d $out ${glibc.dev}/include/$h
           mkdir -p $out/include/$(dirname $h)
           mv $out${glibc.dev}/include/''${h%.h}.ph $out/include/$(dirname $h)
         done
         mv $out/_h2ph_pre.ph $out/include
-        cp -r $out/include/* $out/${perl540.libPrefix}/${perl540.version}
+        cp -r $out/include/* $out/${perl5.libPrefix}/${perl5.version}
         rm -r $out/{nix,include}
       '';
 
@@ -136,6 +138,10 @@ perl540.pkgs.toPerlModule (
         -e "s|ovs-vsctl|${openvswitch}/bin/ovs-vsctl|" \
         -e "s|/usr/share/zoneinfo|${tzdata}/share/zoneinfo|" \
         -Ee "s|(/usr)?/s?bin/||"
+
+      substituteInPlace $out/${perl5.libPrefix}/${perl5.version}/PVE/Tools.pm \
+        --replace-fail "['dpkg', '--print-architecture']" \
+        "['${dpkg}/bin/dpkg', '--print-architecture']"
     '';
 
     passthru.updateScript = pve-update-script {

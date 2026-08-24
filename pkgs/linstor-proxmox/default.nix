@@ -2,35 +2,35 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  perl540,
+  perl5,
   nix-update-script,
 }:
 
 let
-  perlDeps = with perl540.pkgs; [
+  perlDeps = with perl5.pkgs; [
     JSONXS
     RESTClient
     TypesSerialiser
   ];
 
-  perlEnv = perl540.withPackages (_: perlDeps);
+  perlEnv = perl5.withPackages (_: perlDeps);
 in
 
-perl540.pkgs.toPerlModule (
+perl5.pkgs.toPerlModule (
   stdenv.mkDerivation rec {
     pname = "linstor-proxmox";
-    version = "8.2.0";
+    version = "8.2.1";
 
     src = fetchFromGitHub {
       owner = "LINBIT";
       repo = "linstor-proxmox";
       rev = "v${version}";
-      hash = "sha256-nvVN6jEiwo2oJaca6hE3T1TW/zpZNNy4WaCNgrQcUL0=";
+      hash = "sha256-qy7lm8BqEOfhWxDfuevCoOY7S+eBNKiBzPXa170C9ls=";
     };
 
     makeFlags = [
       "DESTDIR=$(out)"
-      "PERLDIR=/${perl540.libPrefix}/${perl540.version}"
+      "PERLDIR=/${perl5.libPrefix}/${perl5.version}"
     ];
 
     buildInputs = [ perlEnv ];

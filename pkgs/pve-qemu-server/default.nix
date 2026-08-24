@@ -20,6 +20,7 @@
   vncterm,
   swtpm,
   libglvnd,
+  virtiofsd,
   pve-update-script,
   python3Packages,
 }:
@@ -152,6 +153,7 @@ perl5.pkgs.toPerlModule (
         -e "s|/usr/share/pve-edk2-firmware|${pve-edk2-firmware}/usr/share/pve-edk2-firmware|" \
         -e 's|/etc/swtpm_setup.conf|${swtpm}/etc/swtpm_setup.conf|' \
         -e "s|virt-fw-vars|${python3Packages.virt-firmware}/bin/virt-fw-vars|g" \
+        -e "s|/usr/libexec/virtiofsd|${virtiofsd}/bin/virtiofsd|" \
         #-e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         #-e "s|/usr/sbin/qm|$out/bin/qm|" \
         #-e "s|/usr/bin/qemu|${pve-qemu}/bin/qemu|" \

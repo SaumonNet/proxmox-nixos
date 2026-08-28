@@ -36,23 +36,20 @@ in
       hash = "sha256-o3F0d9jiyE1jC//7wg9s0yk+tFqh5trG0MwnaJmRyeE=";
     };
 
-    patches =
-      let
-        series = builtins.readFile "${pveSrc}/debian/patches/series";
-        patchList = builtins.filter (patch: patch != "") (lib.splitString "\n" series);
-        patchPathsList = map (patch: "${pveSrc}/debian/patches/${patch}") patchList;
-      in
-      old.patches ++ patchPathsList;
-
     sourceRoot = "qemu-${qemuVersion}";
 
     buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
 
-    postPatch =
-      old.postPatch
-      + ''
-        cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
-      '';
+    # Applied here to avoid IFD
+    postPatch = old.postPatch + ''
+      while IFS= read -r pvePatch; do
+        [ -n "$pvePatch" ] || continue
+        echo "applying $pvePatch"
+        patch -p1 < ${pveSrc}/debian/patches/"$pvePatch"
+      done < ${pveSrc}/debian/patches/series
+
+      cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
+    '';
 
     # Generate cpu flag files and machine versions json
     # This is done in /debian/rules of pve-qemu, and needed by pve-qemu-server

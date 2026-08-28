@@ -1,0 +1,41 @@
+name: Cache GC
+
+concurrency:
+  group: hestia-gc
+  cancel-in-progress: false
+
+on:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Plan only; do not repack, touch, or delete anything.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  gc:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - uses: samueldr/lix-gha-installer-action@v2026-06-15
+        with:
+          extra_nix_config: |
+            extra-substituters = https://cache.saumon.network/proxmox-nixos
+            extra-trusted-public-keys = proxmox-nixos:D9RYSWpQQC/msZUWphOY2I5RLH5Dd6yQcaHIuug7dWM=
+      - name: Build hestia from pinned master
+        run: nix build "github:Mic92/hestia/ab1d3f3b75010a9ae42393d3c3657d8852ccc476" -o hestia-bin
+      - uses: Mic92/hestia@ab1d3f3b75010a9ae42393d3c3657d8852ccc476
+        with:
+          version: ""
+      - name: Run garbage collection
+        run: |
+          ./hestia-bin/bin/hestia gc ${{ inputs.dry-run && '--dry-run' || '' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

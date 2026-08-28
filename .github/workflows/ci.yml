@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  HESTIA_REV: ab1d3f3b75010a9ae42393d3c3657d8852ccc476
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      any-jobs: ${{ steps.matrix.outputs.any-jobs }}
+      manifest-version: ${{ steps.matrix.outputs.manifest-version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: samueldr/lix-gha-installer-action@v2026-06-15
+        with:
+          extra_nix_config: |
+            extra-substituters = https://cache.saumon.network/proxmox-nixos
+            extra-trusted-public-keys = proxmox-nixos:D9RYSWpQQC/msZUWphOY2I5RLH5Dd6yQcaHIuug7dWM=
+      - name: Build hestia from pinned master
+        run: |
+          nix build "github:Mic92/hestia/$HESTIA_REV" -o hestia-bin
+          install -m755 hestia-bin/bin/hestia hestia
+      - name: Push hestia to binary cache
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+        run: |
+          if [ -z "$ATTIC_TOKEN" ]; then exit 0; fi
+          nix run nixpkgs#attic-client -- login saumon https://cache.saumon.network "$ATTIC_TOKEN"
+          nix run nixpkgs#attic-client -- push proxmox-nixos ./hestia-bin
+      - uses: actions/upload-artifact@v7
+        with:
+          name: hestia-bin
+          path: hestia
+      - uses: Mic92/hestia@ab1d3f3b75010a9ae42393d3c3657d8852ccc476
+        with:
+          binary: ./hestia
+      - id: matrix
+        uses: Mic92/hestia/matrix@ab1d3f3b75010a9ae42393d3c3657d8852ccc476
+        with:
+          nix-eval-jobs: "nix run nixpkgs#nix-eval-jobs --"
+
+  build:
+    needs: eval
+    if: needs.eval.outputs.any-jobs == 'true'
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.eval.outputs.matrix) }}
+    steps:
+      - name: Reclaim disk space
+        uses: wimpysworld/nothing-but-nix@v10
+
+      - uses: samueldr/lix-gha-installer-action@v2026-06-15
+        with:
+          extra_nix_config: |
+            extra-substituters = https://cache.saumon.network/proxmox-nixos
+            extra-trusted-public-keys = proxmox-nixos:D9RYSWpQQC/msZUWphOY2I5RLH5Dd6yQcaHIuug7dWM=
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: hestia-bin
+
+      - name: Make hestia executable
+        run: chmod +x ./hestia
+
+      - uses: Mic92/hestia@ab1d3f3b75010a9ae42393d3c3657d8852ccc476
+        with:
+          binary: ./hestia
+          wait-manifest-version: ${{ needs.eval.outputs.manifest-version }}
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Prefetch drv closure
+        run: '"$HESTIA_BIN" prefetch ${{ matrix.installables }}'
+
+      - name: Build
+        run: nix build -L --print-out-paths ${{ matrix.installables }} | tee out-paths.txt
+
+      - name: Push to binary cache
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+        run: |
+          if [ -z "$ATTIC_TOKEN" ]; then exit 0; fi
+          nix run nixpkgs#attic-client -- login saumon https://cache.saumon.network "$ATTIC_TOKEN"
+          xargs nix run nixpkgs#attic-client -- push proxmox-nixos < out-paths.txt
+
+  ci:
+    needs: [eval, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if any dependency failed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo "All checks green (or cached)."

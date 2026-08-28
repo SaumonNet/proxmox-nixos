@@ -3,7 +3,22 @@
   ...
 }:
 let
-  callPackage = pkgs.lib.callPackageWith (pkgs // ours);
+  inherit (pkgs) lib;
+
+  # Nixpkgs builds libxcrypt with `--enable-hashes=strong`, which omits
+  # sha256crypt.
+  libxcrypt = pkgs.libxcrypt.overrideAttrs (old: {
+    configureFlags = map (
+      flag: if lib.hasPrefix "--enable-hashes=" flag then "${flag},sha256crypt" else flag
+    ) old.configureFlags;
+  });
+
+  perl5 = pkgs.perl5.override {
+    inherit libxcrypt;
+    self = perl5;
+  };
+
+  callPackage = pkgs.lib.callPackageWith (pkgs // { inherit perl5; } // ours);
 
   ours = {
     authenpam = callPackage ./perl-modules/authenpam { };
@@ -22,7 +37,7 @@ let
 
     extjs = callPackage ./extjs { };
     fonts-font-logos = callPackage ./fonts-font-logos { };
-    
+
     markedjs = callPackage ./markedjs { };
     qrcodejs = callPackage ./qrcodejs { };
     perlmod = callPackage ./perlmod { };

@@ -8,15 +8,22 @@
   pkgconf,
   libsysprof-capture,
   pcre2,
+  makeWrapper,
   proxmox-backup-client,
+  pve-apiclient,
+  pve-cluster,
+  pve-common,
   pve-edk2-firmware,
   pve-firewall,
+  pve-guest-common,
   pve-qemu,
+  pve-storage,
   util-linux,
   uuid,
   findbin,
   termreadline,
   socat,
+  conntrack-tools,
   vncterm,
   swtpm,
   libglvnd,
@@ -28,6 +35,7 @@
 let
   perlDeps = with perl5.pkgs; [
     CryptOpenSSLRandom
+    ClassMethodMaker
     DataDumper
     DigestSHA
     FilePath
@@ -41,7 +49,12 @@ let
     MIMEBase64
     NetSSLeay
     PathTools
+    pve-apiclient
+    pve-cluster
+    pve-common
     pve-firewall
+    pve-guest-common
+    pve-storage
     ScalarListUtils
     Socket
     Storable
@@ -55,6 +68,7 @@ let
   ];
 
   perlEnv = perl5.withPackages (_: perlDeps);
+  perlLibPath = lib.makeSearchPath "${perl5.libPrefix}/${perl5.version}" perlDeps;
 in
 
 perl5.pkgs.toPerlModule (
@@ -113,6 +127,7 @@ perl5.pkgs.toPerlModule (
       glib
       json_c
       pkgconf
+      makeWrapper
       perlEnv
       libsysprof-capture
       pcre2
@@ -122,9 +137,10 @@ perl5.pkgs.toPerlModule (
 
     dontBuild = true;
 
-    # Create missing SERVICEDIR
+    # Create missing dirs
     preInstall = ''
       mkdir -p $out/lib/systemd/system
+      mkdir -p $out/share/dbus-1/system.d
     '';
 
     installPhase = ''
@@ -142,6 +158,9 @@ perl5.pkgs.toPerlModule (
     '';
 
     postFixup = ''
+      mv "$out"/usr/lib/systemd/system/* "$out/lib/systemd/system/"
+      mv "$out"/usr/share/dbus-1/system.d/* "$out/share/dbus-1/system.d/"
+
       find $out/lib $out/libexec -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d" \
         -e "s|/usr/lib/qemu-server|$out/lib/qemu-server|" \
@@ -168,8 +187,25 @@ perl5.pkgs.toPerlModule (
         #-e "s|/usr/bin/vma||" \
         #-e "s|/usr/bin/pbs-restore||" \
 
+      find $out/lib/systemd/system -type f | xargs sed -i \
+        -e "s|/usr/libexec/qemu-server|$out/libexec/qemu-server|"
+
+      patchShebangs $out/.bin/
       patchShebangs $out/lib/
       patchShebangs $out/libexec/
+
+      find $out/.bin $out/libexec/qemu-server -type f -executable ! -name dbus-vmstate | while read -r bin; do
+        wrapProgram "$bin" \
+          --prefix PATH : ${lib.makeBinPath [ pve-qemu ]} \
+          --prefix PERL5LIB : $out/${perl5.libPrefix}/${perl5.version}:${perlLibPath}
+      done
+
+      wrapProgram $out/libexec/qemu-server/dbus-vmstate \
+        --prefix PATH : ${lib.makeBinPath [
+          conntrack-tools
+          pve-qemu
+        ]} \
+        --prefix PERL5LIB : $out/${perl5.libPrefix}/${perl5.version}:${perlLibPath}
     '';
 
     passthru.updateScript = pve-update-script {

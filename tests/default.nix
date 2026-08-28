@@ -20,6 +20,8 @@ in
   test-pve-basic = runTest ./basic.nix;
   # test-pve-ceph = runTest ./ceph.nix;
   test-pve-cluster = runTest ./cluster.nix;
+  test-pve-cluster-api-conntrack = runTest ./cluster-api-conntrack.nix;
+  test-pve-cluster-conntrack = runTest ./cluster-conntrack.nix;
   test-pve-iso-upload = runTest ./iso-upload.nix;
   test-pve-linstor = runTest ./linstor.nix;
   test-pve-reboot = runTest ./reboot.nix;

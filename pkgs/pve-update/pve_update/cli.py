@@ -53,6 +53,16 @@ def main():
         help="Optional prefix to use when grepping git commit messages for the version",
         default="bump version to ",
     )
+    parser.add_argument(
+        "--source-key",
+        help="Attribute path of the source to update within the derivation",
+        default="src",
+    )
+    parser.add_argument(
+        "--version-key",
+        help="Attribute name of the version to update within the derivation",
+        default="version",
+    )
 
     args = parser.parse_args()
     if not args.deb_name:
@@ -68,6 +78,8 @@ def main():
             deb_name=args.deb_name,
             use_git_log=args.use_git_log,
             git_log_prefix=args.git_log_prefix,
+            source_key=args.source_key,
+            version_key=args.version_key,
         )
     else:
         print("[INFO] Skipping source update.")

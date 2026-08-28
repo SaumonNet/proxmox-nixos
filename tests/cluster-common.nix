@@ -6,29 +6,31 @@ let
   mkNode =
     ipAddress: extraConfig:
     { pkgs, ... }:
-    {
-      services.proxmox-ve = {
-        enable = true;
-        inherit ipAddress;
-        bridges = [ "vmbr0" ];
-      };
+    lib.mkMerge [
+      {
+        services.proxmox-ve = {
+          enable = true;
+          inherit ipAddress;
+          bridges = [ "vmbr0" ];
+        };
 
-      networking.bridges.vmbr0.interfaces = [ ];
+        networking.bridges.vmbr0.interfaces = [ ];
 
-      virtualisation.diskSize = 4096;
-      virtualisation.memorySize = 2048;
+        virtualisation.diskSize = 4096;
+        virtualisation.memorySize = 2048;
 
-      # Give slower test VMs more time to migrate conntrack state and validate it.
-      boot.kernelModules = [
-        "nf_conntrack"
-        "nf_conntrack_netlink"
-      ];
-      boot.kernel.sysctl = {
-        "net.netfilter.nf_conntrack_udp_timeout" = 300;
-        "net.netfilter.nf_conntrack_udp_timeout_stream" = 300;
-      };
-    }
-    // extraConfig pkgs;
+        # Give slower test VMs more time to migrate conntrack state and validate it.
+        boot.kernelModules = [
+          "nf_conntrack"
+          "nf_conntrack_netlink"
+        ];
+        boot.kernel.sysctl = {
+          "net.netfilter.nf_conntrack_udp_timeout" = 300;
+          "net.netfilter.nf_conntrack_udp_timeout_stream" = 300;
+        };
+      }
+      (extraConfig pkgs)
+    ];
 in
 {
   inherit vmid;

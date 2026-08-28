@@ -8,6 +8,7 @@
   meson,
   cacert,
   git,
+  fuse3,
   pve-update-script,
 }:
 
@@ -60,7 +61,8 @@ in
 
   sourceRoot = "${src.name}/qemu";
 
-  buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
+  buildInputs = old.buildInputs ++ [ proxmox-backup-qemu fuse3 ];
+  configureFlags = old.configureFlags ++ [ "--enable-fuse" ];
   propagatedBuildInputs = [ proxmox-backup-qemu ];
 
   preBuild = ''

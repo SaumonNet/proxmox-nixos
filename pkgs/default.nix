@@ -5,7 +5,13 @@
 let
   callPackage = pkgs.lib.callPackageWith (pkgs // ours);
 
+  # Patch swtpm for FUSE export support, using a separate nixpkgs import to avoid recursion
+  basePkgs = import pkgs.path { inherit (pkgs) system config; };
+
   ours = {
+    swtpm = basePkgs.swtpm.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./pve-qemu-server/swtpm-fuse.patch ];
+    });
     authenpam = callPackage ./perl-modules/authenpam { };
     datadumper = callPackage ./perl-modules/datadumper { };
     digestsha = callPackage ./perl-modules/digestsha { };

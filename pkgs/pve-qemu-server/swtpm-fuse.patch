@@ -1,0 +1,57 @@
+diff --git a/src/swtpm_setup/swtpm_backend_file.c b/src/swtpm_setup/swtpm_backend_file.c
+index a0d0f4d..d4ca2c5 100644
+--- a/src/swtpm_setup/swtpm_backend_file.c
++++ b/src/swtpm_setup/swtpm_backend_file.c
+@@ -57,36 +57,28 @@ static int check_access(void *state,
+     return ret == 0 || errno == ENOENT ? 0 : 1;
+ }
+
+-/* Delete state from file: if regular file, unlink, if blockdev, zero header so
+- * swtpm binary will treat it as a new instance. */
++/* Delete state from file: zero header so swtpm binary will treat it as a new
++ * instance. */
+ static int delete_state(void *state) {
+     const struct file_state *fstate = (struct file_state*)state;
+     int fd;
+
+-    if (fstate->is_blockdev) {
+-        char zerobuf[8] = {0}; /* swtpm header has 8 byte */
+-        fd = open(fstate->path, O_WRONLY);
+-        if (fd < 0) {
+-            logerr(gl_LOGFILE, "Couldn't open file for clearing %s: %s\n",
+-                   fstate->path, strerror(errno));
+-            return 1;
+-        }
+-        /* writing less bytes than requested is bad, but won't set errno */
+-        errno = 0;
+-        if (write(fd, zerobuf, sizeof(zerobuf)) < (long)sizeof(zerobuf)) {
+-            logerr(gl_LOGFILE, "Couldn't write file for clearing %s: %s\n",
+-                   fstate->path, strerror(errno));
+-            close(fd);
+-            return 1;
+-        }
++    char zerobuf[8] = {0}; /* swtpm header has 8 byte */
++    fd = open(fstate->path, O_WRONLY);
++    if (fd < 0) {
++        logerr(gl_LOGFILE, "Couldn't open file for clearing %s: %s\n",
++               fstate->path, strerror(errno));
++        return 1;
++    }
++    /* writing less bytes than requested is bad, but won't set errno */
++    errno = 0;
++    if (write(fd, zerobuf, sizeof(zerobuf)) < (long)sizeof(zerobuf)) {
++        logerr(gl_LOGFILE, "Couldn't write file for clearing %s: %s\n",
++               fstate->path, strerror(errno));
+         close(fd);
+-    } else {
+-        if (unlink(fstate->path)) {
+-            logerr(gl_LOGFILE, "Couldn't unlink file for clearing %s: %s\n",
+-                   fstate->path, strerror(errno));
+-            return 1;
+-        }
++        return 1;
+     }
++    close(fd);
+
+     return 0;
+ }

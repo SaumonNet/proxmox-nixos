@@ -18,8 +18,9 @@ with lib;
 
   options.virtualisation.proxmox = (import ./options.nix { inherit config lib; }).options // {
     node = mkOption {
-      type = types.str;
-      description = "The cluster node name.";
+      type = types.nullOr types.str;
+      default = null;
+      description = "The cluster node name. May instead be selected when running nixmoxer.";
     };
 
     name = mkOption {

@@ -190,7 +190,6 @@ First, configure the virtual machine settings using the options of the NixOS mod
   networking.hostName = "myvm";
 
   virtualisation.proxmox = {
-    node = "myproxmoxnode";
     iso = <derivation for your iso>;
     vmid = 101;
     memory = 4096;
@@ -225,8 +224,12 @@ verify_ssl=0
 Now you can bootstrap `myvm` using `nixmoxer`:
 
 ```console
-$ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] myvm
+$ nix run github:SaumonNet/proxmox-nixos#nixmoxer -- [--flake] [--node NODE] myvm
 ```
+
+The target node can be set with `virtualisation.proxmox.node` or selected at
+bootstrap time with `--node`. The command-line option takes precedence. At
+least one of them must be provided.
 
 `nixmoxer` will setup the VM on the Proxmox node and attach the specified iso. Instead of specified an iso, setting `autoInstall = true;` will automatically generate an iso that will automatically install the configuration to the VM being bootstrapped.
 

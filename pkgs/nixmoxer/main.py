@@ -632,19 +632,26 @@ def authenticate_promox():
 
 @click.command()
 @click.option("--flake", is_flag=True)
+@click.option("--node", help="Proxmox cluster node on which to create the VM.")
 @click.argument("machine")
-def bootstrap(flake, machine):
+def bootstrap(flake, machine, node=None):
     """
     Bootstrap the NixOS configuration for a specific machine using Nix flake or non-flake.
 
     Args:
         flake (bool): A flag indicating whether to use the Nix flake system.
         machine (str): The name of the machine to bootstrap.
+        node (str): An optional deployment-time target node override.
     """
     proxmox = authenticate_promox()
     config = eval_config(machine, flake)
     config = json.loads(config)
-    node = config["node"]
+    node = node or config.get("node")
+    if not node:
+        raise click.ClickException(
+            "no target node configured; pass --node or set virtualisation.proxmox.node"
+        )
+    config["node"] = node
     config.pop("autoInstall", None)
 
     build_iso(machine, flake)

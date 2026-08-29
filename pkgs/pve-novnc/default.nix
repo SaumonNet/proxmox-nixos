@@ -16,15 +16,14 @@ novnc.overrideAttrs (old: rec {
     fetchSubmodules = true;
   };
 
-  patches =
-    let
-      series = builtins.readFile "${src}/debian/patches/series";
-      patchList = builtins.filter (patch: builtins.isString patch && patch != "") (
-        builtins.split "\n" series
-      );
-      patchPathsList = map (patch: "${src}/debian/patches/${patch}") patchList;
-    in
-    old.patches ++ patchPathsList;
+  # Applied here to avoid IFD
+  postPatch = (old.postPatch or "") + ''
+    while IFS= read -r pvePatch; do
+      [ -n "$pvePatch" ] || continue
+      echo "applying $pvePatch"
+      patch -p1 < ${src}/debian/patches/"$pvePatch"
+    done < ${src}/debian/patches/series
+  '';
 
   sourceRoot = "${src.name}/novnc";
 

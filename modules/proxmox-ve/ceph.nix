@@ -260,7 +260,7 @@ in
               ];
               serviceConfig = {
                 Type = "oneshot";
-                KillMode = "none";
+                KillMode = "control-group";
                 Environment = "CEPH_VOLUME_TIMEOUT=10000";
                 ExecStart = "${cfg.osd.package}/bin/ceph-volume lvm activate --all --no-systemd";
                 TimeoutSec = 0;

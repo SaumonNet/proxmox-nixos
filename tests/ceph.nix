@@ -96,10 +96,18 @@
     time.sleep(10)
     pve2.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
 
+    pve3.wait_for_unit("multi-user.target")
+    time.sleep(10)
+    pve3.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
+
+    assert "pve2" in pve1.succeed("pvecm nodes")
+    assert "pve3" in pve1.succeed("pvecm nodes")
+    assert "Yes" in pve1.succeed("pvecm status | grep Quorate")
+
     pve1.succeed(
       "pveceph init",
-      "pveceph mon create",
       "pveceph mgr create",
+      "pveceph mon create",
       "ceph-volume lvm create --osd-id 1 --data /dev/vdb --no-systemd"
     )
 
@@ -114,5 +122,12 @@
       "pveceph mon create",
       "ceph-volume lvm create --osd-id 3 --data /dev/vdb --no-systemd"
     )
+
+    pve1.wait_for_unit("ceph.target")
+    pve2.wait_for_unit("ceph.target")
+    pve3.wait_for_unit("ceph.target")
+
+    time.sleep(10)
+    assert "HEALTH_OK" in pve1.succeed("ceph status")
   '';
 }

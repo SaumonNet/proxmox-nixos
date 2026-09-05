@@ -325,6 +325,7 @@ in
         types.enum [
           "x86_64"
           "aarch64"
+          "riscv64"
         ]
       );
       default = null;

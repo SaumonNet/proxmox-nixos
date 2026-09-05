@@ -54,7 +54,7 @@ perl5.pkgs.toPerlModule (
         camillemndn
         julienmalka
       ];
-      platforms = platforms.linux;
+      platforms = ceph.meta.platforms;
     };
   }
 )

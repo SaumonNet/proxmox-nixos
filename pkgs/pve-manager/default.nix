@@ -14,6 +14,7 @@
   pve-yew-mobile-gui,
   cdrkit,
   enableLinstor ? false,
+  withCeph ? lib.meta.availableOn stdenv.hostPlatform ceph,
   ceph,
   gnupg,
   graphviz,
@@ -141,10 +142,12 @@ perl5.pkgs.toPerlModule (
       # Ceph systemd units in NixOS do not use templates
       find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
 
-      sed -i $out/${perl5.libPrefix}/${perl5.version}/PVE/Ceph/Tools.pm \
-        -e 's|=> "ceph|=> "${ceph}/bin/ceph|' \
-        -e "s|=> 'ceph|=> '${ceph}/bin/ceph|" \
-        -e "s|ceph-authtool|${ceph}/bin/ceph-authtool|"
+      ${lib.optionalString withCeph ''
+        sed -i $out/${perl5.libPrefix}/${perl5.version}/PVE/Ceph/Tools.pm \
+          -e 's|=> "ceph|=> "${ceph}/bin/ceph|' \
+          -e "s|=> 'ceph|=> '${ceph}/bin/ceph|" \
+          -e "s|ceph-authtool|${ceph}/bin/ceph-authtool|"
+      ''}
 
       find $out/bin -type f | xargs sed -i \
         -e "/ENV{'PATH'}/d"
@@ -152,8 +155,7 @@ perl5.pkgs.toPerlModule (
       for bin in $out/{bin/*,share/pve-manager/helpers/pve-startall-delay}; do
         wrapProgram $bin \
           --prefix PATH : ${
-            lib.makeBinPath [
-              ceph
+            lib.makeBinPath (lib.optional withCeph ceph ++ [
               cdrkit # cloud-init
               corosync
               gnupg
@@ -181,7 +183,7 @@ perl5.pkgs.toPerlModule (
               rsync
               system-sendmail
               zstd
-            ]
+            ])
           } \
           --prefix PERL5LIB : $out/${perl5.libPrefix}/${perl5.version}
       done      

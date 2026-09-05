@@ -1,7 +1,9 @@
 {
   common-updater-scripts,
   lib,
+  stdenv,
   nix,
+  ceph,
   qemu,
   fetchurl,
   fetchgit,
@@ -88,5 +90,5 @@ in
   {
     glusterfsSupport = true;
     enableDocs = false;
-    cephSupport = true;
+    cephSupport = lib.meta.availableOn stdenv.hostPlatform ceph;
   }

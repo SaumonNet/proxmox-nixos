@@ -7,6 +7,7 @@
   pve-rados2,
   enableLinstor ? false,
   linstor-proxmox,
+  withCeph ? lib.meta.availableOn stdenv.hostPlatform ceph,
   ceph,
   coreutils,
   e2fsprogs,
@@ -38,11 +39,15 @@ let
       XMLLibXML
       posixstrptime
       pve-cluster
+    ]
+    ++ lib.optionals withCeph [
       pve-rados2
     ]
     ++ lib.optional enableLinstor linstor-proxmox;
 
   perlEnv = perl5.withPackages (_: perlDeps);
+
+  cephBinDir = if withCeph then "${ceph}/bin" else "/run/current-system/sw/bin";
 in
 
 perl5.pkgs.toPerlModule (
@@ -62,6 +67,11 @@ perl5.pkgs.toPerlModule (
       sed -i bin/Makefile \
         -e "s/pvesm.1 pvesm.bash-completion pvesm.zsh-completion//" \
         -e "/pvesm.1/,+3d"
+    ''
+    + lib.optionalString (!withCeph) ''
+      sed -i PVE/Storage.pm \
+        -e '/RBDPlugin/d' \
+        -e '/CephFSPlugin/d'
     '';
 
     buildInputs = [ perlEnv ];
@@ -108,8 +118,8 @@ perl5.pkgs.toPerlModule (
         -e "s|/usr/bin/iscsiadm|${openiscsi}/bin/iscsiadm|" \
         -e "s|/usr/bin/proxmox-backup-client|${proxmox-backup-client}/bin/proxmox-backup-client|" \
         -e "s|/usr/bin/qemu|${pve-qemu}/bin/qemu|" \
-        -e "s|/usr/bin/rados|${ceph}/bin/rados|" \
-        -e "s|/usr/bin/rbd|${ceph}/bin/rbd|" \
+        -e "s|/usr/bin/rados|${cephBinDir}/rados|" \
+        -e "s|/usr/bin/rbd|${cephBinDir}/rbd|" \
         -e "s|/usr/bin/scp|${openssh}/bin/scp|" \
         -e "s|/usr/bin/smbclient|${samba}/bin/smbclient|" \
         -e "s|/usr/bin/ssh|${openssh}/bin/ssh|" \
@@ -117,7 +127,7 @@ perl5.pkgs.toPerlModule (
         -e "s|/usr/bin/vma|${pve-qemu}/bin/vma|" \
         -e "s|/usr/bin/zcat|${gzip}/bin/zcat|" \
         -e "s|/usr/libexec/ceph|$out/libexec/ceph|" \
-        -re "s|/usr/s?bin/ceph|${ceph}/bin/ceph|" \
+        -re "s|/usr/s?bin/ceph|${cephBinDir}/ceph|" \
         -e "s|/usr/sbin/gluster|${glusterfs}/bin/gluster|" \
         -e "s|/usr/sbin/ietadm||" \
         -e "s|/usr/sbin/rpcinfo|${rpcbind}/bin/rpcinfo|" \

@@ -91,6 +91,14 @@ perl5.pkgs.toPerlModule (
       (replaceVars ./0003-pci-id-path.patch {
         pciutils = "${pciutils}";
       })
+
+      # PVE tickets historically use SHA-1 with PKCS#1 v1.5 signatures. Stock
+      # Proxmox's Crypt::OpenSSL::RSA 0.35-1.1 keeps SHA-1 as its module default
+      # and patches sign/verify to leave padding unspecified, retaining OpenSSL's
+      # PKCS#1 signing default. Nixpkgs' 0.41 instead defaults to SHA-256 and PSS.
+      # Select the wire format explicitly so tickets remain compatible with stock
+      # Proxmox nodes.
+      ./0004-select-ticket-signature-mode.patch
     ];
 
     propagatedBuildInputs = [

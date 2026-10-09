@@ -1,0 +1,37 @@
+diff --git a/PVE/Ticket.pm b/PVE/Ticket.pm
+index 764c02d..c591563 100644
+--- a/PVE/Ticket.pm
++++ b/PVE/Ticket.pm
+@@ -16,6 +16,14 @@ Crypt::OpenSSL::RSA->import_random_seed();
+ 
+ use constant HTTP_UNAUTHORIZED => 401;
+ 
++my sub select_rsa_ticket_signature_mode {
++    my ($rsa) = @_;
++
++    # Ticket signatures are a wire format, so do not rely on module defaults.
++    $rsa->use_sha1_hash();
++    $rsa->use_pkcs1_padding();
++}
++
+ sub assemble_csrf_prevention_token {
+     my ($secret, $username) = @_;
+ 
+@@ -64,6 +72,8 @@ sub assemble_rsa_ticket {
+ 
+     my $full = defined($secret_data) ? "$plain:$secret_data" : $plain;
+ 
++    select_rsa_ticket_signature_mode($rsa_priv);
++
+     my $ticket = $plain . "::" . encode_base64($rsa_priv->sign($full), '');
+ 
+     return $ticket;
+@@ -78,6 +88,8 @@ sub verify_rsa_ticket {
+         my $plain = $1;
+         my $sig = $2;
+ 
++        select_rsa_ticket_signature_mode($rsa_pub);
++
+         my $full = defined($secret_data) ? "$plain:$secret_data" : $plain;
+ 
+         if ($rsa_pub->verify($full, decode_base64($sig))) {

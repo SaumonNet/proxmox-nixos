@@ -101,6 +101,9 @@ jobs:
         run: '"$HESTIA_BIN" prefetch ${{ matrix.installables }}'
 
       - name: Build
+        # explicit bash enables pipefail.
+        # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsshell
+        shell: bash
         run: nix build -L --print-out-paths ${{ matrix.installables }} | tee out-paths.txt
 
       - name: Push to binary cache

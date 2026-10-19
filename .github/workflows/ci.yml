@@ -91,8 +91,9 @@ jobs:
 
       - name: Enable KVM
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
-            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo tee /etc/udev/rules.d/99-kvm4all.rules > /dev/null <<'EOF'
+          KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"
+          EOF
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
@@ -101,6 +102,9 @@ jobs:
         run: '"$HESTIA_BIN" prefetch ${{ matrix.installables }}'
 
       - name: Build
+        # explicit bash enables pipefail.
+        # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsshell
+        shell: bash
         run: nix build -L --print-out-paths ${{ matrix.installables }} | tee out-paths.txt
 
       - name: Push to binary cache

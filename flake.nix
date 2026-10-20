@@ -57,19 +57,7 @@
                     libvncserver
                     ;
                 })
-                # https://github.com/NixOS/nixpkgs/pull/557465
-                (final: prev: {
-                  pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-                    (pyfinal: pyprev: {
-                      sh = pyprev.sh.overridePythonAttrs (old: {
-                        disabledTests = (old.disabledTests or [ ]) ++ [
-                          "test_done_callback_no_deadlock"
-                          "test_timeout_overstep"
-                        ];
-                      });
-                    })
-                  ];
-
+                (_: prev: {
                   binaryen = prev.binaryen.overrideAttrs (
                     old:
                     nixpkgs-stable.lib.optionalAttrs (system == "riscv64-linux") {

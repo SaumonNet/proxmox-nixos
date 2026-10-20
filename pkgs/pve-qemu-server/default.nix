@@ -20,8 +20,6 @@
   pve-storage,
   util-linux,
   uuid,
-  findbin,
-  termreadline,
   socat,
   conntrack-tools,
   vncterm,
@@ -39,7 +37,6 @@ let
     DataDumper
     DigestSHA
     FilePath
-    findbin
     HTTPMessage
     GetoptLong
     IO
@@ -58,7 +55,6 @@ let
     ScalarListUtils
     Socket
     Storable
-    termreadline
     TestHarness
     TestMockModule
     TestMore

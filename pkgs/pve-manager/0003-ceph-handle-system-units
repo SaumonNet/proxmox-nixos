@@ -1,0 +1,27 @@
+diff --git a/PVE/API2/Ceph/OSD.pm b/PVE/API2/Ceph/OSD.pm
+index f6581564..5a09b86f 100644
+--- a/PVE/API2/Ceph/OSD.pm
++++ b/PVE/API2/Ceph/OSD.pm
+@@ -533,7 +533,7 @@ __PACKAGE__->register_method({
+                 # create allows for detailed configuration of DB and WAL devices
+                 # batch for easy creation of multiple OSDs (per device)
+                 my $create_mode = $param->{'osds-per-device'} ? 'batch' : 'create';
+-                my $cmd = ['ceph-volume', 'lvm', $create_mode];
++                my $cmd = ['ceph-volume', 'lvm', $create_mode, '--no-systemd'];
+                 push @$cmd, '--crush-device-class', $dev_class if $dev_class;
+ 
+                 my $devname = $devs->{dev}->{name};
+diff --git a/PVE/Ceph/Services.pm b/PVE/Ceph/Services.pm
+index 89206bab..8d4ba6ed 100644
+--- a/PVE/Ceph/Services.pm
++++ b/PVE/Ceph/Services.pm
+@@ -33,6 +33,9 @@ sub get_local_services {
+                 $regex,
+                 sub {
+                     my (undef, $id) = @_;
++                    my $keyring = "/var/lib/ceph/$type/ceph-$id/keyring";
++                    return if !-e $keyring;    # treat as non-existent until mkfs has run
++
+                     $res->{$type}->{$id}->{service} = JSON::true;
+                 },
+             );

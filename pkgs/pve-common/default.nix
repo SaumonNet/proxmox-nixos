@@ -16,7 +16,6 @@
   tzdata,
   usbutils,
   mimebase32,
-  mimebase64,
   replaceVars,
   pve-update-script,
 }:
@@ -51,7 +50,6 @@ let
     LWPProtocolHttps
     ScalarListUtils
     mimebase32
-    mimebase64
     NetDBus
     NetIP
     perlldap

@@ -20,28 +20,28 @@
   };
 
   testScript = ''
-    machine.start()
-    machine.wait_for_unit("pveproxy.service")
-    machine.wait_for_unit("qmeventd.service")
-    assert "running" in machine.succeed("pveproxy status")
+    mypve.start()
+    mypve.wait_for_unit("pveproxy.service")
+    mypve.wait_for_unit("qmeventd.service")
+    assert "running" in mypve.succeed("pveproxy status")
 
-    machine.succeed("mkdir -p /var/lib/vz/template/iso/")
-    machine.succeed("cp ${minimalIso} /var/lib/vz/template/iso/minimal.iso")
+    mypve.succeed("mkdir -p /var/lib/vz/template/iso/")
+    mypve.succeed("cp ${minimalIso} /var/lib/vz/template/iso/minimal.iso")
 
-    machine.wait_until_succeeds("ip link show vmbr0")
+    mypve.wait_until_succeeds("ip link show vmbr0")
 
-    machine.succeed(
+    mypve.succeed(
       "qm create 200 --memory 512 --cores 1 --net0 virtio,bridge=vmbr0 -cdrom local:iso/minimal.iso",
       "qm start 200"
     )
-    machine.wait_until_succeeds("qm status 200 | grep -F 'status: running'")
+    mypve.wait_until_succeeds("qm status 200 | grep -F 'status: running'")
 
-    machine.succeed("touch /run/qemu-server/200.reboot")
-    machine.succeed("kill -TERM $(cat /run/qemu-server/200.pid)")
+    mypve.succeed("touch /run/qemu-server/200.reboot")
+    mypve.succeed("kill -TERM $(cat /run/qemu-server/200.pid)")
 
-    machine.wait_until_succeeds(
+    mypve.wait_until_succeeds(
       "journalctl -u qmeventd.service -b --no-pager | grep -F 'Restarting VM 200'"
     )
-    machine.wait_until_succeeds("qm status 200 | grep -F 'status: running'")
+    mypve.wait_until_succeeds("qm status 200 | grep -F 'status: running'")
   '';
 }

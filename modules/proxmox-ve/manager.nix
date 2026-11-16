@@ -108,7 +108,8 @@ lib.mkIf cfg.enable {
         '';
         Type = "oneshot";
         RemainAfterExit = true;
-        #TimeoutSec = "infinity";
+        # Let Proxmox enforce guest shutdown timeouts without systemd interrupting it.
+        TimeoutSec = "infinity";
       };
     };
 

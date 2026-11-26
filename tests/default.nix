@@ -25,6 +25,7 @@ in
   test-pve-iso-upload = runTest ./iso-upload.nix;
   test-pve-linstor = runTest ./linstor.nix;
   test-pve-metrics = runTest ./metrics.nix;
+  test-pve-novnc = runTest ./novnc.nix;
   test-pve-reboot = runTest ./reboot.nix;
   test-pve-vm = runTest ./vm.nix;
   test-pve-vncterm = runTest ./vncterm.nix;

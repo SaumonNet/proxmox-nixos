@@ -15,7 +15,6 @@
   systemd,
   tzdata,
   usbutils,
-  mimebase32,
   replaceVars,
   pve-update-script,
 }:
@@ -49,7 +48,7 @@ let
     LinuxInotify2
     LWPProtocolHttps
     ScalarListUtils
-    mimebase32
+    MIMEBase32
     NetDBus
     NetIP
     perlldap

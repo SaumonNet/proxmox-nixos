@@ -22,7 +22,6 @@ let
 
   ours = {
     authenpam = callPackage ./perl-modules/authenpam { };
-    mimebase32 = callPackage ./perl-modules/mimebase32 { };
     netsubnet = callPackage ./perl-modules/netsubnet { };
     posixstrptime = callPackage ./perl-modules/posixstrptime { };
     uuid = callPackage ./perl-modules/uuid { };

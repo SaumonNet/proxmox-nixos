@@ -64,10 +64,17 @@ def main():
     ticket = console["ticket"]
     if args.invalid_ticket:
         ticket += "x"
-    client.set_credential(credential.USERNAME, console["user"])
-    client.set_credential(credential.PASSWORD, ticket)
-    client.set_credential(credential.CLIENTNAME, "vncterm-test")
-    client.set_credential(credential.CA_CERT_DATA, ca.read_text())
+
+    credentials = {
+        credential.USERNAME: console["user"],
+        credential.PASSWORD: ticket,
+        credential.CLIENTNAME: "vncterm-test",
+        credential.CA_CERT_DATA: ca.read_text(),
+    }
+    assert client.set_credential_types(list(credentials))
+    for kind, value in credentials.items():
+        assert client.set_credential(kind, value), kind
+
     assert client.open_host(node, str(console["port"]))
 
     (offered,) = wait_for(client, "vnc-auth-choose-type")

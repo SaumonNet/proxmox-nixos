@@ -40,6 +40,10 @@ in
 
     sourceRoot = "qemu-${qemuVersion}";
 
+    # nixpkgs patches the no-hostname TLS migration test in QEMU 11.1.
+    # Proxmox uses QEMU 10.2, which lacks that test.
+    patches = lib.filter (patch: baseNameOf patch != "fix-tls-tests-without-tasn1.patch") old.patches;
+
     buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
 
     # Applied here to avoid IFD

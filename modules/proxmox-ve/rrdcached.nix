@@ -40,16 +40,17 @@ in
         SourcePath = "${pkgs.rrdtool}/bin/rrdcached";
       };
       serviceConfig = {
-        Type = "forking";
         Restart = "no";
         TimeoutSec = "5min";
         IgnoreSIGPIPE = false;
         KillMode = "process";
-        GuessMainPID = false;
-        RemainAfterExit = true;
-        SuccessExitStatus = "5 6";
-        ExecStart = "${pkgs.rrdtool}/bin/rrdcached start -b /var/lib/rrdcached/db/ -j /var/lib/rrdcached/journal/ -l /var/run/rrdcached.sock -p /var/run/rrdcached.pid";
-        ExecStop = "${pkgs.rrdtool}/bin/rrdcached stop";
+        StateDirectory = [
+          "rrdcached/db"
+          "rrdcached/journal"
+        ];
+        ExecStart = "${pkgs.rrdtool}/bin/rrdcached -g"
+          + " -b /var/lib/rrdcached/db -j /var/lib/rrdcached/journal"
+          + " -l /run/rrdcached.sock -p /run/rrdcached.pid";
       };
     };
   };

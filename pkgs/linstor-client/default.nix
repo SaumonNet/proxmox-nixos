@@ -2,7 +2,7 @@
   lib,
   python311,
   fetchFromGitHub,
-  linstor-api-py,
+  python-linstor,
   nix-update-script,
 }:
 
@@ -30,7 +30,7 @@ python311.pkgs.buildPythonApplication rec {
     python311.pkgs.wheel
   ];
 
-  propagatedBuildInputs = [ linstor-api-py ];
+  propagatedBuildInputs = [ python-linstor ];
 
   pythonImportsCheck = [ "linstor_client" ];
 

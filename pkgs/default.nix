@@ -69,7 +69,7 @@ let
     pve-xtermjs = callPackage ./pve-xtermjs { };
     pve-yew-mobile-gui = callPackage ./pve-yew-mobile-gui { };
 
-    linstor-api-py = callPackage ./linstor-api-py { };
+    python-linstor = callPackage ./python-linstor { };
     linstor-client = callPackage ./linstor-client { };
     linstor-proxmox = callPackage ./linstor-proxmox { };
     linstor-server = callPackage ./linstor-server {

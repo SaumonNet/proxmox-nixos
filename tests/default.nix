@@ -24,6 +24,7 @@ in
   test-pve-cluster-conntrack = runTest ./cluster-conntrack.nix;
   test-pve-iso-upload = runTest ./iso-upload.nix;
   test-pve-linstor = runTest ./linstor.nix;
+  test-pve-metrics = runTest ./metrics.nix;
   test-pve-reboot = runTest ./reboot.nix;
   test-pve-vm = runTest ./vm.nix;
 }

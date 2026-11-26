@@ -41,7 +41,12 @@ stdenv.mkDerivation rec {
   makeFlags =
     let
       libvncserver-patched = libvncserver.overrideAttrs (
-        _: _: { patches = [ "${src}/vncpatches/tls-auth-pluging.patch" ]; }
+        old: {
+          patches = [ "${src}/vncpatches/tls-auth-pluging.patch" ];
+
+          # The Proxmox patch reads through GnuTLS only when WebSockets are disabled.
+          cmakeFlags = old.cmakeFlags ++ [ "-DWITH_WEBSOCKETS=OFF" ];
+        }
       );
     in
     [

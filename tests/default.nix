@@ -27,4 +27,5 @@ in
   test-pve-metrics = runTest ./metrics.nix;
   test-pve-reboot = runTest ./reboot.nix;
   test-pve-vm = runTest ./vm.nix;
+  test-pve-vncterm = runTest ./vncterm.nix;
 }

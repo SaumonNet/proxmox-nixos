@@ -6,6 +6,7 @@
       enable = true;
       ipAddress = "192.168.1.1";
     };
+    virtualisation.memorySize = 2048;
   };
 
   testScript = ''

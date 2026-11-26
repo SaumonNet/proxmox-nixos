@@ -69,7 +69,7 @@ jobs:
       matrix: ${{ fromJSON(needs.eval.outputs.matrix) }}
     steps:
       - name: Reclaim disk space
-        uses: wimpysworld/nothing-but-nix@v10
+        uses: wimpysworld/nothing-but-nix@v12
 
       - uses: samueldr/lix-gha-installer-action@v2026-06-15
         with:

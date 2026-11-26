@@ -88,7 +88,6 @@ in
   }
 )).override
   {
-    glusterfsSupport = true;
     enableDocs = false;
     cephSupport = lib.meta.availableOn stdenv.hostPlatform ceph;
   }

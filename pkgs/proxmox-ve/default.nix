@@ -39,7 +39,7 @@ buildEnv rec {
   meta = with lib; {
     description = "A complete, open-source server management platform for enterprise virtualization";
     homepage = "https://proxmox.com/proxmox-virtual-environment/";
-    license = concatMap (pkg: toList pkg.meta.license) paths;
+    license = licenses.AND (concatMap (pkg: toList pkg.meta.license) paths);
     maintainers = with maintainers; [
       camillemndn
       julienmalka

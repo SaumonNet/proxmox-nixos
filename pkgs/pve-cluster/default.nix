@@ -9,7 +9,7 @@
   bash,
   check,
   corosync,
-  fuse,
+  fuse2,
   glib,
   gzip,
   libfaketime,
@@ -68,7 +68,7 @@ perl5.pkgs.toPerlModule (
     buildInputs = [
       check
       corosync
-      fuse
+      fuse2
       glib
       libqb
       libxcrypt

@@ -48,7 +48,9 @@ let
 
     pve-access-control = callPackage ./pve-access-control { };
     pve-apiclient = callPackage ./pve-apiclient { };
-    pve-cluster = callPackage ./pve-cluster { };
+    pve-cluster = callPackage ./pve-cluster {
+      fuse2 = callPackage ./pve-cluster/fuse2.nix { };
+    };
     pve-common = callPackage ./pve-common { };
     pve-container = callPackage ./pve-container { };
     pve-docs = callPackage ./pve-docs { };

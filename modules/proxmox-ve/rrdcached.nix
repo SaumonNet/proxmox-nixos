@@ -22,28 +22,9 @@ in
 
   config = mkIf cfg.enable {
     systemd.services.rrdcached = {
-      description = "LSB: start or stop rrdcached";
-      before = [
-        "multi-user.target"
-        "graphical.target"
-      ];
-      after = [
-        "remote-fs.target"
-        "nss-lookup.target"
-        "time-sync.target"
-        "network-online.target"
-      ];
-      wants = [ "network-online.target" ];
+      description = "RRD update cache";
       wantedBy = [ "multi-user.target" ];
-      unitConfig = {
-        Documentation = "man:systemd-sysv-generator(8)";
-        SourcePath = "${pkgs.rrdtool}/bin/rrdcached";
-      };
       serviceConfig = {
-        Restart = "no";
-        TimeoutSec = "5min";
-        IgnoreSIGPIPE = false;
-        KillMode = "process";
         StateDirectory = [
           "rrdcached/db"
           "rrdcached/journal"

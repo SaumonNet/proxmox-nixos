@@ -114,11 +114,12 @@ in
         pve3.shutdown()
         wait_for_osds(up=2)
         assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
+        pve2.succeed("printf 'Written during outage' | rados -p testpool put probe -")
 
         pve3.start()
         pve3.wait_for_unit("ceph-osd-2.service")
         wait_for_osds()
         wait_for_health()
-        assert pve3.succeed("rados -p testpool get probe -") == "Ceph cluster test"
+        assert pve3.succeed("rados -p testpool get probe -") == "Written during outage"
   '';
 }

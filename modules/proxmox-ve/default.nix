@@ -71,7 +71,10 @@ in
 
       services.openssh = {
         enable = true;
-        settings.AcceptEnv = if lib.versionAtLeast pkgs.lib.version "26.05pre-git" then ["LANG" "LC_*"] else "LANG LC_*";
+        settings.AcceptEnv = [
+          "LANG"
+          "LC_*"
+        ];
       };
       programs.ssh.extraConfig = ''
         Host *

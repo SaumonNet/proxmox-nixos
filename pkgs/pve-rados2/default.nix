@@ -18,6 +18,11 @@ perl5.pkgs.toPerlModule (
       hash = "sha256-CcURv6KrfdyzRq9ccOXita05QHJ9AdvZTTxPRWpO0k0=";
     };
 
+    # A foreground pveceph task can send SIGTERM while pverados is closing
+    # its RADOS handle, causing a second shutdown and a segfault.
+    # https://lore.proxmox.com/pve-devel/20261029055409.3552673-1-k.chai@proxmox.com/
+    patches = [ ./avoid-double-shutdown.patch ];
+
     postPatch = ''
       sed -i Makefile \
         -e '/GITVERSION/d' \

@@ -19,6 +19,7 @@ in
 {
   test-pve-basic = runTest ./basic.nix;
   test-pve-ceph = runTest ./ceph.nix;
+  test-pve-ceph-rbd = runTest ./ceph-rbd.nix;
   test-pve-cluster = runTest ./cluster.nix;
   test-pve-cluster-api-conntrack = runTest ./cluster-api-conntrack.nix;
   test-pve-cluster-conntrack = runTest ./cluster-conntrack.nix;

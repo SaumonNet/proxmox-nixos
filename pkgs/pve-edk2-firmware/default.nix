@@ -5,6 +5,7 @@
   pkgsCross,
   stdenv,
   fetchgit,
+  fetchpatch,
   fetchurl,
   writeShellScriptBin,
   dpkg,
@@ -22,6 +23,15 @@
 }:
 
 let
+  fetchEdk2Patch =
+    { name, rev, hash }:
+    fetchpatch {
+      inherit name hash;
+      url = "https://github.com/tianocore/edk2/commit/${rev}.patch";
+      stripLen = 1;
+      extraPrefix = "edk2/";
+    };
+
   # nasm 3.x rejects 32-bit operand-size instructions inside 64-bit blocks
   # that older nasm accepted (e.g. `push strict dword %[Vector]` in
   # UefiCpuPkg/.../X64/ExceptionHandlerAsm.nasm). edk2 stable-202505, the
@@ -46,6 +56,19 @@ stdenv.mkDerivation rec {
     rev = "cb8a660902ffa10d58f41933d26ccd3c46544918";
     sha256 = "sha256-exJNFCIzFM90qhJNAlDKSFSVy7leuCd1fPHFE/O0Rkg=";
   };
+
+  patches = [
+    (fetchEdk2Patch {
+      name = "basetools-stringfuncs-fix-gcc16-warning.patch";
+      rev = "3597306191297b504683b83fe7750e49c6a2e836";
+      hash = "sha256-Ozk/qMixZoVq95rDmCmNNDWkhuprIRr34AIKCAret8E=";
+    })
+    (fetchEdk2Patch {
+      name = "basetools-efirom-fix-const-warning.patch";
+      rev = "9af06ef3cbb052b142f9660c2c01e7aeb401300c";
+      hash = "sha256-UAvB0c1faBfhQRFDdZ3/jOJnCYl5MKXpThuKbDK9J98=";
+    })
+  ];
 
   hardeningDisable = [
     "format"

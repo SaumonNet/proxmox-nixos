@@ -1,6 +1,7 @@
 {
   inputs = {
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
+    # Switch to nixos-26.11 once the full channel is available.
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.11-small";
     nixpkgs-libvncserver.url = "github:NixOS/nixpkgs/e6f23dc08d3624daab7094b701aa3954923c6bbb";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
@@ -28,7 +29,6 @@
           "x86_64-linux"
           "aarch64-linux"
           "riscv64-linux"
-          "x86_64-darwin"
           "aarch64-darwin"
         ]
         (

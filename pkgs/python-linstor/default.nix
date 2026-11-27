@@ -6,7 +6,7 @@
 }:
 
 python311.pkgs.buildPythonPackage rec {
-  pname = "linstor-api-py";
+  pname = "python-linstor";
   version = "1.27.1";
   pyproject = true;
 

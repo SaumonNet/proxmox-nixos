@@ -22,7 +22,6 @@ let
 
   ours = {
     authenpam = callPackage ./perl-modules/authenpam { };
-    mimebase32 = callPackage ./perl-modules/mimebase32 { };
     netsubnet = callPackage ./perl-modules/netsubnet { };
     posixstrptime = callPackage ./perl-modules/posixstrptime { };
     uuid = callPackage ./perl-modules/uuid { };
@@ -34,7 +33,6 @@ let
     qrcodejs = callPackage ./qrcodejs { };
     perlmod = callPackage ./perlmod { };
     termproxy = callPackage ./termproxy { };
-    unifont_hex = callPackage ./unifont { };
     vncterm = callPackage ./vncterm { };
     cstream = callPackage ./cstream { };
 
@@ -49,7 +47,9 @@ let
 
     pve-access-control = callPackage ./pve-access-control { };
     pve-apiclient = callPackage ./pve-apiclient { };
-    pve-cluster = callPackage ./pve-cluster { };
+    pve-cluster = callPackage ./pve-cluster {
+      fuse2 = callPackage ./pve-cluster/fuse2.nix { };
+    };
     pve-common = callPackage ./pve-common { };
     pve-container = callPackage ./pve-container { };
     pve-docs = callPackage ./pve-docs { };
@@ -69,7 +69,7 @@ let
     pve-xtermjs = callPackage ./pve-xtermjs { };
     pve-yew-mobile-gui = callPackage ./pve-yew-mobile-gui { };
 
-    linstor-api-py = callPackage ./linstor-api-py { };
+    python-linstor = callPackage ./python-linstor { };
     linstor-client = callPackage ./linstor-client { };
     linstor-proxmox = callPackage ./linstor-proxmox { };
     linstor-server = callPackage ./linstor-server {

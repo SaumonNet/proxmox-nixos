@@ -11,6 +11,7 @@
   pkg-config,
   openssl,
   systemdLibs,
+  zstd,
   fetchgit,
   perl5,
   perlmod,
@@ -69,6 +70,7 @@ perl5.pkgs.toPerlModule (
       pkg-config
       openssl
       systemdLibs
+      zstd
       registry
       apt
     ];

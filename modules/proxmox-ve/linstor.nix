@@ -22,13 +22,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    boot.extraModulePackages = [
-      # TODO: Remove this override and patch once the nixpkgs input includes
-      # https://github.com/NixOS/nixpkgs/pull/576199.
-      (config.boot.kernelPackages.drbd.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [ ./drbd-sockaddr-unsized.patch ];
-      }))
-    ];
+    boot.extraModulePackages = [ config.boot.kernelPackages.drbd ];
 
     boot.kernelModules = [
       "dm_thin_pool"

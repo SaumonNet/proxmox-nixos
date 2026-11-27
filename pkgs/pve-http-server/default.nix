@@ -17,7 +17,9 @@
 let
   perlDeps = with perl5.pkgs; [ AnyEventHTTP ];
   fonts-font-awesome = font-awesome_4.overrideAttrs (
-    _: _: {
+    finalAttrs: _: {
+      sourceRoot = finalAttrs.src.name;
+
       installPhase = ''
         mkdir -p $out/share/fonts-font-awesome
         cp -r css $out/share/fonts-font-awesome

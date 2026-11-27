@@ -7,7 +7,9 @@
   qemu,
   fetchurl,
   fetchgit,
+  libuuid,
   proxmox-backup-qemu,
+  systemdLibs,
   perl5,
   pve-update,
   writeShellScript,
@@ -16,8 +18,8 @@
 let
   pveSrc = fetchgit {
     url = "git://git.proxmox.com/git/pve-qemu.git";
-    rev = "ed7782b2471fc8f3888c3c4c0329d4d124cf38cb";
-    hash = "sha256-sP1IeDujfw+DLuP+adNddo4Guy+CVp9tqRgLymTdQnI=";
+    rev = "242e15da9cbdf3e5b64f0ea9a4719dca99a0f2c3";
+    hash = "sha256-othiaAcgPB1J6QyKOjwG4YcYtcMVbZcVRaDMTpPeftY=";
     fetchSubmodules = false;
   };
 
@@ -31,16 +33,20 @@ in
   in
   {
     pname = "pve-qemu";
-    version = "10.2.1-2";
+    version = "11.1.3-4";
 
     src = fetchurl {
       url = "https://download.qemu.org/qemu-${qemuVersion}.tar.xz";
-      hash = "sha256-o3F0d9jiyE1jC//7wg9s0yk+tFqh5trG0MwnaJmRyeE=";
+      hash = "sha256-WoKJx5QNx304c8gabCm6Ov4URvydNud/oWWM2+y4SyI=";
     };
 
     sourceRoot = "qemu-${qemuVersion}";
 
-    buildInputs = old.buildInputs ++ [ proxmox-backup-qemu ];
+    buildInputs = old.buildInputs ++ [
+      libuuid
+      proxmox-backup-qemu
+      systemdLibs
+    ];
 
     # Applied here to avoid IFD
     postPatch = old.postPatch + ''
@@ -53,13 +59,17 @@ in
       cp ${proxmox-backup-qemu}/lib/proxmox-backup-qemu.h .
     '';
 
-    # Generate cpu flag files and machine versions json
-    # This is done in /debian/rules of pve-qemu, and needed by pve-qemu-server
+    # qemu-server reads the CPU and machine lists generated in Proxmox's debian/rules.
     postInstall = old.postInstall + ''
-      $out/bin/qemu-system-x86_64 -cpu help \
-        | ${perlEnv}/bin/perl ${pveSrc}/debian/parse-cpu-flags.pl > $out/share/qemu/recognized-CPUID-flags-x86_64
-      $out/bin/qemu-system-x86_64 -machine help \
-        | ${perlEnv}/bin/perl ${pveSrc}/debian/parse-machines.pl > $out/share/qemu/machine-versions-x86_64.json
+      ${perlEnv}/bin/perl ${pveSrc}/debian/parse-cpu-flags.pl \
+        "$out/bin/qemu-system-x86_64" max-x86_64-cpu > "$out/share/qemu/recognized-CPUID-flags-x86_64"
+
+      for arch in x86_64 aarch64; do
+        "$out/bin/qemu-system-$arch" -machine help \
+          | ${perlEnv}/bin/perl ${pveSrc}/debian/parse-machines.pl > "$out/share/qemu/machine-versions-$arch.json"
+        "$out/bin/qemu-system-$arch" -cpu help \
+          | ${perlEnv}/bin/perl ${pveSrc}/debian/parse-cpu-models.pl > "$out/share/qemu/cpu-models-$arch.json"
+      done
     '';
 
     passthru = (old.passthru or { }) // {
@@ -88,7 +98,6 @@ in
   }
 )).override
   {
-    glusterfsSupport = true;
     enableDocs = false;
     cephSupport = lib.meta.availableOn stdenv.hostPlatform ceph;
   }

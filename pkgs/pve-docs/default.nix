@@ -70,6 +70,7 @@ let
   dblatexCustom = stdenv.mkDerivation {
     pname = "dblatex-wrapped";
     version = dblatexBase.version;
+    meta.mainProgram = "dblatex";
     
     nativeBuildInputs = [ makeWrapper ];
     

@@ -5,16 +5,9 @@
 let
   inherit (pkgs) lib;
 
-  # Nixpkgs builds libxcrypt with `--enable-hashes=strong`, which omits
-  # sha256crypt.
-  libxcrypt = pkgs.libxcrypt.overrideAttrs (old: {
-    configureFlags = map (
-      flag: if lib.hasPrefix "--enable-hashes=" flag then "${flag},sha256crypt" else flag
-    ) old.configureFlags;
-  });
-
   perl5 = pkgs.perl5.override {
-    inherit libxcrypt;
+    # PVE uses sha256crypt for passwords in the PVE realm.
+    libxcrypt = pkgs.libxcrypt.override { enableHashes = "strong,sha256crypt"; };
     self = perl5;
   };
 

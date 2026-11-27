@@ -57,6 +57,17 @@ in
   };
 
   testScript = ''
+    def wait_for_health():
+        try:
+            pve1.wait_until_succeeds(
+                "ceph status -f json | jq -e '"
+                ".health.status == \"HEALTH_OK\" and (.quorum_names | length) == 3 and "
+                "(.pgmap.pgs_by_state | map(.state_name)) == [\"active+clean\"]'",
+                timeout=120,
+            )
+        finally:
+            print(pve1.succeed("ceph status"))
+
     start_all()
     with subtest("Form a three-node Proxmox cluster"):
         pve1.wait_for_unit("pveproxy.service")
@@ -87,5 +98,12 @@ in
             "ceph osd stat -f json | jq -e "
             "'.num_osds == 3 and .num_up_osds == 3 and .num_in_osds == 3'"
         )
+
+    with subtest("Read a replicated object from another node"):
+        # Start this small pool at the Ceph autoscaler's default minimum.
+        pve1.succeed("pveceph pool create testpool --size 3 --pg_num 32")
+        wait_for_health()
+        pve1.succeed("printf 'Ceph cluster test' | rados -p testpool put probe -")
+        assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
   '';
 }

@@ -1,78 +1,41 @@
+let
+  node = ipAddress: osdId: {
+    services.proxmox-ve = {
+      enable = true;
+      inherit ipAddress;
+      ceph = {
+        enable = true;
+        mon.enable = true;
+        osd.enable = true;
+        osd.daemons = [ osdId ];
+      };
+    };
+  };
+in
 {
   name = "pve-ceph";
 
+  defaults = {
+    virtualisation = {
+      emptyDiskImages = [ 1024 ];
+      memorySize = 2048;
+    };
+  };
+
   nodes = {
-    pve1 =
-      { pkgs, ... }:
-      {
-        services.proxmox-ve = {
-          enable = true;
-          ipAddress = "192.168.1.1";
-          ceph = {
-            enable = true;
-            mgr.enable = true;
-            mon.enable = true;
-            osd = {
-              enable = true;
-              daemons = [ "1" ];
-            };
-          };
-        };
-
-        environment.systemPackages = [ pkgs.openssl ];
-
-        users.users.root = {
-          password = "mypassword";
-          initialPassword = null;
-          hashedPassword = null;
-          hashedPasswordFile = null;
-        };
-
-        virtualisation = {
-          emptyDiskImages = [ 1024 ];
-          memorySize = 2048;
-        };
-      };
-
-    pve2 = {
-      services.proxmox-ve = {
-        enable = true;
-        ipAddress = "192.168.1.2";
-        ceph = {
-          enable = true;
-          mon.enable = true;
-          osd = {
-            enable = true;
-            daemons = [ "2" ];
-          };
-        };
-      };
-
-      virtualisation = {
-        emptyDiskImages = [ 1024 ];
-        memorySize = 2048;
+    pve1 = { pkgs, ... }: {
+      imports = [ (node "192.168.1.1" "1") ];
+      services.proxmox-ve.ceph.mgr.enable = true;
+      environment.systemPackages = [ pkgs.openssl ];
+      users.users.root = {
+        password = "mypassword";
+        initialPassword = null;
+        hashedPassword = null;
+        hashedPasswordFile = null;
       };
     };
-
-    pve3 = {
-      services.proxmox-ve = {
-        enable = true;
-        ipAddress = "192.168.1.3";
-        ceph = {
-          enable = true;
-          mon.enable = true;
-          osd = {
-            enable = true;
-            daemons = [ "3" ];
-          };
-        };
-      };
-
-      virtualisation = {
-        emptyDiskImages = [ 1024 ];
-        memorySize = 2048;
-      };
-    };
+    pve2 = node "192.168.1.2" "2";
+    pve3 = node "192.168.1.3" "3";
   };
 
   testScript = ''

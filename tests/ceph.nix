@@ -1,13 +1,22 @@
 let
-  common = import ./ceph-common.nix;
+  common = import ./ceph-common.nix { monitors = [ "pve2" "pve3" "pve4" ]; };
 in
 {
   name = "pve-ceph";
   imports = [ common.module ];
 
-  testScript = common.setupScript + ''
-    import json
+  nodes.pve1 = { config, lib, ... }: {
+    assertions = [
+      {
+        assertion = lib.any (range: range.from <= 6800 && range.to >= 7568)
+          config.networking.firewall.allowedTCPPortRanges;
+        message = "The OSD firewall must allow Ceph's default TCP range (6800–7568).";
+      }
+    ];
+  };
+  nodes.pve4 = common.node "192.168.1.4" [ ];
 
+  testScript = common.setupScript + ''
     def restart_osds(host, options=""):
         node = f"/nodes/{host.name}"
         # pvesh runs local tasks in the foreground and prints the UPID last.
@@ -48,11 +57,13 @@ in
 
     with subtest("Recover both OSDs and read the updated object after reboot"):
         pve3.shutdown()
+        wait_for_quorum([pve2, pve4])
         wait_for_osds(up=2)
         assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
         pve2.succeed("printf 'Written during outage' | rados -p testpool put probe -")
 
         with subtest("Refuse a rolling restart on a degraded pool"):
+            pve2.wait_until_succeeds("ceph health detail -f json | jq -e '.checks.PG_DEGRADED'")
             pid = osd_pid(pve2, 1)
             result, _ = restart_osds(pve2)
             assert "PG_DEGRADED" in result, result

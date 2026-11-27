@@ -1,18 +1,26 @@
+{ monitors }:
+
 let
-  node = ipAddress: osdIds: {
+  node = ipAddress: osdIds: { config, lib, ... }: {
     services.proxmox-ve = {
       enable = true;
       inherit ipAddress;
       ceph = {
         enable = true;
-        mon.enable = true;
-        osd.enable = true;
+        mon.enable = builtins.elem config.networking.hostName monitors;
+        # Proxmox creates a manager on the first monitor.
+        mgr.enable = config.networking.hostName == builtins.head monitors;
+        osd.enable = osdIds != [ ];
         osd.daemons = osdIds;
       };
     };
+    # Give the two OSDs on the batch-provisioned disk 6 GiB each.
+    virtualisation.emptyDiskImages = lib.optional (osdIds != [ ]) 12288;
   };
 in
 {
+  inherit node;
+
   module = {
     globalTimeout = 10 * 60;
 
@@ -27,17 +35,12 @@ in
         servers = lib.mkDefault [ "192.168.1.1" ];
         makestep.threshold = 0.01;
       };
-      virtualisation = {
-        # Give the two OSDs on the batch-provisioned disk 6 GiB each.
-        emptyDiskImages = [ 12288 ];
-        memorySize = 2048;
-      };
+      virtualisation.memorySize = 2048;
     };
 
     nodes = {
       pve1 = { pkgs, ... }: {
         imports = [ (node "192.168.1.1" [ "0" ]) ];
-        services.proxmox-ve.ceph.mgr.enable = true;
         services.chrony = {
           servers = [ ];
           extraConfig = ''
@@ -60,6 +63,16 @@ in
   };
 
   setupScript = ''
+    import json
+
+    monitors = [${builtins.concatStringsSep ", " monitors}]
+
+    def wait_for_quorum(members):
+        names = json.dumps(sorted(host.name for host in members))
+        pve1.wait_until_succeeds(
+            f"ceph quorum_status -f json | jq -e '(.quorum_names | sort) == {names}'"
+        )
+
     def wait_for_osds(up=4):
         pve1.wait_until_succeeds(
             "ceph osd stat -f json | jq -e "
@@ -68,9 +81,10 @@ in
 
     def wait_for_health():
         try:
+            wait_for_quorum(monitors)
             pve1.wait_until_succeeds(
                 "ceph status -f json | jq -e '"
-                ".health.status == \"HEALTH_OK\" and (.quorum_names | length) == 3 and "
+                ".health.status == \"HEALTH_OK\" and "
                 "(.pgmap.pgs_by_state | map(.state_name)) == [\"active+clean\"]'",
                 timeout=120,
             )
@@ -78,7 +92,7 @@ in
             print(pve1.succeed("ceph status"))
 
     start_all()
-    with subtest("Form a three-node Proxmox cluster"):
+    with subtest("Form the Proxmox cluster"):
         pve1.wait_for_unit("pveproxy.service")
         pve1.succeed("pvecm create mycluster")
         quorate = "pvecm status | grep -E '^Quorate: +Yes$'"
@@ -86,7 +100,9 @@ in
         fingerprint = pve1.succeed(
             "openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2"
         ).strip()
-        for peer in (pve2, pve3):
+        for peer in machines:
+            if peer is pve1:
+                continue
             peer.wait_for_unit("multi-user.target")
             peer.succeed(
                 "pvesh create /cluster/config/join --hostname 192.168.1.1 "
@@ -97,11 +113,9 @@ in
 
     with subtest("Create monitors and OSDs through Proxmox"):
         pve1.succeed("pveceph init --network 192.168.1.0/24")
-        for index, host in enumerate((pve1, pve2, pve3), start=1):
-            host.succeed(f"pveceph mon create --mon-address 192.168.1.{index}")
-            pve1.wait_until_succeeds(
-                f"ceph quorum_status -f json | jq -e '.quorum_names | index(\"{host.name}\") != null'"
-            )
+        for count, host in enumerate(monitors, start=1):
+            host.succeed("pveceph mon create")
+            wait_for_quorum(monitors[:count])
         pve1.succeed("pveceph osd create /dev/vdb")
         pve2.succeed("pveceph osd create /dev/vdb")
         pve3.succeed("pveceph osd create /dev/vdb --osds-per-device 2")

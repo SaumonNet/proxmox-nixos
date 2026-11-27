@@ -1,7 +1,7 @@
 { lib, ... }:
 
 let
-  common = import ./ceph-common.nix;
+  common = import ./ceph-common.nix { monitors = [ "pve1" "pve2" "pve3" ]; };
 in
 {
   name = "pve-ceph-rbd";
@@ -15,7 +15,6 @@ in
   nodes.pve2.virtualisation.memorySize = lib.mkForce 3072;
 
   testScript = common.setupScript + ''
-    import json
     import shlex
 
     def guest_exec(host, command):

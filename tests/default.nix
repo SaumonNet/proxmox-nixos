@@ -10,7 +10,7 @@ let
     in
     pkgs.testers.runNixOSTest {
       imports = [ resolvedModule ];
-      globalTimeout = 5 * 60;
+      globalTimeout = pkgs.lib.mkDefault (5 * 60);
       extraBaseModules = {
         imports = builtins.attrValues extraBaseModules;
       };

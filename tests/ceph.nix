@@ -14,6 +14,7 @@ let
 in
 {
   name = "pve-ceph";
+  globalTimeout = 10 * 60;
 
   defaults = { lib, pkgs, ... }: {
     environment.systemPackages = [
@@ -57,6 +58,12 @@ in
   };
 
   testScript = ''
+    def wait_for_osds(up=3):
+        pve1.wait_until_succeeds(
+            "ceph osd stat -f json | jq -e "
+            f"'.num_osds == 3 and .num_up_osds == {up} and .num_in_osds == 3'"
+        )
+
     def wait_for_health():
         try:
             pve1.wait_until_succeeds(
@@ -94,10 +101,7 @@ in
                 f"ceph quorum_status -f json | jq -e '.quorum_names | index(\"{host.name}\") != null'"
             )
             host.succeed("pveceph osd create /dev/vdb")
-        pve1.wait_until_succeeds(
-            "ceph osd stat -f json | jq -e "
-            "'.num_osds == 3 and .num_up_osds == 3 and .num_in_osds == 3'"
-        )
+        wait_for_osds()
 
     with subtest("Read a replicated object from another node"):
         # Start this small pool at the Ceph autoscaler's default minimum.
@@ -105,5 +109,16 @@ in
         wait_for_health()
         pve1.succeed("printf 'Ceph cluster test' | rados -p testpool put probe -")
         assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
+
+    with subtest("Recover the OSD and read the object after reboot"):
+        pve3.shutdown()
+        wait_for_osds(up=2)
+        assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
+
+        pve3.start()
+        pve3.wait_for_unit("ceph-osd-2.service")
+        wait_for_osds()
+        wait_for_health()
+        assert pve3.succeed("rados -p testpool get probe -") == "Ceph cluster test"
   '';
 }

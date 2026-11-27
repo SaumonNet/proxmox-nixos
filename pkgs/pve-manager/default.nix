@@ -94,6 +94,8 @@ perl5.pkgs.toPerlModule (
       #cp PVE/pvecfg.pm{.in,}
       sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
       sed -i PVE/CLI/pveceph.pm -e '/use AptPkg::Cache;/d'
+      substituteInPlace PVE/Ceph/Services.pm \
+        --replace-fail '/usr/bin/ceph-$daemon_type' '/etc/proxmox-ve/ceph-$daemon_type'
     '';
 
     buildInputs = [

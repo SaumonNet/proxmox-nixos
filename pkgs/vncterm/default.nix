@@ -40,12 +40,20 @@ stdenv.mkDerivation rec {
 
   makeFlags =
     let
-      libvncserver-patched = libvncserver.overrideAttrs (
-        old: {
+      libvncserver-patched = (libvncserver.override { withSystemd = false; }).overrideAttrs (
+        final: old: {
+          version = "0.9.14";
+          src = "${src}/LibVNCServer-${final.version}.tar.gz";
           patches = [ "${src}/vncpatches/tls-auth-pluging.patch" ];
 
-          # The Proxmox patch reads through GnuTLS only when WebSockets are disabled.
-          cmakeFlags = old.cmakeFlags ++ [ "-DWITH_WEBSOCKETS=OFF" ];
+          # vncterm handles TLS itself. Match the crypto backends in its Makefile.
+          cmakeFlags = old.cmakeFlags ++ [
+            "-DWITH_OPENSSL=OFF"
+            "-DWITH_GCRYPT=OFF"
+            # WebSockets bypass the Proxmox GnuTLS read hook.
+            "-DWITH_WEBSOCKETS=OFF"
+            "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+          ];
         }
       );
     in

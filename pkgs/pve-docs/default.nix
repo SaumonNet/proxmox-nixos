@@ -9,7 +9,6 @@
   graphviz,
   imagemagick,
   librsvg,
-  makeWrapper,
   writeShellScriptBin,
   pve-update-script,
   texlive,
@@ -60,40 +59,14 @@ let
     ]
   );
 
-  # Override dblatex to use our texlive environment
-  dblatexBase = dblatex.override {
-    enableAllFeatures = true;
-    tex = texliveEnv;
-  };
-
-  # Wrap dblatex to add librsvg to PATH (needed for SVG conversion)
-  dblatexCustom = stdenv.mkDerivation {
-    pname = "dblatex-wrapped";
-    version = dblatexBase.version;
-    
-    nativeBuildInputs = [ makeWrapper ];
-    
-    buildCommand = ''
-      mkdir -p $out/bin $out/share
-      
-      # Wrap the dblatex binary
-      makeWrapper ${dblatexBase}/bin/dblatex $out/bin/dblatex \
-        --prefix PATH : "${librsvg}/bin"
-      
-      # Link share directory (contains XSL files etc.)
-      ln -s ${dblatexBase}/share/dblatex $out/share/dblatex
-    '';
-  };
-
-  # Use asciidoc with enableStandardFeatures which:
-  # - Patches a2x.py ENV to include PATH for subprocess calls
-  # - Hardcodes absolute paths for dblatex, xsltproc, xmllint, epubcheck, etc.
-  # Override both texliveMinimal and dblatexFull to use our custom wrapped dblatex.
   asciidocFull = asciidoc.override (
     {
       enableStandardFeatures = true;
       texliveMinimal = texliveEnv;
-      dblatexFull = dblatexCustom;
+      dblatexFull = dblatex.override {
+        enableAllFeatures = true;
+        tex = texliveEnv;
+      };
     }
     // lib.optionalAttrs (stdenv.hostPlatform.system == "riscv64-linux") {
       enableJava = false;
@@ -113,6 +86,9 @@ stdenv.mkDerivation rec {
   };
 
   postPatch = ''
+    substituteInPlace asciidoc/dblatex-export.conf \
+      --replace-fail 'rsvg-convert -a' '${lib.getExe' librsvg "rsvg-convert"} -a'
+
     patchShebangs scripts/scan-adoc-refs scripts/png-verify.pl
     sed -i '1s|#!/usr/bin/perl|#!${perlEnv}/bin/perl|' scripts/asciidoc-pve.in
 

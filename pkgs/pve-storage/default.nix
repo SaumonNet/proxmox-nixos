@@ -12,7 +12,6 @@
   coreutils,
   e2fsprogs,
   file,
-  glusterfs,
   gptfdisk,
   gzip,
   libiscsi,
@@ -128,7 +127,6 @@ perl5.pkgs.toPerlModule (
         -e "s|/usr/bin/zcat|${gzip}/bin/zcat|" \
         -e "s|/usr/libexec/ceph|$out/libexec/ceph|" \
         -re "s|/usr/s?bin/ceph|${cephBinDir}/ceph|" \
-        -e "s|/usr/sbin/gluster|${glusterfs}/bin/gluster|" \
         -e "s|/usr/sbin/ietadm||" \
         -e "s|/usr/sbin/rpcinfo|${rpcbind}/bin/rpcinfo|" \
         -e "s|/usr/sbin/sbdadm||" \

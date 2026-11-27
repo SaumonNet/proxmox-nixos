@@ -2,7 +2,6 @@
   lib,
   fetchurl,
   perl5,
-  libuuid,
 }:
 
 perl5.pkgs.buildPerlPackage rec {
@@ -14,13 +13,8 @@ perl5.pkgs.buildPerlPackage rec {
     hash = "sha256-AvWv4rQ4bgm2yzo5taECt054mj4pcimUogqOMoXFYcc=";
   };
 
-  buildInputs = [
-    perl5.pkgs.DevelChecklib
-    libuuid.dev
-  ];
-
-  NIX_CFLAGS_LINK = "-luuid";
-  doCheck = false;
+  buildInputs = [ perl5.pkgs.DevelChecklib ];
+  nativeCheckInputs = [ perl5.pkgs.TryTiny ];
 
   passthru.updateScript = [
     ../update.pl

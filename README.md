@@ -167,6 +167,32 @@ networking.bridges.vmbr0.interfaces = [ "ens18" ];
 networking.interfaces.vmbr0.useDHCP = lib.mkDefault true;
 ```
 
+## Ceph
+
+Enable `services.proxmox-ve.ceph` on each Proxmox node that will run Ceph
+daemons and select its roles. For example, a node hosting a monitor, a manager,
+and OSD 0 would use:
+
+```nix
+services.proxmox-ve.ceph = {
+  enable = true;
+  mon.enable = true;
+  mgr.enable = true;
+  osd.enable = true;
+  osd.daemons = [ "0" ];
+};
+```
+
+These options define the local systemd services. Use the Proxmox web UI or
+`pveceph` to initialize the cluster and provision its daemons. Monitor and
+manager IDs default to the hostname. Set `osd.daemons` to the OSD IDs on each
+node. For CephFS metadata servers (`mds`) and RADOS gateways (`rgw`), enable
+the role and list its local daemon names. [Ceph module options](modules/proxmox-ve/ceph.nix)
+
+Nodes that mount CephFS need Linux 7.0 or newer for the 256-bit CephX keys
+generated on fresh clusters. If the default kernel is older, set
+`boot.kernelPackages = pkgs.linuxPackages_7_3;` on those nodes.
+
 ## 🧱 Declarative VMs
 
 ### Using the module [`virtualisation.proxmox`](modules/declarative-vms)
@@ -290,7 +316,6 @@ Truly declarative configuration of virtual machines is very difficult with Proxm
 
 ## 🚧 Roadmap
 
-- Support for clusters / HA with Ceph
 - More coverage of NixOS tests
 - Proxmox backup server
 

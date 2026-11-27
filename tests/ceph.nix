@@ -15,11 +15,17 @@ in
 {
   name = "pve-ceph";
 
-  defaults = { pkgs, ... }: {
+  defaults = { lib, pkgs, ... }: {
     environment.systemPackages = [
       pkgs.ceph
       pkgs.jq
     ];
+    # The isolated guests need a common clock to stay within Ceph's monitor skew limit.
+    services.chrony = {
+      enable = true;
+      servers = lib.mkDefault [ "192.168.1.1" ];
+      makestep.threshold = 0.01;
+    };
     virtualisation = {
       emptyDiskImages = [ 1024 ];
       memorySize = 2048;
@@ -30,6 +36,14 @@ in
     pve1 = { pkgs, ... }: {
       imports = [ (node "192.168.1.1" "0") ];
       services.proxmox-ve.ceph.mgr.enable = true;
+      services.chrony = {
+        servers = [ ];
+        extraConfig = ''
+          local stratum 8
+          allow 192.168.1.0/24
+        '';
+      };
+      networking.firewall.allowedUDPPorts = [ 123 ];
       environment.systemPackages = [ pkgs.openssl ];
       users.users.root = {
         password = "mypassword";

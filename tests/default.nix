@@ -10,7 +10,7 @@ let
     in
     pkgs.testers.runNixOSTest {
       imports = [ resolvedModule ];
-      globalTimeout = 5 * 60;
+      globalTimeout = pkgs.lib.mkDefault (5 * 60);
       extraBaseModules = {
         imports = builtins.attrValues extraBaseModules;
       };
@@ -18,7 +18,9 @@ let
 in
 {
   test-pve-basic = runTest ./basic.nix;
-  # test-pve-ceph = runTest ./ceph.nix;
+  test-pve-ceph = runTest ./ceph.nix;
+  test-pve-cephfs = runTest ./cephfs.nix;
+  test-pve-ceph-rbd = runTest ./ceph-rbd.nix;
   test-pve-cluster = runTest ./cluster.nix;
   test-pve-cluster-api-conntrack = runTest ./cluster-api-conntrack.nix;
   test-pve-cluster-conntrack = runTest ./cluster-conntrack.nix;

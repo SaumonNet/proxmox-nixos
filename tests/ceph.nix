@@ -1,118 +1,77 @@
+let
+  common = import ./ceph-common.nix { monitors = [ "pve2" "pve3" "pve4" ]; };
+in
 {
   name = "pve-ceph";
+  imports = [ common.module ];
 
-  nodes = {
-    pve1 =
-      { pkgs, ... }:
+  nodes.pve1 = { config, lib, ... }: {
+    assertions = [
       {
-        services.proxmox-ve = {
-          enable = true;
-          ipAddress = "192.168.1.1";
-          ceph = {
-            enable = true;
-            mgr.enable = true;
-            mon.enable = true;
-            osd = {
-              enable = true;
-              daemons = [ "1" ];
-            };
-          };
-        };
-
-        environment.systemPackages = [ pkgs.openssl ];
-
-        users.users.root = {
-          password = "mypassword";
-          initialPassword = null;
-          hashedPassword = null;
-          hashedPasswordFile = null;
-        };
-
-        virtualisation = {
-          emptyDiskImages = [ 1024 ];
-          memorySize = 2048;
-        };
-      };
-
-    pve2 = {
-      services.proxmox-ve = {
-        enable = true;
-        ipAddress = "192.168.1.2";
-        ceph = {
-          enable = true;
-          mon.enable = true;
-          osd = {
-            enable = true;
-            daemons = [ "2" ];
-          };
-        };
-      };
-
-      virtualisation = {
-        emptyDiskImages = [ 1024 ];
-        memorySize = 2048;
-      };
-    };
-
-    pve3 = {
-      services.proxmox-ve = {
-        enable = true;
-        ipAddress = "192.168.1.3";
-        ceph = {
-          enable = true;
-          mon.enable = true;
-          osd = {
-            enable = true;
-            daemons = [ "3" ];
-          };
-        };
-      };
-
-      virtualisation = {
-        emptyDiskImages = [ 1024 ];
-        memorySize = 2048;
-      };
-    };
+        assertion = lib.any (range: range.from <= 6800 && range.to >= 7568)
+          config.networking.firewall.allowedTCPPortRanges;
+        message = "The OSD firewall must allow Ceph's default TCP range (6800–7568).";
+      }
+    ];
   };
+  nodes.pve4 = common.node "192.168.1.4" [ ];
 
-  testScript = ''
-    import time
-    start_all()
+  testScript = common.setupScript + ''
+    def restart_osds(host, options=""):
+        node = f"/nodes/{host.name}"
+        # pvesh runs local tasks in the foreground and prints the UPID last.
+        output = host.succeed(
+            f"pvesh create {node}/ceph/restart-bulk --service-type osd {options} --output-format json"
+        )
+        upid = json.loads(output.splitlines()[-1])
+        status = json.loads(host.succeed(f"pvesh get {node}/tasks/{upid}/status --output-format json"))
+        assert status["status"] == "stopped", status
+        return status["exitstatus"], output
 
-    pve1.wait_for_unit("pveproxy.service")
-    pve1.wait_for_unit("sshd.service")
-    pve2.wait_for_unit("sshd.service")
-    pve3.wait_for_unit("sshd.service")
+    def osd_pid(host, osd_id):
+        pid = int(host.succeed(f"systemctl show ceph-osd-{osd_id} --property MainPID --value"))
+        assert pid > 0, f"osd.{osd_id} is down on {host.name}"
+        return pid
 
-    assert "running" in pve1.succeed("pveproxy status")
-    assert "Proxmox" in pve1.succeed("curl -k https://localhost:8006")
+    with subtest("Read a replicated object from another node"):
+        # Start this small pool at the Ceph autoscaler's default minimum.
+        pve1.succeed("pveceph pool create testpool --size 3 --pg_num 32")
+        wait_for_health()
+        pve1.succeed("printf 'Ceph cluster test' | rados -p testpool put probe -")
+        assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
 
-    pve1.succeed("pvecm create mycluster")
-    pve1.wait_for_unit("corosync.service")
+    with subtest("Skip up-to-date OSDs in the restart plan"):
+        result, plan = restart_osds(pve3, "--only-outdated 1 --dry-run 1")
+        assert result == "OK", result
+        assert "2 skipped, 0 remain" in plan, plan
 
-    fingerprint = pve1.succeed("openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2")
+    with subtest("Roll both OSDs on one node"):
+        old_pids = {osd: osd_pid(pve3, osd) for osd in (2, 3)}
+        result, _ = restart_osds(pve3)
+        assert result == "OK", result
+        for osd, pid in old_pids.items():
+            assert osd_pid(pve3, osd) != pid, f"osd.{osd} did not restart"
+        wait_for_osds()
+        wait_for_health()
+        assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
 
-    pve2.wait_for_unit("multi-user.target")
-    time.sleep(10)
-    pve2.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
+    with subtest("Recover both OSDs and read the updated object after reboot"):
+        pve3.shutdown()
+        wait_for_quorum([pve2, pve4])
+        wait_for_osds(up=2)
+        assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
+        pve2.succeed("printf 'Written during outage' | rados -p testpool put probe -")
 
-    pve1.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "pveceph mgr create",
-      "ceph-volume lvm create --osd-id 1 --data /dev/vdb --no-systemd"
-    )
+        with subtest("Refuse a rolling restart on a degraded pool"):
+            pve2.wait_until_succeeds("ceph health detail -f json | jq -e '.checks.PG_DEGRADED'")
+            pid = osd_pid(pve2, 1)
+            result, _ = restart_osds(pve2)
+            assert "PG_DEGRADED" in result, result
+            assert osd_pid(pve2, 1) == pid
 
-    pve2.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "ceph-volume lvm create --osd-id 2 --data /dev/vdb --no-systemd"
-    )
-
-    pve3.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "ceph-volume lvm create --osd-id 3 --data /dev/vdb --no-systemd"
-    )
+        pve3.start()
+        wait_for_osds()
+        wait_for_health()
+        assert pve3.succeed("rados -p testpool get probe -") == "Written during outage"
   '';
 }

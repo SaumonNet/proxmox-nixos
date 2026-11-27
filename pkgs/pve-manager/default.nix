@@ -77,6 +77,8 @@ perl5.pkgs.toPerlModule (
     patches = [
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
+      ./0003-ignore-uninitialized-ceph-services.patch
+      ./0004-start-created-osds.patch
     ];
 
     postPatch = ''
@@ -91,6 +93,9 @@ perl5.pkgs.toPerlModule (
       sed -i bin/Makefile -e '/pod2man/,+1d' -e '/install -d \$(MAN1DIR)/,+9d'
       #cp PVE/pvecfg.pm{.in,}
       sed -i www/manager6/Makefile -e "/BIOME/d" -e "s|/usr/bin/asciidoc-pve|${pve-docs}/bin/asciidoc-pve|"
+      sed -i PVE/CLI/pveceph.pm -e '/use AptPkg::Cache;/d'
+      substituteInPlace PVE/Ceph/Services.pm \
+        --replace-fail '/usr/bin/ceph-$daemon_type' '/etc/proxmox-ve/ceph-$daemon_type'
     '';
 
     buildInputs = [
@@ -139,8 +144,8 @@ perl5.pkgs.toPerlModule (
         -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/" \
         -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl5.libPrefix}/${perl5.version}/\$plug|"
 
-      # Ceph systemd units in NixOS do not use templates
-      find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
+      # Rewrite the unit instance separator only in Ceph service names.
+      find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -E 's/(ceph-[$a-zA-Z0-9]+)\\@/\1-/g'
 
       ${lib.optionalString withCeph ''
         sed -i $out/${perl5.libPrefix}/${perl5.version}/PVE/Ceph/Tools.pm \

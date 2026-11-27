@@ -1,0 +1,10 @@
+--- a/PVE/Ceph/Services.pm
++++ b/PVE/Ceph/Services.pm
+@@ -35,4 +35,7 @@ sub get_local_services {
+                 sub {
+                     my (undef, $id) = @_;
++                    my $keyring = "/var/lib/ceph/$type/ceph-$id/keyring";
++                    return if !-e $keyring;    # treat as non-existent until mkfs has run
++
+                     $res->{$type}->{$id}->{service} = JSON::true;
+                 },

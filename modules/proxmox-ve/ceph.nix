@@ -190,6 +190,12 @@ in
   };
 
   config = lib.mkIf config.services.proxmox-ve.ceph.enable {
+    # Let Proxmox's --only-outdated check find ceph-osd even when
+    # this node overrides ceph.osd.package.
+    environment.etc."proxmox-ve/ceph-osd" = lib.mkIf cfg.osd.enable {
+      source = "${cfg.osd.package.out}/bin/ceph-osd";
+    };
+
     assertions = [
       {
         assertion = cfg.enable -> !config.services.ceph.enable;
@@ -218,10 +224,10 @@ in
         3300
         6789
       ];
-      allowedTCPPortRanges = lib.optionals (cfg.osd.enable || cfg.msd.enable || cfg.mgr.enable) [
+      allowedTCPPortRanges = lib.optionals (cfg.osd.enable || cfg.mds.enable || cfg.mgr.enable) [
         {
           from = 6800;
-          to = 7300;
+          to = 7568;
         }
       ];
     };

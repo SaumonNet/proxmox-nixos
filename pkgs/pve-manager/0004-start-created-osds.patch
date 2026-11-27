@@ -1,0 +1,31 @@
+--- a/PVE/Ceph/Tools.pm
++++ b/PVE/Ceph/Tools.pm
+@@ -492,3 +492,4 @@
+ # get ceph-volume managed osds
+ sub ceph_volume_list {
++    my ($device) = @_;
+     my $result = {};
+@@ -500,3 +501,4 @@
+     my $output = '';
+     my $cmd = [$ceph_service->{ceph_volume}, 'lvm', 'list', '--format', 'json'];
++    push @$cmd, $device if defined($device);
+     run_command($cmd, outfunc => sub { $output .= shift });
+--- a/PVE/API2/Ceph/OSD.pm
++++ b/PVE/API2/Ceph/OSD.pm
+@@ -535,3 +535,3 @@
+                 my $create_mode = $param->{'osds-per-device'} ? 'batch' : 'create';
+-                my $cmd = ['ceph-volume', 'lvm', $create_mode];
++                my $cmd = ['ceph-volume', 'lvm', $create_mode, '--no-systemd'];
+                 push @$cmd, '--crush-device-class', $dev_class if $dev_class;
+@@ -587,3 +587,11 @@
+                 run_command($cmd);
++
++                # With --no-systemd, ceph-volume prepares the OSDs but leaves them stopped.
++                my $osds = PVE::Ceph::Tools::ceph_volume_list($devpath);
++                die "no OSDs found on '$devpath' after creation\n" if !$osds || !keys %$osds;
++
++                for my $id (keys %$osds) {
++                    PVE::Ceph::Services::ceph_service_cmd('start', "osd.$id");
++                }
+             });
+         };

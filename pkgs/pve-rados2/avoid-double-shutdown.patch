@@ -1,0 +1,86 @@
+From: Kefu Chai <k.chai@proxmox.com>
+Subject: [PATCH librados2-perl v2] do not shut down the handle twice if a
+ signal arrives at exit
+Date: Thu, 29 Oct 2026 13:54:09 +0800
+
+When a task runs in the foreground from the command line,
+fork_worker() sends SIGTERM to the worker's process group once the
+worker exits. The worker's pverados child is in that group, and it is
+often already shutting down the handle after seeing EOF. The handler
+then calls rados_shutdown() on the freed handle, and the child
+segfaults:
+
+  pverados[...]: segfault at 3bc0 ... in libc.so.6[95ba0,...]
+
+This affects commands like 'pveceph pool create' or 'pvesh create
+/nodes/<node>/ceph/pool', whose worker opens a RADOS connection. It is
+a race, but on a test cluster with Ceph 21.1.2, 'pveceph pool create'
+crashed this way in all four runs. Tasks started from the GUI or the
+API run in the background. Their process group is not signalled at
+the end, and they did not crash.
+
+The crash is a regression from commit 8cab00f ("reset inherited signal
+handlers in child worker"), first released in librados2-perl 1.4.1 in
+August 2023. Before that, the child kept the worker's handler, which
+dies instead of shutting down the handle again. The new handlers also
+outlived the eval, since the 'local' only covered $SIG{HUP}.
+
+So ignore the signals before shutting down, and install the handlers
+first thing in the child.
+
+Tested-by: Maximiliano Sandoval <m.sandoval@proxmox.com>
+Signed-off-by: Kefu Chai <k.chai@proxmox.com>
+---
+Changes since v1 [1]:
+- say in the commit message which setups are affected and since when,
+  as Maximiliano asked. The code is unchanged.
+
+[1] https://lore.proxmox.com/pve-devel/20261020141223.2814127-1-k.chai@proxmox.com/
+
+ PVE/RADOS.pm | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/PVE/RADOS.pm b/PVE/RADOS.pm
+index 5a79235..deb4912 100644
+--- a/PVE/RADOS.pm
++++ b/PVE/RADOS.pm
+@@ -200,6 +200,17 @@ sub new {
+     } else { # child
+ 	$0 = 'pverados';
+ 
++	my @signals = qw(HUP INT QUIT TERM);
++
++	# ignore signals from here on, the handler must not shut down a freed handle
++	my $shutdown = sub {
++	    @SIG{@signals} = ('IGNORE') x @signals;
++	    pve_rados_shutdown($self->{conn}) if $self->{conn};
++	};
++
++	# override signal handlers inherited from the parent
++	@SIG{@signals} = (sub { $shutdown->(); POSIX::_exit(1); }) x @signals;
++
+ 	eval {
+ 	    PVE::INotify::inotify_close();
+ 
+@@ -207,12 +218,6 @@ sub new {
+ 		&$atfork();
+ 	    }
+ 
+-	    # override signal handlers inherited from the parent
+-	    local $SIG{HUP} = $SIG{INT} = $SIG{QUIT} = $SIG{TERM} = sub {
+-		pve_rados_shutdown($self->{conn}) if $self->{conn};
+-		POSIX::_exit(1);
+-	    };
+-
+ 	    # fixme: timeout?
+ 
+ 	    close $child;
+@@ -222,7 +227,7 @@ sub new {
+ 	my $err = $@;
+ 	warn $err if $err;
+ 
+-	pve_rados_shutdown($self->{conn}) if $self->{conn};
++	$shutdown->();
+ 	POSIX::_exit($err ? 1 : 0);
+     }
+ 

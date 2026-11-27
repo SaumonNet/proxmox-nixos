@@ -15,7 +15,11 @@ in
 {
   name = "pve-ceph";
 
-  defaults = {
+  defaults = { pkgs, ... }: {
+    environment.systemPackages = [
+      pkgs.ceph
+      pkgs.jq
+    ];
     virtualisation = {
       emptyDiskImages = [ 1024 ];
       memorySize = 2048;
@@ -24,7 +28,7 @@ in
 
   nodes = {
     pve1 = { pkgs, ... }: {
-      imports = [ (node "192.168.1.1" "1") ];
+      imports = [ (node "192.168.1.1" "0") ];
       services.proxmox-ve.ceph.mgr.enable = true;
       environment.systemPackages = [ pkgs.openssl ];
       users.users.root = {
@@ -34,8 +38,8 @@ in
         hashedPasswordFile = null;
       };
     };
-    pve2 = node "192.168.1.2" "2";
-    pve3 = node "192.168.1.3" "3";
+    pve2 = node "192.168.1.2" "1";
+    pve3 = node "192.168.1.3" "2";
   };
 
   testScript = ''
@@ -57,23 +61,17 @@ in
             peer.wait_until_succeeds(quorate)
             pve1.wait_until_succeeds(f"pvecm nodes | grep -w {peer.name}")
 
-    pve1.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "pveceph mgr create",
-      "ceph-volume lvm create --osd-id 1 --data /dev/vdb --no-systemd"
-    )
-
-    pve2.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "ceph-volume lvm create --osd-id 2 --data /dev/vdb --no-systemd"
-    )
-
-    pve3.succeed(
-      "pveceph init",
-      "pveceph mon create",
-      "ceph-volume lvm create --osd-id 3 --data /dev/vdb --no-systemd"
-    )
+    with subtest("Create monitors and OSDs through Proxmox"):
+        pve1.succeed("pveceph init --network 192.168.1.0/24")
+        for index, host in enumerate((pve1, pve2, pve3), start=1):
+            host.succeed(f"pveceph mon create --mon-address 192.168.1.{index}")
+            pve1.wait_until_succeeds(
+                f"ceph quorum_status -f json | jq -e '.quorum_names | index(\"{host.name}\") != null'"
+            )
+            host.succeed("pveceph osd create /dev/vdb")
+        pve1.wait_until_succeeds(
+            "ceph osd stat -f json | jq -e "
+            "'.num_osds == 3 and .num_up_osds == 3 and .num_in_osds == 3'"
+        )
   '';
 }

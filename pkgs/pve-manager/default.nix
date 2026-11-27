@@ -78,6 +78,7 @@ perl5.pkgs.toPerlModule (
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
       ./0003-ignore-uninitialized-ceph-services.patch
+      ./0004-start-created-osds.patch
     ];
 
     postPatch = ''

@@ -1,5 +1,5 @@
 let
-  node = ipAddress: osdId: {
+  node = ipAddress: osdIds: {
     services.proxmox-ve = {
       enable = true;
       inherit ipAddress;
@@ -7,7 +7,7 @@ let
         enable = true;
         mon.enable = true;
         osd.enable = true;
-        osd.daemons = [ osdId ];
+        osd.daemons = osdIds;
       };
     };
   };
@@ -28,14 +28,15 @@ in
       makestep.threshold = 0.01;
     };
     virtualisation = {
-      emptyDiskImages = [ 1024 ];
+      # Give the two OSDs on the batch-provisioned disk 6 GiB each.
+      emptyDiskImages = [ 12288 ];
       memorySize = 2048;
     };
   };
 
   nodes = {
     pve1 = { pkgs, ... }: {
-      imports = [ (node "192.168.1.1" "0") ];
+      imports = [ (node "192.168.1.1" [ "0" ]) ];
       services.proxmox-ve.ceph.mgr.enable = true;
       services.chrony = {
         servers = [ ];
@@ -53,15 +54,15 @@ in
         hashedPasswordFile = null;
       };
     };
-    pve2 = node "192.168.1.2" "1";
-    pve3 = node "192.168.1.3" "2";
+    pve2 = node "192.168.1.2" [ "1" ];
+    pve3 = node "192.168.1.3" [ "2" "3" ];
   };
 
   testScript = ''
-    def wait_for_osds(up=3):
+    def wait_for_osds(up=4):
         pve1.wait_until_succeeds(
             "ceph osd stat -f json | jq -e "
-            f"'.num_osds == 3 and .num_up_osds == {up} and .num_in_osds == 3'"
+            f"'.num_osds == 4 and .num_up_osds == {up} and .num_in_osds == 4'"
         )
 
     def wait_for_health():
@@ -100,7 +101,9 @@ in
             pve1.wait_until_succeeds(
                 f"ceph quorum_status -f json | jq -e '.quorum_names | index(\"{host.name}\") != null'"
             )
-            host.succeed("pveceph osd create /dev/vdb")
+        pve1.succeed("pveceph osd create /dev/vdb")
+        pve2.succeed("pveceph osd create /dev/vdb")
+        pve3.succeed("pveceph osd create /dev/vdb --osds-per-device 2")
         wait_for_osds()
 
     with subtest("Read a replicated object from another node"):
@@ -110,14 +113,13 @@ in
         pve1.succeed("printf 'Ceph cluster test' | rados -p testpool put probe -")
         assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
 
-    with subtest("Recover the OSD and read the object after reboot"):
+    with subtest("Recover both OSDs and read the updated object after reboot"):
         pve3.shutdown()
         wait_for_osds(up=2)
         assert pve2.succeed("rados -p testpool get probe -") == "Ceph cluster test"
         pve2.succeed("printf 'Written during outage' | rados -p testpool put probe -")
 
         pve3.start()
-        pve3.wait_for_unit("ceph-osd-2.service")
         wait_for_osds()
         wait_for_health()
         assert pve3.succeed("rados -p testpool get probe -") == "Written during outage"

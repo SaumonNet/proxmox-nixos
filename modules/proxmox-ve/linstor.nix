@@ -30,10 +30,7 @@ in
       }))
     ];
 
-    boot.kernelModules = [
-      "dm_thin_pool"
-      "drbd"
-    ];
+    boot.kernelModules = [ "dm_thin_pool" ];
 
     services.drbd = {
       enable = true;

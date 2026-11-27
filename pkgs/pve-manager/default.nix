@@ -144,8 +144,8 @@ perl5.pkgs.toPerlModule (
         -e "s/Ceph Nautilus required/Ceph Nautilus required - PATH: \$ENV{PATH}\\\n/" \
         -e "s|/usr/share/perl5/\\\$plug|/run/current-system/sw/${perl5.libPrefix}/${perl5.version}/\$plug|"
 
-      # Ceph systemd units in NixOS do not use templates
-      find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -e "s/\\\@/-/g"
+      # Rewrite the unit instance separator only in Ceph service names.
+      find $out/lib -type f -wholename "*Ceph*" | xargs sed -i -E 's/(ceph-[$a-zA-Z0-9]+)\\@/\1-/g'
 
       ${lib.optionalString withCeph ''
         sed -i $out/${perl5.libPrefix}/${perl5.version}/PVE/Ceph/Tools.pm \

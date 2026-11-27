@@ -77,6 +77,7 @@ perl5.pkgs.toPerlModule (
     patches = [
       ./0001-no-apt-update.patch
       ./0002-no-repo-status.patch
+      ./0003-ignore-uninitialized-ceph-services.patch
     ];
 
     postPatch = ''

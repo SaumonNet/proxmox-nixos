@@ -39,25 +39,23 @@ in
   };
 
   testScript = ''
-    import time
     start_all()
-
-    pve1.wait_for_unit("pveproxy.service")
-    pve1.wait_for_unit("sshd.service")
-    pve2.wait_for_unit("sshd.service")
-    pve3.wait_for_unit("sshd.service")
-
-    assert "running" in pve1.succeed("pveproxy status")
-    assert "Proxmox" in pve1.succeed("curl -k https://localhost:8006")
-
-    pve1.succeed("pvecm create mycluster")
-    pve1.wait_for_unit("corosync.service")
-
-    fingerprint = pve1.succeed("openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2")
-
-    pve2.wait_for_unit("multi-user.target")
-    time.sleep(10)
-    pve2.succeed(f"pvesh create /cluster/config/join --hostname 192.168.1.1 --fingerprint {fingerprint.strip()} --password 'mypassword'")
+    with subtest("Form a three-node Proxmox cluster"):
+        pve1.wait_for_unit("pveproxy.service")
+        pve1.succeed("pvecm create mycluster")
+        quorate = "pvecm status | grep -E '^Quorate: +Yes$'"
+        pve1.wait_until_succeeds(quorate)
+        fingerprint = pve1.succeed(
+            "openssl x509 -noout -fingerprint -sha256 -in /etc/pve/local/pve-ssl.pem | cut -d= -f2"
+        ).strip()
+        for peer in (pve2, pve3):
+            peer.wait_for_unit("multi-user.target")
+            peer.succeed(
+                "pvesh create /cluster/config/join --hostname 192.168.1.1 "
+                f"--fingerprint {fingerprint} --password mypassword"
+            )
+            peer.wait_until_succeeds(quorate)
+            pve1.wait_until_succeeds(f"pvecm nodes | grep -w {peer.name}")
 
     pve1.succeed(
       "pveceph init",
